@@ -307,4 +307,4 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(IntentEditor);;
+export default connect(mapStateToProps, mapDispatchToProps)(IntentEditor);

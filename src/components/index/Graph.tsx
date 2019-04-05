@@ -5,7 +5,8 @@ import Api, { Intent, Knot } from "metamind-client";
 import GraphConfig, {
   NODE_KEY,
   TEXT_TYPE,
-  OPENNLP_EDGE_TYPE
+  OPENNLP_EDGE_TYPE,
+  GLOBAL_TYPE
 } from '../../utils/graph-config'; // Configures node/edge types
 
 interface IGraph {
@@ -25,6 +26,8 @@ interface State {
   copiedNode: any;
   layoutEngineType?: LayoutEngineType;
 };
+
+const GLOBAL_NODE_ID = "GLOBAL";
 
 class Graph extends React.Component<Props, State> {
   GraphViewRef: any
@@ -54,9 +57,15 @@ class Graph extends React.Component<Props, State> {
       intentsService.listIntents(this.props.storyId)
     ]);
 
+    const globalNode: INode = {
+      id: GLOBAL_NODE_ID,
+      title: "Global", // Localize
+      type: GLOBAL_TYPE
+    };
+
     this.setState({
       graph: {
-        nodes: knots.map(knot => this.translateKnot(knot)),
+        nodes: [ globalNode ].concat( knots.map(knot => this.translateKnot(knot)) ),
         edges: intents.map(intent => this.translateIntent(intent))
       }
     });
@@ -101,7 +110,7 @@ class Graph extends React.Component<Props, State> {
   private translateIntent(intent: Intent): IEdge {
     return {
       id: intent.id,
-      source: intent.sourceKnotId || "",
+      source: intent.global ? GLOBAL_NODE_ID : intent.sourceKnotId || "",
       target: intent.targetKnotId,
       type: OPENNLP_EDGE_TYPE
     }
@@ -203,8 +212,8 @@ class Graph extends React.Component<Props, State> {
     const intent = await Api.getIntentsService("not-real-token").createIntent({
       type: "OPENNLP",
       name: "New intent",
-      global: false,
-      sourceKnotId: sourceViewNode.id,
+      global: sourceViewNode.id === GLOBAL_NODE_ID,
+      sourceKnotId: sourceViewNode.id === GLOBAL_NODE_ID ? undefined : sourceViewNode.id ,
       targetKnotId: targetViewNode.id
     }, this.props.storyId);
 
@@ -236,7 +245,9 @@ class Graph extends React.Component<Props, State> {
   }
 
   // Called when an edge is deleted
-  onDeleteEdge = (viewEdge: IEdge, edges: IEdge[]) => {
+  onDeleteEdge = async (viewEdge: IEdge, edges: IEdge[]) => {
+    await Api.getIntentsService("not-real-token").deleteIntent(this.props.storyId, viewEdge.id);
+
     const graph = this.state.graph;
     graph.edges = edges;
     this.setState({

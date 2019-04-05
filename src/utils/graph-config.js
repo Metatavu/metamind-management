@@ -3,6 +3,7 @@ import * as React from 'react';
 export const NODE_KEY = 'id'; // Key used to identify nodes
 
 export const TEXT_TYPE = 'text';
+export const GLOBAL_TYPE = 'global';
 export const OPENNLP_EDGE_TYPE = 'openNlp';
 export const SPECIAL_CHILD_SUBTYPE = 'specialChild';
 
@@ -27,6 +28,13 @@ const OpenNlpEdgeShape = (
   </symbol>
 );
 
+const GlobalShape = (
+  <symbol viewBox="0 0 100 100" id="global" width="100" height="100">
+    <circle cx="50" cy="50" r="50" fill="currentColor" />
+  </symbol>
+);
+
+
 export default {
   EdgeTypes: {
     openNlp: {
@@ -45,6 +53,11 @@ export default {
       shape: TextShape,
       shapeId: "#text",
       typeText: 'Text'
+    },
+    global: {
+      shape: GlobalShape,
+      shapeId: "#global",
+      typeText: 'Global'
     }
   }
 };

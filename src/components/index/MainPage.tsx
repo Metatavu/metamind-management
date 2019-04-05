@@ -16,6 +16,7 @@ import { INode, IEdge } from "react-digraph";
 import IntentEditor from "./IntentEditor";
 import StorySelector from "./StorySelector";
 import KnotEditor from "./KnotEditor";
+import { GLOBAL_TYPE } from "../../utils/graph-config";
 
 interface Props {
   authenticated: boolean,
@@ -86,7 +87,7 @@ class WelcomePage extends React.Component<Props, State> {
       return <IntentEditor storyId={ this.state.storyId } intentId={this.state.selectedEdge.id} />
     }
 
-    if (this.state.selectedNode && this.state.storyId) {
+    if (this.state.selectedNode && this.state.storyId && this.state.selectedNode.type !== GLOBAL_TYPE) {
       return <KnotEditor storyId={ this.state.storyId } knotId={this.state.selectedNode.id} />
     }
 
