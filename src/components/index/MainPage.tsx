@@ -14,6 +14,7 @@ import Graph from "./Graph";
 import { Sidebar, Segment } from "semantic-ui-react";
 import { INode, IEdge } from "react-digraph";
 import IntentEditor from "./IntentEditor";
+import StorySelector from "./StorySelector";
 
 interface Props {
   authenticated: boolean,
@@ -23,7 +24,8 @@ interface Props {
 interface State {
   sidebarVisible: boolean,
   selectedNode: INode | null,
-  selectedEdge: IEdge | null
+  selectedEdge: IEdge | null,
+  storyId?: string
 }
 
 class WelcomePage extends React.Component<Props, State> {
@@ -53,11 +55,11 @@ class WelcomePage extends React.Component<Props, State> {
             visible={this.state.sidebarVisible}
             width="very wide"
           >
-            {this.renderSidebarContent()}
+            { this.renderSidebarContent() }
           </Sidebar>
 
           <Sidebar.Pusher>
-            <Graph storyId="84c1c2a3-1911-4d49-b30f-5c6a1b0e8683" onSelectNode={this.onSelectNode} onSelectEdge={this.onSelectEdge} />
+            { this.renderContent() }
           </Sidebar.Pusher>
         </Sidebar.Pushable>
         ) : (
@@ -67,9 +69,17 @@ class WelcomePage extends React.Component<Props, State> {
     );
   }
 
+  private renderContent() {
+    if (!this.state.storyId) {
+      return <div style={{ minHeight: "400px" }}><StorySelector onStorySelected={ (storyId) => { this.setState({ storyId: storyId}) } } /></div>
+    } else {
+      return <Graph storyId={ this.state.storyId } onSelectNode={this.onSelectNode} onSelectEdge={this.onSelectEdge} />
+    }
+  }
+
   private renderSidebarContent = (): JSX.Element | null => {
     if (this.state.selectedEdge) {
-      return <IntentEditor storyId="84c1c2a3-1911-4d49-b30f-5c6a1b0e8683" intentId={this.state.selectedEdge.id} />
+      return <IntentEditor storyId="e0c0bba2-7c68-498b-9b20-14d843b92ff4" intentId={this.state.selectedEdge.id} />
     }
 
     return null;

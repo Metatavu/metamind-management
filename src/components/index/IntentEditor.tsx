@@ -39,22 +39,14 @@ class IntentEditor extends React.Component<Props, State> {
   }
 
   public componentDidMount = async() => {
-    this.setState({loading: true});
-
-    const intent = await Api.getIntentsService("not-real-token").findIntent(this.props.storyId, this.props.intentId);
-    const trainingMaterialService = await Api.getTrainingMaterialsService("not-a-real-token");
-    const trainingMaterial = intent.trainingMaterialId ? await trainingMaterialService.findTrainingMaterial(intent.trainingMaterialId) : undefined;
-    const trainingMaterials = await trainingMaterialService.listTrainingMaterials();
-
-    this.setState({
-      loading: false,
-      intent: intent,
-      trainingMaterial: trainingMaterial,
-      selectedTrainingMaterialId: intent.trainingMaterialId,
-      trainingMaterials: trainingMaterials,
-      trainingMaterialText: trainingMaterial ? trainingMaterial.text : ""
-    });
+    this.loadIntent();    
   }
+
+  public componentDidUpdate = async (prevProps: Props) => {
+    if (prevProps.intentId !== this.props.intentId) {
+      this.loadIntent();
+    }
+  } 
 
   public render() {
 
@@ -93,10 +85,28 @@ class IntentEditor extends React.Component<Props, State> {
     );
   }
 
+  private async loadIntent() {
+    this.setState({loading: true});
+
+    const intent = await Api.getIntentsService("not-real-token").findIntent(this.props.storyId, this.props.intentId);
+    const trainingMaterialService = await Api.getTrainingMaterialsService("not-a-real-token");
+    const trainingMaterial = intent.trainingMaterialId ? await trainingMaterialService.findTrainingMaterial(intent.trainingMaterialId) : undefined;
+    const trainingMaterials = await trainingMaterialService.listTrainingMaterials();
+
+    this.setState({
+      loading: false,
+      intent: intent,
+      trainingMaterial: trainingMaterial,
+      selectedTrainingMaterialId: intent.trainingMaterialId,
+      trainingMaterials: trainingMaterials,
+      trainingMaterialText: trainingMaterial ? trainingMaterial.text : ""
+    });
+  }
+
   private updateTrainingMaterial = async () => {
     const { storyId, intentId } = this.props;
     const { selectedTrainingMaterialId, trainingMaterialText, intent } = this.state;
-    console.log(intent);
+
     if (!intent) {
       return;
     }
