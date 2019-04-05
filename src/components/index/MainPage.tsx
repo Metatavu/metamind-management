@@ -15,6 +15,7 @@ import { Sidebar, Segment } from "semantic-ui-react";
 import { INode, IEdge } from "react-digraph";
 import IntentEditor from "./IntentEditor";
 import StorySelector from "./StorySelector";
+import KnotEditor from "./KnotEditor";
 
 interface Props {
   authenticated: boolean,
@@ -77,9 +78,16 @@ class WelcomePage extends React.Component<Props, State> {
     }
   }
 
+  /**
+   * Renders sidebar contents
+   */
   private renderSidebarContent = (): JSX.Element | null => {
     if (this.state.selectedEdge && this.state.storyId) {
       return <IntentEditor storyId={ this.state.storyId } intentId={this.state.selectedEdge.id} />
+    }
+
+    if (this.state.selectedNode && this.state.storyId) {
+      return <KnotEditor storyId={ this.state.storyId } knotId={this.state.selectedNode.id} />
     }
 
     return null;
@@ -88,15 +96,16 @@ class WelcomePage extends React.Component<Props, State> {
   private onSelectNode = (item: INode | null) => {
     this.setState({
       sidebarVisible: !!item,
+      selectedEdge: null,
       selectedNode: item
     });
   }
 
   private onSelectEdge = (item: IEdge | null) => {
-    console.log(item);
     this.setState({
       sidebarVisible: !!item,
-      selectedEdge: item
+      selectedEdge: item,
+      selectedNode: null
     });
   }
 }
