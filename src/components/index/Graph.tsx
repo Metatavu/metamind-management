@@ -202,6 +202,7 @@ class Graph extends React.Component<Props, State> {
     const graph = this.state.graph;
     const intent = await Api.getIntentsService("not-real-token").createIntent({
       type: "OPENNLP",
+      name: "New intent",
       global: false,
       sourceKnotId: sourceViewNode.id,
       targetKnotId: targetViewNode.id

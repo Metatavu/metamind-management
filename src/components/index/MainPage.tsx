@@ -78,8 +78,8 @@ class WelcomePage extends React.Component<Props, State> {
   }
 
   private renderSidebarContent = (): JSX.Element | null => {
-    if (this.state.selectedEdge) {
-      return <IntentEditor storyId="e0c0bba2-7c68-498b-9b20-14d843b92ff4" intentId={this.state.selectedEdge.id} />
+    if (this.state.selectedEdge && this.state.storyId) {
+      return <IntentEditor storyId={ this.state.storyId } intentId={this.state.selectedEdge.id} />
     }
 
     return null;
