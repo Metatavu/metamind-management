@@ -6,7 +6,7 @@ import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { KeycloakInstance } from "keycloak-js";
 
-import Api, { Intent, TrainingMaterial } from "metamind-client";
+import Api, { Intent, TrainingMaterial, IntentType } from "metamind-client";
 import { Segment, Dropdown, DropdownProps, TextArea, Button, TextAreaProps, Input, Form, InputOnChangeData, Loader } from "semantic-ui-react";
 
 /**
@@ -76,6 +76,63 @@ class IntentEditor extends React.Component<Props, State> {
    * Component render method
    */
   public render() {
+
+    const intentTypeOptions = [{
+      key: IntentType.OPENNLP,
+      text: "OpenNLP", // TODO: localize
+      value: IntentType.OPENNLP,
+    }, {
+      key: IntentType.TEMPLATE,
+      text: "Template", // TODO: localize
+      value: IntentType.TEMPLATE,
+    }, {
+      key: IntentType.CONFUSED,
+      text: "Confused", // TODO: localize
+      value: IntentType.CONFUSED,
+    }];
+
+    return (
+      <Segment inverted style={{padding: "15px", paddingTop: "100px"}}>
+        <Form inverted>
+          <Form.Field>
+            <label>Intent name</label>
+            <Input value={ this.state.intentName } style={ { width: "100%" } } onChange={ this.onIntentNameChange } />
+          </Form.Field>
+          <Form.Field>
+            <label>Intent type</label>
+            <Dropdown onChange={ this.onIntentTypeChange } value={ this.state.intent ? this.state.intent.type : IntentType.OPENNLP } options={ intentTypeOptions } />
+          </Form.Field>
+          {
+            this.renderEditorContents()
+          }
+          {
+            <Loader inline active={ this.state.loading }/>
+          }
+        </Form>
+      </Segment>
+    );
+  }
+
+  /**
+   * Renders appropriate editor contents for given intent
+   */
+  private renderEditorContents() {
+    if (!this.state.intent) {
+      return null;
+    }
+
+    switch (this.state.intent.type) {
+      case "OPENNLP":
+        return this.renderOpenNlpEditorContents();
+    }
+
+    return null;
+  }
+
+  /**
+   * Renders editor for OpenNLP intents
+   */
+  private renderOpenNlpEditorContents() {
     const trainingMaterialOptions = this.state.trainingMaterials.map((trainingMaterial) => {
       return {
         key: trainingMaterial.id,
@@ -94,32 +151,21 @@ class IntentEditor extends React.Component<Props, State> {
       }
     ]);
 
-    return (
-      <Segment inverted style={{padding: "15px", paddingTop: "100px"}}>
-        <Form inverted>
-          <Form.Field>
-            <label>Intent name</label>
-            <Input value={ this.state.intentName } style={ { width: "100%" } } onChange={ this.onIntentNameChange } />
-          </Form.Field>
-          <Form.Field>
-            <label>Select training material</label>
-            <Dropdown onChange={this.onTrainingMaterialSelect} value={this.state.selectedTrainingMaterialId } options={trainingMaterialOptions} />
-          </Form.Field>
-          {
-            this.renderTrainingMaterialNameEditor()
-          }
-          {
-            this.renderTrainingMaterialTextEditor()
-          }
-          {
-            this.renderTrainingMaterialSave()
-          }
-          {
-            <Loader inline active={ this.state.loading }/>
-          }
-        </Form>
-      </Segment>
-    );
+    return <div>
+      <Form.Field>
+        <label>Select training material</label>
+        <Dropdown onChange={this.onTrainingMaterialSelect} value={this.state.selectedTrainingMaterialId } options={trainingMaterialOptions} />
+      </Form.Field>
+      {
+        this.renderTrainingMaterialNameEditor()
+      }
+      {
+        this.renderTrainingMaterialTextEditor()
+      }
+      {
+        this.renderTrainingMaterialSave()
+      }
+    </div>
   }
 
   /**
@@ -258,6 +304,33 @@ class IntentEditor extends React.Component<Props, State> {
     this.setState({
       loading: true,
       intentName: intent.name
+    });
+    
+    const updatedIntent = await Api.getIntentsService("not-a-real-token").updateIntent(intent, storyId, intentId);
+
+    this.setState({
+      loading: false,
+      intent: updatedIntent
+    });
+  }
+
+  /**
+   * Event handler for intent type change
+   * 
+   * @param event event
+   * @param data data
+   */
+  private onIntentTypeChange = async (event: React.SyntheticEvent<HTMLElement, Event>, data: DropdownProps) => {
+    const { intent } = this.state;
+    if (!intent || !data.value) {
+      return;
+    }
+
+    const { storyId, intentId } = this.props;
+    (intent as any).type = data.value as string;
+    
+    this.setState({
+      loading: true
     });
     
     const updatedIntent = await Api.getIntentsService("not-a-real-token").updateIntent(intent, storyId, intentId);
