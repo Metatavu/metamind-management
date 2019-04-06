@@ -17,6 +17,7 @@ import IntentEditor from "./IntentEditor";
 import StorySelector from "./StorySelector";
 import KnotEditor from "./KnotEditor";
 import { GLOBAL_TYPE } from "../../utils/graph-config";
+import GlobalEditor from "./GlobalEditor";
 
 interface Props {
   authenticated: boolean,
@@ -85,6 +86,10 @@ class WelcomePage extends React.Component<Props, State> {
   private renderSidebarContent = (): JSX.Element | null => {
     if (this.state.selectedEdge && this.state.storyId) {
       return <IntentEditor storyId={ this.state.storyId } intentId={this.state.selectedEdge.id} />
+    }
+
+    if (this.state.selectedNode && this.state.storyId && this.state.selectedNode.type === GLOBAL_TYPE) {
+      return <GlobalEditor storyId={ this.state.storyId } />
     }
 
     if (this.state.selectedNode && this.state.storyId && this.state.selectedNode.type !== GLOBAL_TYPE) {
