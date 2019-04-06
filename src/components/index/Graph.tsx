@@ -148,6 +148,13 @@ class Graph extends React.Component<Props, State> {
     return this.state.graph.nodes[i];
   }
 
+  /**
+   * Deletes an intent
+   */
+  private deleteIntent = async (id: string) => {
+    await Api.getIntentsService("not-real-token").deleteIntent(this.props.storyId, id);
+  }
+
   /*
    * Handlers/Interaction
    */
@@ -193,19 +200,6 @@ class Graph extends React.Component<Props, State> {
     this.setState({ graph });
   }
 
-  // Deletes a node from the graph
-  onDeleteNode = (viewNode: INode, nodeId: string, nodeArr: INode[]) => {
-    const graph = this.state.graph;
-    // Delete any connected edges
-    const newEdges = graph.edges.filter((edge: IEdge, i: number) => {
-      return edge.source !== viewNode[NODE_KEY] && edge.target !== viewNode[NODE_KEY];
-    });
-    graph.nodes = nodeArr;
-    graph.edges = newEdges;
-
-    this.setState({ graph, selected: null });
-  }
-
   // Creates a new edge between two nodes
   onCreateEdge = async (sourceViewNode: INode, targetViewNode: INode) => {
     const graph = this.state.graph;
@@ -244,9 +238,14 @@ class Graph extends React.Component<Props, State> {
     });
   }
 
-  // Called when an edge is deleted
-  onDeleteEdge = async (viewEdge: IEdge, edges: IEdge[]) => {
-    await Api.getIntentsService("not-real-token").deleteIntent(this.props.storyId, viewEdge.id);
+  /**
+   * Event handler for edge deletion
+   * 
+   * @param viewEdge edge
+   * @param edges edges after deletion
+   */
+  private onDeleteEdge = async (viewEdge: IEdge, edges: IEdge[]) => {
+    await this.deleteIntent(viewEdge.id);
 
     const graph = this.state.graph;
     graph.edges = edges;
@@ -254,6 +253,35 @@ class Graph extends React.Component<Props, State> {
       graph,
       selected: null
     });
+  }
+
+  /**
+   * Event handler for node deletion
+   * 
+   * @param viewNode node
+   * @param nodeId node id
+   * @param nodes nodes after deletion
+   */
+  private onDeleteNode = async (viewNode: INode, nodeId: string, nodes: INode[]) => {
+    const graph = this.state.graph;
+
+    await Api.getKnotsService("not-real-token").deleteKnot(this.props.storyId, viewNode.id);
+
+    const edges = [];
+
+    for (let i = 0; i < graph.edges.length; i++) {
+      const edge = graph.edges[i];
+      if (edge.source !== viewNode[NODE_KEY] && edge.target !== viewNode[NODE_KEY]) {
+        edges.push(edge);
+      } else {
+        await this.deleteIntent(edge.id);
+      }
+    }
+
+    graph.nodes = nodes;
+    graph.edges = edges;
+
+    this.setState({ graph, selected: null });
   }
 
   onUndo = () => {
