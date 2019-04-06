@@ -7,6 +7,8 @@ import { connect } from "react-redux";
 import { KeycloakInstance } from "keycloak-js";
 
 import ScriptEditor from "./ScriptEditor";
+import { Tab } from "semantic-ui-react";
+import VariableEditor from "./VariableEditor";
 
 /**
  * Component props
@@ -44,8 +46,13 @@ class GlobalEditor extends React.Component<Props, State> {
    * Component render method
    */
   public render() {
+    const tabPanes = [
+      { menuItem: 'Scripts', render: () => <Tab.Pane style={{ padding: 0, border: "none" }}><ScriptEditor storyId={ this.props.storyId }/></Tab.Pane> },
+      { menuItem: 'Variables', render: () => <Tab.Pane style={{ padding: 0, border: "none" }}><VariableEditor storyId={ this.props.storyId }/></Tab.Pane> }
+    ];
+    
     return (
-      <ScriptEditor storyId={ this.props.storyId }/>
+      <Tab style={{ marginTop: "30px" }} menu={{ inverted: true, borderless: true }} panes={ tabPanes }/> 
     );
   }
 

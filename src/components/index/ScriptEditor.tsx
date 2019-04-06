@@ -74,7 +74,7 @@ class ScriptEditor extends React.Component<Props, State> {
    */
   public render() {
     return (
-      <Segment inverted style={{padding: "15px", paddingTop: "100px"}} loading={ this.state.loading }>
+      <Segment inverted style={{ padding: "15px" }} loading={ this.state.loading }>
         <Form inverted>
           {
             this.renderScriptDropdown()
@@ -124,7 +124,7 @@ class ScriptEditor extends React.Component<Props, State> {
     const scriptsService = Api.getScriptsService("not-a-real-token");
     const scripts = await scriptsService.listScripts();
     const selectedScriptId = !this.state.selectedScriptId ? scripts.length ? scripts[0].id : NEW_SCRIPT_ID : this.state.selectedScriptId;
-    const script = !selectedScriptId || selectedScriptId === NEW_SCRIPT_ID ? null : await scriptsService.findScript(scripts[0].id!); 
+    const script = !selectedScriptId || selectedScriptId === NEW_SCRIPT_ID ? null : await scriptsService.findScript(selectedScriptId); 
 
     this.setState({
       scripts: scripts,
