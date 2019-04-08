@@ -26,7 +26,8 @@ interface State {
   loading: boolean,
   knot?: Knot,
   knotName?: string,
-  knotContent?: string
+  knotContent?: string,
+  knotHint?: string,
 }
 
 /**
@@ -78,7 +79,11 @@ class KnotEditor extends React.Component<Props, State> {
           <Form.Field>
             <label>Knot contents</label>
             <TextArea rows={ 15 } style={ { width: "100%" } } onChange={ this.onKnotContentChange } value={ this.state.knotContent } />
-          </Form.Field>          
+          </Form.Field>       
+          <Form.Field>
+            <label>Knot hint</label>
+            <Input value={ this.state.knotHint } style={ { width: "100%" } } onChange={ this.onKnotHintChange } />
+          </Form.Field>   
           {
             <Loader inline active={ this.state.loading }/>
           }
@@ -121,6 +126,34 @@ class KnotEditor extends React.Component<Props, State> {
     this.setState({
       loading: true,
       knotName: knot.name
+    });
+    
+    const updatedKnot = await Api.getKnotsService("not-a-real-token").updateKnot(knot, storyId, knotId);
+
+    this.setState({
+      loading: false,
+      knot: updatedKnot
+    });
+  }
+
+  /**
+   * Event handler for knot hint change
+   * 
+   * @param event event
+   * @param data data
+   */
+  private onKnotHintChange = async (event: any, data: InputOnChangeData) => {
+    const { knot } = this.state;
+    if (!knot || !data.value) {
+      return;
+    }
+
+    const { storyId, knotId } = this.props;
+    knot.hint = data.value as string;
+    
+    this.setState({
+      loading: true,
+      knotHint: knot.hint
     });
     
     const updatedKnot = await Api.getKnotsService("not-a-real-token").updateKnot(knot, storyId, knotId);
