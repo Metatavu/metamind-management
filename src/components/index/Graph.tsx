@@ -208,7 +208,8 @@ class Graph extends React.Component<Props, State> {
       name: "New intent",
       global: sourceViewNode.id === GLOBAL_NODE_ID,
       sourceKnotId: sourceViewNode.id === GLOBAL_NODE_ID ? undefined : sourceViewNode.id ,
-      targetKnotId: targetViewNode.id
+      targetKnotId: targetViewNode.id,
+      trainingMaterials: {}
     }, this.props.storyId);
 
     const viewEdge = this.translateIntent(intent);
