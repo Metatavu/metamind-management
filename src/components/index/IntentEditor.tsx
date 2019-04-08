@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import { KeycloakInstance } from "keycloak-js";
 
 import Api, { Intent, IntentType, TrainingMaterialType } from "metamind-client";
-import { Segment, Dropdown, DropdownProps, Input, Form, InputOnChangeData, Loader } from "semantic-ui-react";
+import { Segment, Dropdown, DropdownProps, Input, Form, InputOnChangeData, Loader, Button } from "semantic-ui-react";
 import TrainingMaterialEditor from "./TrainingMaterialEditor";
 
 /**
@@ -25,9 +25,7 @@ interface Props {
  */
 interface State {
   loading: boolean,
-  intent?: Intent,
-  intentName?: string,
-  quickResponse?: string
+  intent?: Intent
 }
 
 /**
@@ -69,6 +67,9 @@ class IntentEditor extends React.Component<Props, State> {
    * Component render method
    */
   public render() {
+    if (!this.state.intent) {
+      return null;
+    }
 
     const intentTypeOptions = [{
       key: IntentType.OPENNLP,
@@ -89,11 +90,11 @@ class IntentEditor extends React.Component<Props, State> {
         <Form inverted>
           <Form.Field>
             <label>Intent name</label>
-            <Input value={ this.state.intentName } style={ { width: "100%" } } onChange={ this.onIntentNameChange } />
+            <Input value={ this.state.intent.name } style={ { width: "100%" } } onChange={ this.onIntentNameChange } />
           </Form.Field>
           <Form.Field>
             <label>Quick response</label>
-            <Input value={ this.state.quickResponse } style={ { width: "100%" } } onChange={ this.onIntentQuickResponseChange } />
+            <Input value={ this.state.intent.quickResponse } style={ { width: "100%" } } onChange={ this.onIntentQuickResponseChange } />
           </Form.Field>
           <Form.Field>
             <label>Intent type</label>
@@ -102,6 +103,9 @@ class IntentEditor extends React.Component<Props, State> {
           {
             this.renderEditorContents()
           }
+          <Form.Field>
+            <Button onClick={ this.onSaveIntentClick } disabled={ !this.state.intent.name }>Save intent</Button>
+          </Form.Field>     
           {
             <Loader inline active={ this.state.loading }/>
           }
@@ -118,31 +122,23 @@ class IntentEditor extends React.Component<Props, State> {
       return null;
     }
 
-    switch (this.state.intent.type) {
-      case "OPENNLP":
-        return this.renderOpenNlpEditorContents();
-    }
-
-    return null;
-  }
-
-  /**
-   * Renders editor for OpenNLP intents
-   */
-  private renderOpenNlpEditorContents() {
-    if (!this.state.intent) {
-      return null;
-    }
-
     return (
       <div>
         <Form.Field>
-          <label>OpenNLP Doccat training material</label>
-          <TrainingMaterialEditor trainingMaterialType={ TrainingMaterialType.OPENNLPDOCCAT } storyId={ this.props.storyId } trainingMaterialId={ this.state.intent.trainingMaterials.openNlpDoccatId } onTrainingMaterialSave={ this.onDoccatTrainingMaterialSave }/>
+          <label>Intent OpenNLP Doccat training material</label>
+          <TrainingMaterialEditor trainingMaterialType={ TrainingMaterialType.INTENTOPENNLPDOCCAT } storyId={ this.props.storyId } trainingMaterialId={ this.state.intent.trainingMaterials.intentOpenNlpDoccatId } onTrainingMaterialChange={ this.onTrainingMaterialChangeIntentDoccat }/>
         </Form.Field>
         <Form.Field>
-          <label>OpenNLP NER training material</label>
-          <TrainingMaterialEditor trainingMaterialType={ TrainingMaterialType.OPENNLPNER } storyId={ this.props.storyId } trainingMaterialId={ this.state.intent.trainingMaterials.openNlpNerId } onTrainingMaterialSave={ this.onNerTrainingMaterialSave }/>
+          <label>Intent Regex training material</label>
+          <TrainingMaterialEditor trainingMaterialType={ TrainingMaterialType.INTENTREGEX } storyId={ this.props.storyId } trainingMaterialId={ this.state.intent.trainingMaterials.intentRegexId } onTrainingMaterialChange={ this.onTrainingMaterialChangeIntentRegex }/>
+        </Form.Field>
+        <Form.Field>
+          <label>Variable OpenNLP NER training material</label>
+          <TrainingMaterialEditor trainingMaterialType={ TrainingMaterialType.VARIABLEOPENNLPNER } storyId={ this.props.storyId } trainingMaterialId={ this.state.intent.trainingMaterials.variableOpenNlpNerId } onTrainingMaterialChange={ this.onTrainingMaterialChangeVariableOpenNlpNer }/>
+        </Form.Field>  
+        <Form.Field>
+          <label>Variable OpenNLP Regex training material</label>
+          <TrainingMaterialEditor trainingMaterialType={ TrainingMaterialType.VARIABLEOPENNLPREGEX } storyId={ this.props.storyId } trainingMaterialId={ this.state.intent.trainingMaterials.variableOpenNlpRegex } onTrainingMaterialChange={ this.onTrainingMaterialChangeVariableOpenNlpRegex }/>
         </Form.Field>  
       </div>
     );
@@ -158,9 +154,7 @@ class IntentEditor extends React.Component<Props, State> {
     
     this.setState({
       loading: false,
-      intent: intent,
-      intentName: intent.name,
-      quickResponse: intent.quickResponse
+      intent: intent
     });
   }
 
@@ -170,25 +164,31 @@ class IntentEditor extends React.Component<Props, State> {
    * @param event event
    * @param data data
    */
-  private onDoccatTrainingMaterialSave = async (trainingMaterialId: string) => {
+  private onTrainingMaterialChangeIntentDoccat = async (trainingMaterialId: string) => {
     const { intent } = this.state;
     if (!intent) {
       return;
     }
 
-    const { storyId, intentId } = this.props;
-    
     this.setState({
-      loading: true
+      intent: { ... intent, trainingMaterials: { ... intent.trainingMaterials, intentOpenNlpDoccatId: trainingMaterialId } } 
     });
-    
-    const updatedIntent = await Api.getIntentsService("not-a-real-token").updateIntent({ ... intent, trainingMaterials: {
-      ... intent.trainingMaterials, openNlpDoccatId: trainingMaterialId
-    } }, storyId, intentId);
+  }
+
+  /**
+   * Event handler for intent regex material change
+   * 
+   * @param event event
+   * @param data data
+   */
+  private onTrainingMaterialChangeIntentRegex = async (trainingMaterialId: string) => {
+    const { intent } = this.state;
+    if (!intent) {
+      return;
+    }
 
     this.setState({
-      loading: false,
-      intent: updatedIntent
+      intent: { ... intent, trainingMaterials: { ... intent.trainingMaterials, intentRegexId: trainingMaterialId } } 
     });
   }
 
@@ -198,25 +198,25 @@ class IntentEditor extends React.Component<Props, State> {
    * @param event event
    * @param data data
    */
-  private onNerTrainingMaterialSave = async (trainingMaterialId: string) => {
+  private onTrainingMaterialChangeVariableOpenNlpNer = async (trainingMaterialId: string) => {
     const { intent } = this.state;
     if (!intent) {
       return;
     }
 
-    const { storyId, intentId } = this.props;
-    
     this.setState({
-      loading: true
+      intent: { ... intent, trainingMaterials: { ... intent.trainingMaterials, variableOpenNlpNerId: trainingMaterialId } } 
     });
-    
-    const updatedIntent = await Api.getIntentsService("not-a-real-token").updateIntent({ ... intent, trainingMaterials: {
-      ... intent.trainingMaterials, openNlpNerId: trainingMaterialId
-    } }, storyId, intentId);
+  }
+
+  private onTrainingMaterialChangeVariableOpenNlpRegex = async (trainingMaterialId: string) => {
+    const { intent } = this.state;
+    if (!intent) {
+      return;
+    }
 
     this.setState({
-      loading: false,
-      intent: updatedIntent
+      intent: { ... intent, trainingMaterials: { ... intent.trainingMaterials, variableOpenNlpRegex: trainingMaterialId } } 
     });
   }
   
@@ -232,19 +232,8 @@ class IntentEditor extends React.Component<Props, State> {
       return;
     }
 
-    const { storyId, intentId } = this.props;
-    intent.name = data.value as string;
-    
     this.setState({
-      loading: true,
-      intentName: intent.name
-    });
-    
-    const updatedIntent = await Api.getIntentsService("not-a-real-token").updateIntent(intent, storyId, intentId);
-
-    this.setState({
-      loading: false,
-      intent: updatedIntent
+      intent: { ... intent, name: data.value as string }
     });
   }
 
@@ -259,20 +248,9 @@ class IntentEditor extends React.Component<Props, State> {
     if (!intent) {
       return;
     }
-
-    const { storyId, intentId } = this.props;
-    intent.quickResponse = data.value as string;
-    
+  
     this.setState({
-      loading: true,
-      quickResponse: intent.quickResponse
-    });
-    
-    const updatedIntent = await Api.getIntentsService("not-a-real-token").updateIntent(intent, storyId, intentId);
-
-    this.setState({
-      loading: false,
-      intent: updatedIntent
+      intent: { ... intent, quickResponse: data.value as string }
     });
   }
 
@@ -284,12 +262,27 @@ class IntentEditor extends React.Component<Props, State> {
    */
   private onIntentTypeChange = async (event: React.SyntheticEvent<HTMLElement, Event>, data: DropdownProps) => {
     const { intent } = this.state;
+    
     if (!intent || !data.value) {
+      return;
+    }
+  
+    this.setState({
+      intent: { ... intent, type: data.value as IntentType }
+    });
+  }
+
+  /**
+   * Saves an intent
+   */
+  private onSaveIntentClick = async () => {
+    const { intent } = this.state;    
+
+    if (!intent) {
       return;
     }
 
     const { storyId, intentId } = this.props;
-    (intent as any).type = data.value as string;
     
     this.setState({
       loading: true

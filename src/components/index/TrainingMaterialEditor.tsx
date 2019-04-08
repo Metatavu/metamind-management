@@ -18,7 +18,8 @@ interface Props {
   keycloak?: Keycloak.KeycloakInstance,
   trainingMaterialId?: string,
   trainingMaterialType: TrainingMaterialType,
-  onTrainingMaterialSave: (trainingMaterialId?: string) => void
+  onTrainingMaterialChange: (trainingMaterialId?: string) => void,
+  onTrainingMaterialSave?: (trainingMaterialId?: string) => void
 }
 
 /**
@@ -29,7 +30,6 @@ interface State {
   trainingMaterials: TrainingMaterial[],
   selectedTrainingMaterialId?: string,
   trainingMaterialName?: string,
-  // trainingMaterialType?: TrainingMaterialType,
   trainingMaterialText?: string
 }
 
@@ -145,7 +145,6 @@ class TrainingMaterialEditor extends React.Component<Props, State> {
       trainingMaterials: trainingMaterials,
       selectedTrainingMaterialId: selectedTrainingMaterialId,
       trainingMaterialName: trainingMaterial ? trainingMaterial.name : "",
-      // trainingMaterialType: trainingMaterial ? trainingMaterial.type : TrainingMaterialType.OPENNLPDOCCAT,
       trainingMaterialText: trainingMaterial ? trainingMaterial.text : "",
       loading: false
     });
@@ -183,9 +182,13 @@ class TrainingMaterialEditor extends React.Component<Props, State> {
    * @param data data
    */
   private onTrainingMaterialSelect = async (event: React.SyntheticEvent<HTMLElement, Event>, data: DropdownProps) => {
+    const trainingMaterialId = data.value as string;
+
     this.setState({
-      selectedTrainingMaterialId: data.value as string
+      selectedTrainingMaterialId: trainingMaterialId
     });
+
+    this.props.onTrainingMaterialChange(trainingMaterialId === NEW_VARIABLE_ID ||trainingMaterialId === NONE_VARIABLE_ID ? undefined : trainingMaterialId);
   }
 
   /**
@@ -216,7 +219,8 @@ class TrainingMaterialEditor extends React.Component<Props, State> {
         selectedTrainingMaterialId: trainingMaterial.id
       });
 
-      this.props.onTrainingMaterialSave(trainingMaterial.id);
+      this.props.onTrainingMaterialSave && this.props.onTrainingMaterialSave(trainingMaterial.id);
+      this.props.onTrainingMaterialChange(trainingMaterial.id);
     } else if (this.state.selectedTrainingMaterialId) {
       await trainingMaterialsService.updateTrainingMaterial({
         name: trainingMaterialName,
@@ -228,7 +232,7 @@ class TrainingMaterialEditor extends React.Component<Props, State> {
         loading: false
       });
 
-      this.props.onTrainingMaterialSave(this.state.selectedTrainingMaterialId);
+      this.props.onTrainingMaterialSave && this.props.onTrainingMaterialSave(this.state.selectedTrainingMaterialId);
     }
 
   }
