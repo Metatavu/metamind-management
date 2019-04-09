@@ -83,6 +83,10 @@ class IntentEditor extends React.Component<Props, State> {
       key: IntentType.CONFUSED,
       text: "Confused", // TODO: localize
       value: IntentType.CONFUSED,
+    }, {
+      key: IntentType.REDIRECT,
+      text: "Redirect", // TODO: localize
+      value: IntentType.REDIRECT,
     }];
 
     return (
