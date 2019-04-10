@@ -72,13 +72,13 @@ class IntentEditor extends React.Component<Props, State> {
     }
 
     const intentTypeOptions = [{
-      key: IntentType.OPENNLP,
-      text: "OpenNLP", // TODO: localize
-      value: IntentType.OPENNLP,
+      key: IntentType.NORMAL,
+      text: "Normal", // TODO: localize
+      value: IntentType.NORMAL,
     }, {
-      key: IntentType.TEMPLATE,
-      text: "Template", // TODO: localize
-      value: IntentType.TEMPLATE,
+      key: IntentType.DEFAULT,
+      text: "Default", // TODO: localize
+      value: IntentType.DEFAULT,
     }, {
       key: IntentType.CONFUSED,
       text: "Confused", // TODO: localize
@@ -102,7 +102,7 @@ class IntentEditor extends React.Component<Props, State> {
           </Form.Field>
           <Form.Field>
             <label>Intent type</label>
-            <Dropdown onChange={ this.onIntentTypeChange } value={ this.state.intent ? this.state.intent.type : IntentType.OPENNLP } options={ intentTypeOptions } />
+            <Dropdown onChange={ this.onIntentTypeChange } value={ this.state.intent ? this.state.intent.type : IntentType.NORMAL } options={ intentTypeOptions } />
           </Form.Field>
           {
             this.renderEditorContents()
