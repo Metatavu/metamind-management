@@ -82,6 +82,7 @@ class Graph extends React.Component<Props, State> {
     return (
       <div id="graph" style={{width: "100vw", height: "100vh"}}>
         <GraphView
+          nodeSize={ 400 }
           ref={(el) => (this.GraphViewRef = el)}
           nodeKey={NODE_KEY}
           nodes={nodes}
@@ -193,7 +194,8 @@ class Graph extends React.Component<Props, State> {
     const knot = await Api.getKnotsService("not-real-token").createKnot({
       content: "New knot",
       name: "New knot",
-      type: "TEXT"
+      type: "TEXT",
+      tokenizer: "WHITESPACE"
     }, this.props.storyId);
 
     graph.nodes = [...graph.nodes, this.translateKnot(knot, x, y)];
