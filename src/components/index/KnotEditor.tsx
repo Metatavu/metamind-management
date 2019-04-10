@@ -6,8 +6,8 @@ import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { KeycloakInstance } from "keycloak-js";
 
-import Api, { Knot } from "metamind-client";
-import { Segment, Input, Form, InputOnChangeData, Loader, TextArea, TextAreaProps } from "semantic-ui-react";
+import Api, { Knot, TokenizerType } from "metamind-client";
+import { Segment, Input, Form, InputOnChangeData, Loader, TextArea, TextAreaProps, Dropdown, DropdownProps } from "semantic-ui-react";
 
 /**
  * Component props
@@ -27,7 +27,7 @@ interface State {
   knot?: Knot,
   knotName?: string,
   knotContent?: string,
-  knotHint?: string,
+  knotHint?: string
 }
 
 /**
@@ -69,6 +69,16 @@ class KnotEditor extends React.Component<Props, State> {
    * Component render method
    */
   public render() {
+    const tokenizerTypeOptions = [{
+      key: TokenizerType.WHITESPACE,
+      text: "Whitespace", // TODO: localize
+      value: TokenizerType.WHITESPACE,
+    }, {
+      key: TokenizerType.UNTOKENIZED,
+      text: "Untokenized", // TODO: localize
+      value: TokenizerType.UNTOKENIZED,
+    }];
+
     return (
       <Segment inverted style={{padding: "15px", paddingTop: "100px"}}>
         <Form inverted>
@@ -84,6 +94,10 @@ class KnotEditor extends React.Component<Props, State> {
             <label>Knot hint</label>
             <Input value={ this.state.knotHint } style={ { width: "100%" } } onChange={ this.onKnotHintChange } />
           </Form.Field>   
+          <Form.Field>
+            <label>Tokenizer</label>
+            <Dropdown onChange={ this.onTokenizerChange } value={ this.state.knot ? this.state.knot.tokenizer : TokenizerType.WHITESPACE } options={ tokenizerTypeOptions } />
+          </Form.Field>
           {
             <Loader inline active={ this.state.loading }/>
           }
@@ -191,6 +205,35 @@ class KnotEditor extends React.Component<Props, State> {
       knot: updatedKnot
     });
   }
+
+  /**
+   * Event handler for knot tokenizer change
+   * 
+   * @param event event
+   * @param data data
+   */
+  private onTokenizerChange = async (event: React.SyntheticEvent<HTMLElement, Event>, data: DropdownProps) => {
+    const { knot } = this.state;
+    if (!knot || !data.value) {
+      return;
+    }
+
+    const { storyId, knotId } = this.props;
+    knot.tokenizer = data.value as TokenizerType;
+    
+    this.setState({
+      loading: true
+    });
+    
+    const updatedKnot = await Api.getKnotsService("not-a-real-token").updateKnot(knot, storyId, knotId);
+
+    this.setState({
+      loading: false,
+      knot: updatedKnot
+    });
+  }
+
+  
 
 }
 
