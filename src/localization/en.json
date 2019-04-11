@@ -8,5 +8,6 @@
   "deliveries": "Deliveries",
   "contracts": "Contracts",
   "welcome": "Welcome",
-  "redirectingTokeycloak": "Redirecting to keycloak..."
+  "redirectingTokeycloak": "Redirecting to keycloak...",
+  "layoutAutomatically": "Layout automatically"
 }

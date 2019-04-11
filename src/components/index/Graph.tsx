@@ -1,5 +1,9 @@
 import * as React from 'react';
 
+import { StoreState } from "src/types";
+import { Dispatch } from "redux";
+import { connect } from "react-redux";
+import * as actions from "../../actions/"
 import { GraphView, IEdge, INode, LayoutEngineType } from 'react-digraph';
 import Api, { Intent, Knot } from "metamind-client";
 import GraphConfig, {
@@ -17,6 +21,7 @@ interface IGraph {
 interface Props {
   onSelectNode: (item: INode | null) => void,
   onSelectEdge: (item: IEdge | null) => void,
+  autolayout: boolean
   storyId: string
 };
 
@@ -102,7 +107,7 @@ class Graph extends React.Component<Props, State> {
           onUndo={this.onUndo}
           onCopySelected={this.onCopySelected}
           onPasteSelected={this.onPasteSelected}
-          layoutEngineType="VerticalTree"
+          layoutEngineType={ this.props.autolayout ? "VerticalTree" : undefined}
         />
       </div>
     );
@@ -319,4 +324,14 @@ class Graph extends React.Component<Props, State> {
   }
 }
 
-export default Graph;
+export function mapStateToProps(state: StoreState) {
+  return {
+    autolayout: state.autolayout
+  };
+}
+
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {};
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Graph);

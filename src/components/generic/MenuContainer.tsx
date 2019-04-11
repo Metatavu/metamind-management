@@ -6,7 +6,8 @@ import {
   Container,
   Image,
   Menu,
-  Dropdown
+  Dropdown,
+  Button
 } from "semantic-ui-react"
 import { StoreState } from "src/types";
 import { Dispatch } from "redux";
@@ -17,8 +18,10 @@ export interface Props {
   siteName: string,
   siteLogo?: string,
   authenticated: boolean,
+  autolayout: boolean,
   keycloak?: KeycloakInstance,
   onLogout?: () => void
+  onAutoLayoutToggle?: (a: boolean) => void
 }
 
 class MenuContainer extends React.Component<Props, object> {
@@ -46,16 +49,21 @@ class MenuContainer extends React.Component<Props, object> {
               <span>{this.props.siteName}</span>
             </Link>
           </Menu.Item>
-          { this.props.authenticated &&
-            <Menu.Menu position="right">
-              <Dropdown item simple text={strings.menuBarUserItemText}>
-                <Dropdown.Menu>
-                  <Dropdown.Item onClick={this.onAccountItemClick}>{strings.menuBarManageAccountText}</Dropdown.Item>
-                  <Dropdown.Item onClick={this.onLogoutItemClick}>{strings.menuBarLogoutText}</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </Menu.Menu>
-          }
+          <Menu.Menu position="right">
+            <Menu.Item>
+              <Button toggle active={this.props.autolayout} onClick={() => this.props.onAutoLayoutToggle && this.props.onAutoLayoutToggle(!this.props.autolayout)}>
+                {strings.layoutAutomatically}
+              </Button>
+            </Menu.Item>
+            { this.props.authenticated &&
+            <Dropdown item simple text={strings.menuBarUserItemText}>
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={this.onAccountItemClick}>{strings.menuBarManageAccountText}</Dropdown.Item>
+                <Dropdown.Item onClick={this.onLogoutItemClick}>{strings.menuBarLogoutText}</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+            }
+          </Menu.Menu>
         </Container>
       </Menu>
     );
@@ -65,13 +73,15 @@ class MenuContainer extends React.Component<Props, object> {
 export function mapStateToProps(state: StoreState) {
   return {
     authenticated: state.authenticated,
-    keycloak: state.keycloak
+    keycloak: state.keycloak,
+    autolayout: state.autolayout
   };
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onLogout: () => dispatch(actions.userLogout())
+    onLogout: () => dispatch(actions.userLogout()),
+    onAutoLayoutToggle: (a: boolean) => dispatch(actions.autoLayoutToggle(a))
   };
 }
 
