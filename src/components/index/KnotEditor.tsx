@@ -17,6 +17,7 @@ interface Props {
   knotId: string,
   authenticated: boolean,
   keycloak?: Keycloak.KeycloakInstance
+  onKnotUpdated: (knot: Knot) => void
 }
 
 /**
@@ -142,7 +143,7 @@ class KnotEditor extends React.Component<Props, State> {
       knotName: knot.name
     });
     
-    const updatedKnot = await Api.getKnotsService("not-a-real-token").updateKnot(knot, storyId, knotId);
+    const updatedKnot = await this.updateKnot(knot, storyId, knotId);
 
     this.setState({
       loading: false,
@@ -170,7 +171,7 @@ class KnotEditor extends React.Component<Props, State> {
       knotHint: knot.hint
     });
     
-    const updatedKnot = await Api.getKnotsService("not-a-real-token").updateKnot(knot, storyId, knotId);
+    const updatedKnot = await this.updateKnot(knot, storyId, knotId);
 
     this.setState({
       loading: false,
@@ -198,7 +199,7 @@ class KnotEditor extends React.Component<Props, State> {
       knotContent: knot.content
     });
     
-    const updatedKnot = await Api.getKnotsService("not-a-real-token").updateKnot(knot, storyId, knotId);
+    const updatedKnot = await this.updateKnot(knot, storyId, knotId);
 
     this.setState({
       loading: false,
@@ -225,7 +226,7 @@ class KnotEditor extends React.Component<Props, State> {
       loading: true
     });
     
-    const updatedKnot = await Api.getKnotsService("not-a-real-token").updateKnot(knot, storyId, knotId);
+    const updatedKnot = await this.updateKnot(knot, storyId, knotId);
 
     this.setState({
       loading: false,
@@ -233,7 +234,11 @@ class KnotEditor extends React.Component<Props, State> {
     });
   }
 
-  
+  private updateKnot = async (knot: Knot, storyId: string, knotId: string): Promise<Knot> => {
+    const updatedKnot = await Api.getKnotsService("not-a-real-token").updateKnot(knot, storyId, knotId);
+    this.props.onKnotUpdated(updatedKnot);
+    return updatedKnot;
+  }
 
 }
 
@@ -246,7 +251,8 @@ export function mapStateToProps(state: StoreState) {
 
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onLogin: (keycloak: KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated))
+    onLogin: (keycloak: KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated)),
+    onKnotUpdated: (knot: Knot) => dispatch(actions.knotUpdated(knot))
   };
 }
 
