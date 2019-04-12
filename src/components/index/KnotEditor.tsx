@@ -110,10 +110,10 @@ class KnotEditor extends React.Component<Props, State> {
   /**
    * Loads knot
    */
-  private async loadKnot() {
+  private loadKnot = async () => {
     this.setState({loading: true});
 
-    const knot = await Api.getKnotsService("not-real-token").findKnot(this.props.storyId, this.props.knotId);
+    const knot = await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").findKnot(this.props.storyId, this.props.knotId);
 
     this.setState({
       loading: false,
@@ -235,7 +235,7 @@ class KnotEditor extends React.Component<Props, State> {
   }
 
   private updateKnot = async (knot: Knot, storyId: string, knotId: string): Promise<Knot> => {
-    const updatedKnot = await Api.getKnotsService("not-a-real-token").updateKnot(knot, storyId, knotId);
+    const updatedKnot = await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").updateKnot(knot, storyId, knotId);
     this.props.onKnotUpdated(updatedKnot);
     return updatedKnot;
   }

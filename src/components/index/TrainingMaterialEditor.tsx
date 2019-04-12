@@ -136,7 +136,7 @@ class TrainingMaterialEditor extends React.Component<Props, State> {
    * Loads trainingMaterials
    */
   private loadTrainingMaterials = async () => {
-    const trainingMaterialsService = Api.getTrainingMaterialsService("not-a-real-token");
+    const trainingMaterialsService = Api.getTrainingMaterialsService(this.props.keycloak ? this.props.keycloak.token! : "");
     const trainingMaterials = await trainingMaterialsService.listTrainingMaterials(this.props.storyId, this.props.trainingMaterialType);
     const selectedTrainingMaterialId = !this.state.selectedTrainingMaterialId ? NONE_VARIABLE_ID : this.state.selectedTrainingMaterialId;
     const trainingMaterial = !selectedTrainingMaterialId || selectedTrainingMaterialId === NEW_VARIABLE_ID || selectedTrainingMaterialId === NONE_VARIABLE_ID ? null : await trainingMaterialsService.findTrainingMaterial(selectedTrainingMaterialId); 
@@ -203,7 +203,7 @@ class TrainingMaterialEditor extends React.Component<Props, State> {
 
     this.setState({loading: true});
 
-    const trainingMaterialsService = Api.getTrainingMaterialsService("not-a-real-token");
+    const trainingMaterialsService = Api.getTrainingMaterialsService(this.props.keycloak ? this.props.keycloak.token! : "");
 
     if (selectedTrainingMaterialId === NEW_VARIABLE_ID) {
       const trainingMaterial = await trainingMaterialsService.createTrainingMaterial({

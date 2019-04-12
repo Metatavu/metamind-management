@@ -12,6 +12,7 @@ import GraphConfig, {
   OPENNLP_EDGE_TYPE,
   GLOBAL_TYPE
 } from '../../utils/graph-config'; // Configures node/edge types
+import { KeycloakInstance } from 'keycloak-js';
 
 interface IGraph {
   nodes: INode[];
@@ -27,6 +28,7 @@ interface Props {
   onIntentsFound: (intents: Intent[]) => void
   onIntentUpdated: (intent: Intent) => void
   onIntentDeleted: (intentId: string) => void
+  keycloak?: KeycloakInstance
   knots: Knot[]
   intents: Intent[]
   autolayout: boolean
@@ -91,9 +93,9 @@ class Graph extends React.Component<Props, State> {
   /**
    * Loads intents and knots while graph is mounted
    */
-  public async componentDidMount() {
-    const knotsService = Api.getKnotsService("Not-a-real-token");
-    const intentsService = Api.getIntentsService("Not-a-real-token");
+  public componentDidMount = async () => {
+    const knotsService = Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "");
+    const intentsService = Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "");
 
     const [ knots, intents ] = await Promise.all([
       knotsService.listKnots(this.props.storyId),
@@ -213,7 +215,7 @@ class Graph extends React.Component<Props, State> {
    * @param id id of intent to delete
    */
   private deleteIntent = async (id: string) => {
-    await Api.getIntentsService("not-real-token").deleteIntent(this.props.storyId, id);
+    await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").deleteIntent(this.props.storyId, id);
     this.props.onIntentDeleted(id);
   }
 
@@ -251,7 +253,7 @@ class Graph extends React.Component<Props, State> {
    */
   private onCreateNode = async (x: number, y: number) => {
     const graph = this.state.graph;
-    const knot = await Api.getKnotsService("not-real-token").createKnot({
+    const knot = await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").createKnot({
       content: "New knot",
       name: "New knot",
       type: "TEXT",
@@ -269,7 +271,7 @@ class Graph extends React.Component<Props, State> {
    */
   private onCreateEdge = async (sourceViewNode: INode, targetViewNode: INode) => {
     const graph = this.state.graph;
-    const intent = await Api.getIntentsService("not-real-token").createIntent({
+    const intent = await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").createIntent({
       type: "NORMAL",
       name: "New intent",
       global: sourceViewNode.id === GLOBAL_NODE_ID,
@@ -301,7 +303,7 @@ class Graph extends React.Component<Props, State> {
 
     intent.sourceKnotId = sourceViewNode.id;
     intent.targetKnotId = targetViewNode.id;
-    const updatedIntent = await Api.getIntentsService("not-a-real-token").updateIntent(intent, this.props.storyId, intent.id!);
+    const updatedIntent = await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").updateIntent(intent, this.props.storyId, intent.id!);
     const i = this.getEdgeIndex(viewEdge);
     const edge = JSON.parse(JSON.stringify(graph.edges[i]));
 
@@ -340,7 +342,7 @@ class Graph extends React.Component<Props, State> {
   private onDeleteNode = async (viewNode: INode, nodeId: string, nodes: INode[]) => {
     const graph = this.state.graph;
 
-    await Api.getKnotsService("not-real-token").deleteKnot(this.props.storyId, viewNode.id);
+    await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").deleteKnot(this.props.storyId, viewNode.id);
 
     const edges = [];
 
@@ -393,7 +395,8 @@ export function mapStateToProps(state: StoreState) {
   return {
     autolayout: state.autolayout,
     knots: state.knots,
-    intents: state.intents
+    intents: state.intents,
+    keycloak: state.keycloak
   };
 }
 
