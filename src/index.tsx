@@ -18,7 +18,7 @@ const store = createStore<StoreState, AppAction, any, any>(processAction, {
   intents: []
 });
 
-Api.configure("https://v2-api.metamind.fi/v2");
+Api.configure(process.env.REACT_APP_API_BASE_PATH || "");
 
 ReactDOM.render(
   <Provider store={store}>

@@ -45,14 +45,13 @@ class WelcomePage extends React.Component<Props, State> {
   public render() {
     return (
       <BasicLayout>
-        { /*this.props.authenticated*/ true ? (
+        { this.props.authenticated ? (
         <Sidebar.Pushable style={{border: "none"}} as={Segment}>
           <Sidebar
             as={Segment}
             animation='overlay'
             icon='labeled'
             inverted
-            //onHide={this.handleSidebarHide}
             direction="right"
             vertical
             visible={this.state.sidebarVisible}

@@ -121,7 +121,7 @@ class ScriptEditor extends React.Component<Props, State> {
    * Loads scripts
    */
   private loadScripts = async () => {
-    const scriptsService = Api.getScriptsService("not-a-real-token");
+    const scriptsService = Api.getScriptsService(this.props.keycloak ? this.props.keycloak.token! : "");
     const scripts = await scriptsService.listScripts();
     const selectedScriptId = !this.state.selectedScriptId ? scripts.length ? scripts[0].id : NEW_SCRIPT_ID : this.state.selectedScriptId;
     const script = !selectedScriptId || selectedScriptId === NEW_SCRIPT_ID ? null : await scriptsService.findScript(selectedScriptId); 
@@ -194,7 +194,7 @@ class ScriptEditor extends React.Component<Props, State> {
 
     this.setState({loading: true});
 
-    const scriptsService = Api.getScriptsService("not-a-real-token");
+    const scriptsService = Api.getScriptsService(this.props.keycloak ? this.props.keycloak.token! : "");
 
     if (selectedScriptId === NEW_SCRIPT_ID) {
       const script = await scriptsService.createScript({

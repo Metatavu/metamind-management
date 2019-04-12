@@ -119,7 +119,7 @@ class StorySelector extends React.Component<Props, State> {
    */
   private async loadStories() {
     this.setState({loading: true});
-    const stories = await Api.getStoriesService("not-real-token").listStories();
+    const stories = await Api.getStoriesService(this.props.keycloak ? this.props.keycloak.token! : "").listStories();
 
     this.setState({
       loading: false,
@@ -150,7 +150,7 @@ class StorySelector extends React.Component<Props, State> {
    */
   private onSelectStoryClick = async (event: React.SyntheticEvent<HTMLElement, Event>, data: ButtonProps) => {
     if (this.state.newStoryName && this.state.selectedStoryId === NEW_STORY_ID) {
-      const story = await Api.getStoriesService("not-real-token").createStory({
+      const story = await Api.getStoriesService(this.props.keycloak ? this.props.keycloak.token! : "").createStory({
         locale: "fi",
         name: this.state.newStoryName
       });

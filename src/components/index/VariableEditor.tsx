@@ -120,7 +120,7 @@ class VariableEditor extends React.Component<Props, State> {
    * Loads variables
    */
   private loadVariables = async () => {
-    const variablesService = Api.getVariablesService("not-a-real-token");
+    const variablesService = Api.getVariablesService(this.props.keycloak ? this.props.keycloak.token! : "");
     const variables = await variablesService.listVariables(this.props.storyId);
     const selectedVariableId = !this.state.selectedVariableId ? variables.length ? variables[0].id : NEW_VARIABLE_ID : this.state.selectedVariableId;
     const variable = !selectedVariableId || selectedVariableId === NEW_VARIABLE_ID ? null : await variablesService.findVariable(this.props.storyId, selectedVariableId); 
@@ -198,7 +198,7 @@ class VariableEditor extends React.Component<Props, State> {
 
     this.setState({loading: true});
 
-    const variablesService = Api.getVariablesService("not-a-real-token");
+    const variablesService = Api.getVariablesService(this.props.keycloak ? this.props.keycloak.token! : "");
 
     if (selectedVariableId === NEW_VARIABLE_ID) {
       const variable = await variablesService.createVariable({

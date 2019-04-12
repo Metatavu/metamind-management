@@ -155,7 +155,7 @@ class IntentEditor extends React.Component<Props, State> {
   private async loadIntent() {
     this.setState({loading: true});
 
-    const intent = await Api.getIntentsService("not-real-token").findIntent(this.props.storyId, this.props.intentId);
+    const intent = await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").findIntent(this.props.storyId, this.props.intentId);
     
     this.setState({
       loading: false,
@@ -293,7 +293,7 @@ class IntentEditor extends React.Component<Props, State> {
       loading: true
     });
     
-    const updatedIntent = await Api.getIntentsService("not-a-real-token").updateIntent(intent, storyId, intentId);
+    const updatedIntent = await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").updateIntent(intent, storyId, intentId);
 
     this.setState({
       loading: false,
