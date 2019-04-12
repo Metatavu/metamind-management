@@ -19,8 +19,16 @@ interface IGraph {
 };
 
 interface Props {
-  onSelectNode: (item: INode | null) => void,
-  onSelectEdge: (item: IEdge | null) => void,
+  onSelectNode: (item: INode | null) => void
+  onSelectEdge: (item: IEdge | null) => void
+  onKnotsFound: (knots: Knot[]) => void
+  onKnotUpdated: (knot: Knot) => void
+  onKnotDeleted: (knotId: string) => void
+  onIntentsFound: (intents: Intent[]) => void
+  onIntentUpdated: (intent: Intent) => void
+  onIntentDeleted: (intentId: string) => void
+  knots: Knot[]
+  intents: Intent[]
   autolayout: boolean
   storyId: string
 };
@@ -53,6 +61,36 @@ class Graph extends React.Component<Props, State> {
     this.GraphViewRef = React.createRef();
   }
 
+  /**
+   * Updates component state when knots or intents are changed
+   */
+  static getDerivedStateFromProps = (props: Props, state: State) => {
+    const globalNode: INode = {
+      id: GLOBAL_NODE_ID,
+      title: "Global", // Localize
+      type: GLOBAL_TYPE
+    };
+
+    const { nodes } = state.graph;
+    const { knots, intents } = props;
+    const newNodes = knots.map((knot: Knot) => {
+      const previousNode = nodes.find((node) => node.id == knot.id);
+      const x = previousNode ? previousNode.x : undefined;
+      const y = previousNode ? previousNode.y : undefined;
+      return Graph.translateKnot(knot, x || undefined, y || undefined);
+    });
+
+    return {
+      graph: {
+        nodes: [ globalNode ].concat( newNodes ),
+        edges: intents.map(intent => Graph.translateIntent(intent))
+      }
+    };
+  }
+
+  /**
+   * Loads intents and knots while graph is mounted
+   */
   public async componentDidMount() {
     const knotsService = Api.getKnotsService("Not-a-real-token");
     const intentsService = Api.getIntentsService("Not-a-real-token");
@@ -62,18 +100,8 @@ class Graph extends React.Component<Props, State> {
       intentsService.listIntents(this.props.storyId)
     ]);
 
-    const globalNode: INode = {
-      id: GLOBAL_NODE_ID,
-      title: "Global", // Localize
-      type: GLOBAL_TYPE
-    };
-
-    this.setState({
-      graph: {
-        nodes: [ globalNode ].concat( knots.map(knot => this.translateKnot(knot)) ),
-        edges: intents.map(intent => this.translateIntent(intent))
-      }
-    });
+    this.props.onKnotsFound(knots);
+    this.props.onIntentsFound(intents);
   }
 
   /*
@@ -113,7 +141,12 @@ class Graph extends React.Component<Props, State> {
     );
   }
 
-  private translateIntent(intent: Intent): IEdge {
+  /**
+   * Translates intent into edge
+   * 
+   * @param intent intent to translate
+   */
+  private static translateIntent(intent: Intent): IEdge {
     return {
       id: intent.id,
       source: intent.global ? GLOBAL_NODE_ID : intent.sourceKnotId || "",
@@ -122,7 +155,14 @@ class Graph extends React.Component<Props, State> {
     }
   }
 
-  private translateKnot(knot: Knot, x?: number, y?: number): INode {
+  /**
+   * Translates knot into node
+   * 
+   * @param knot knot to translate
+   * @param x x coordinate
+   * @param y  y coordinate
+   */
+  private static translateKnot(knot: Knot, x?: number, y?: number): INode {
     return {
       id: knot.id,
       title: knot.name,
@@ -132,21 +172,34 @@ class Graph extends React.Component<Props, State> {
     }
   }
 
-  // Helper to find the index of a given node
+  /**
+   * Helper to find the index of a given node
+   * 
+   * @param searchNode node to find the index for
+   */
   getNodeIndex(searchNode: INode | any) {
     return this.state.graph.nodes.findIndex((node: INode) => {
       return node[NODE_KEY] === searchNode[NODE_KEY];
     });
   }
 
-  // Helper to find the index of a given edge
+  // 
+  /**
+   * Helper to find the index of a given edge
+   * 
+   * @param searchEdge edge to find the index for
+   */
   getEdgeIndex(searchEdge: IEdge) {
     return this.state.graph.edges.findIndex((edge: IEdge) => {
       return edge.source === searchEdge.source && edge.target === searchEdge.target;
     });
   }
 
-  // Given a nodeKey, return the corresponding node
+  /**
+   * Given a nodeKey, return the corresponding node
+   * 
+   * @param nodeKey key to find node for
+   */
   getViewNode(nodeKey: string) {
     const searchNode = {};
     searchNode[NODE_KEY] = nodeKey;
@@ -156,18 +209,19 @@ class Graph extends React.Component<Props, State> {
 
   /**
    * Deletes an intent
+   * 
+   * @param id id of intent to delete
    */
   private deleteIntent = async (id: string) => {
     await Api.getIntentsService("not-real-token").deleteIntent(this.props.storyId, id);
+    this.props.onIntentDeleted(id);
   }
 
-  /*
-   * Handlers/Interaction
+  /**
+   * Called by 'drag' handler, etc..
+   * to sync updates from D3 with the graph
    */
-
-  // Called by 'drag' handler, etc..
-  // to sync updates from D3 with the graph
-  onUpdateNode = (viewNode: INode) => {
+  private onUpdateNode = (viewNode: INode) => {
     const graph = this.state.graph;
     const i = this.getNodeIndex(viewNode);
 
@@ -192,10 +246,11 @@ class Graph extends React.Component<Props, State> {
     this.props.onSelectEdge(viewEdge);
   }
 
-  // Updates the graph with a new node
-  onCreateNode = async (x: number, y: number) => {
+  /**
+   * Updates the graph with a new node
+   */
+  private onCreateNode = async (x: number, y: number) => {
     const graph = this.state.graph;
-
     const knot = await Api.getKnotsService("not-real-token").createKnot({
       content: "New knot",
       name: "New knot",
@@ -203,12 +258,16 @@ class Graph extends React.Component<Props, State> {
       tokenizer: "WHITESPACE"
     }, this.props.storyId);
 
-    graph.nodes = [...graph.nodes, this.translateKnot(knot, x, y)];
+    graph.nodes = [...graph.nodes, Graph.translateKnot(knot, x, y)];
     this.setState({ graph });
+
+    this.props.onKnotsFound([knot]);
   }
 
-  // Creates a new edge between two nodes
-  onCreateEdge = async (sourceViewNode: INode, targetViewNode: INode) => {
+  /**
+   * Creates a new edge between two nodes
+   */
+  private onCreateEdge = async (sourceViewNode: INode, targetViewNode: INode) => {
     const graph = this.state.graph;
     const intent = await Api.getIntentsService("not-real-token").createIntent({
       type: "NORMAL",
@@ -219,31 +278,43 @@ class Graph extends React.Component<Props, State> {
       trainingMaterials: {}
     }, this.props.storyId);
 
-    const viewEdge = this.translateIntent(intent);
+    const viewEdge = Graph.translateIntent(intent);
 
     graph.edges = [...graph.edges, viewEdge];
     this.setState({
       graph,
       selected: viewEdge
     });
+
+    this.props.onIntentsFound([intent]);
   }
 
-  // Called when an edge is reattached to a different target.
-  onSwapEdge = (sourceViewNode: INode, targetViewNode: INode, viewEdge: IEdge) => {
+  /**
+   * Called when an edge is reattached to a different target.
+   */
+  private onSwapEdge = async (sourceViewNode: INode, targetViewNode: INode, viewEdge: IEdge) => {
     const graph = this.state.graph;
+    const intent = this.props.intents.find(intent => intent.id == viewEdge.id);
+    if (!intent) {
+      return;
+    }
+
+    intent.sourceKnotId = sourceViewNode.id;
+    intent.targetKnotId = targetViewNode.id;
+    const updatedIntent = await Api.getIntentsService("not-a-real-token").updateIntent(intent, this.props.storyId, intent.id!);
     const i = this.getEdgeIndex(viewEdge);
     const edge = JSON.parse(JSON.stringify(graph.edges[i]));
 
     edge.source = sourceViewNode[NODE_KEY];
     edge.target = targetViewNode[NODE_KEY];
     graph.edges[i] = edge;
-    // reassign the array reference if you want the graph to re-render a swapped edge
     graph.edges = [...graph.edges];
 
     this.setState({
       graph,
       selected: edge
     });
+    this.props.onIntentUpdated(updatedIntent);
   }
 
   /**
@@ -254,11 +325,7 @@ class Graph extends React.Component<Props, State> {
    */
   private onDeleteEdge = async (viewEdge: IEdge, edges: IEdge[]) => {
     await this.deleteIntent(viewEdge.id);
-
-    const graph = this.state.graph;
-    graph.edges = edges;
     this.setState({
-      graph,
       selected: null
     });
   }
@@ -286,10 +353,8 @@ class Graph extends React.Component<Props, State> {
       }
     }
 
-    graph.nodes = nodes;
-    graph.edges = edges;
-
-    this.setState({ graph, selected: null });
+    this.props.onKnotDeleted(viewNode.id);
+    this.setState({ selected: null });
   }
 
   onUndo = () => {
@@ -326,12 +391,21 @@ class Graph extends React.Component<Props, State> {
 
 export function mapStateToProps(state: StoreState) {
   return {
-    autolayout: state.autolayout
+    autolayout: state.autolayout,
+    knots: state.knots,
+    intents: state.intents
   };
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
-  return {};
+  return {
+    onKnotsFound: (knots: Knot[]) => dispatch(actions.knotsFound(knots)),
+    onKnotUpdated: (knot: Knot) => dispatch(actions.knotUpdated(knot)),
+    onKnotDeleted: (knotId: string) => dispatch(actions.knotDeleted(knotId)),
+    onIntentsFound: (intents: Intent[]) => dispatch(actions.intentsFound(intents)),
+    onIntentUpdated: (intent: Intent) => dispatch(actions.intentUpdated(intent)),
+    onIntentDeleted: (intentId: string) => dispatch(actions.intentDeleted(intentId)),
+  };
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Graph);

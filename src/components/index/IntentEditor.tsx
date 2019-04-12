@@ -18,6 +18,7 @@ interface Props {
   intentId: string,
   authenticated: boolean,
   keycloak?: Keycloak.KeycloakInstance
+  onIntentUpdated: (intent: Intent) => void
 }
 
 /**
@@ -298,6 +299,8 @@ class IntentEditor extends React.Component<Props, State> {
       loading: false,
       intent: updatedIntent
     });
+
+    this.props.onIntentUpdated(intent);
   }
 
 }
@@ -311,7 +314,8 @@ export function mapStateToProps(state: StoreState) {
 
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onLogin: (keycloak: KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated))
+    onLogin: (keycloak: KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated)),
+    onIntentUpdated: (intent: Intent) => dispatch(actions.intentUpdated(intent))
   };
 }
 

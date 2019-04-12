@@ -13,7 +13,9 @@ import Api from "metamind-client";
 
 const store = createStore<StoreState, AppAction, any, any>(processAction, {
   authenticated: false,
-  autolayout: true
+  autolayout: true,
+  knots: [],
+  intents: []
 });
 
 Api.configure("https://v2-api.metamind.fi/v2");
