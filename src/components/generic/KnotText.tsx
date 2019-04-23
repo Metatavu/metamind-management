@@ -17,7 +17,7 @@ class KnotText extends React.Component<Props> {
   /**
    * Render
    */
-  render() {
+  public render() {
     const { data } = this.props;
     const title = data.title;
     const className = GraphUtils.classNames('node-text', { selected: false });
