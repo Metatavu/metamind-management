@@ -10,9 +10,11 @@ import GraphConfig, {
   NODE_KEY,
   TEXT_TYPE,
   OPENNLP_EDGE_TYPE,
-  GLOBAL_TYPE
+  GLOBAL_TYPE,
+  PENDING_TYPE
 } from '../../utils/graph-config'; // Configures node/edge types
 import { KeycloakInstance } from 'keycloak-js';
+import KnotText from '../generic/KnotText';
 
 interface IGraph {
   nodes: INode[];
@@ -81,10 +83,13 @@ class Graph extends React.Component<Props, State> {
       const y = previousNode ? previousNode.y : undefined;
       return Graph.translateKnot(knot, x || undefined, y || undefined);
     });
+    const pendingNodes = nodes.filter(node => node.id && node.id.startsWith("pending"));
+    const newStateNodes = nodes.filter(node => node.id && node.id.startsWith("new"));
+    newStateNodes.forEach(((n) => {n.id = n.id.replace("new-", "")}));
 
     return {
       graph: {
-        nodes: [ globalNode ].concat( newNodes ),
+        nodes: [ globalNode ].concat( newNodes ).concat( pendingNodes ).concat( newStateNodes ),
         edges: intents.map(intent => Graph.translateIntent(intent))
       }
     };
@@ -138,6 +143,7 @@ class Graph extends React.Component<Props, State> {
           onCopySelected={this.onCopySelected}
           onPasteSelected={this.onPasteSelected}
           layoutEngineType={ this.props.autolayout ? "VerticalTree" : undefined}
+          renderNodeText={this.renderNodeText}
         />
       </div>
     );
@@ -175,11 +181,22 @@ class Graph extends React.Component<Props, State> {
   }
 
   /**
+   * Renders text for single node
+   * 
+   * @param data node data
+   * @param id node id
+   * @param isSelected is node currently selected 
+   */
+  private renderNodeText(data: INode, id: string | number, isSelected: boolean): JSX.Element {
+    return <KnotText data={data} isSelected={isSelected} />
+  }
+
+  /**
    * Helper to find the index of a given node
    * 
    * @param searchNode node to find the index for
    */
-  getNodeIndex(searchNode: INode | any) {
+  private getNodeIndex(searchNode: INode | any) {
     return this.state.graph.nodes.findIndex((node: INode) => {
       return node[NODE_KEY] === searchNode[NODE_KEY];
     });
@@ -191,22 +208,10 @@ class Graph extends React.Component<Props, State> {
    * 
    * @param searchEdge edge to find the index for
    */
-  getEdgeIndex(searchEdge: IEdge) {
+  private getEdgeIndex(searchEdge: IEdge) {
     return this.state.graph.edges.findIndex((edge: IEdge) => {
       return edge.source === searchEdge.source && edge.target === searchEdge.target;
     });
-  }
-
-  /**
-   * Given a nodeKey, return the corresponding node
-   * 
-   * @param nodeKey key to find node for
-   */
-  getViewNode(nodeKey: string) {
-    const searchNode = {};
-    searchNode[NODE_KEY] = nodeKey;
-    const i = this.getNodeIndex(searchNode);
-    return this.state.graph.nodes[i];
   }
 
   /**
@@ -253,6 +258,17 @@ class Graph extends React.Component<Props, State> {
    */
   private onCreateNode = async (x: number, y: number) => {
     const graph = this.state.graph;
+    const tempNodeId = `pending-${new Date().getTime()}`;
+    const node = {
+      id: tempNodeId,
+      title: "loading",
+      type: PENDING_TYPE,
+      x: x,
+      y: y
+    };
+    graph.nodes = [...graph.nodes, node];
+
+    this.setState({ graph });
     const knot = await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").createKnot({
       content: "New knot",
       name: "New knot",
@@ -260,10 +276,21 @@ class Graph extends React.Component<Props, State> {
       tokenizer: "WHITESPACE"
     }, this.props.storyId);
 
-    graph.nodes = [...graph.nodes, Graph.translateKnot(knot, x, y)];
+    const newNodes = graph.nodes.map((n: INode) => {
+      if (n.id === tempNodeId) {
+        const translatedNode = Graph.translateKnot(knot, x, y);
+        translatedNode.id = `new-${translatedNode.id}`;
+        return translatedNode;
+      }
+
+      return n;
+    });
+
+    graph.nodes = newNodes;
     this.setState({ graph });
 
     this.props.onKnotsFound([knot]);
+
   }
 
   /**
