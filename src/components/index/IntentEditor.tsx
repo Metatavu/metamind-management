@@ -102,6 +102,10 @@ class IntentEditor extends React.Component<Props, State> {
             <Input value={ this.state.intent.quickResponse } style={ { width: "100%" } } onChange={ this.onIntentQuickResponseChange } />
           </Form.Field>
           <Form.Field>
+            <label>Quick response order</label>
+            <Input value={ this.state.intent.quickResponseOrder } type="number" style={ { width: "100%" } } onChange={ this.onIntentQuickResponseOrderChange } />
+          </Form.Field>
+          <Form.Field>
             <label>Intent type</label>
             <Dropdown onChange={ this.onIntentTypeChange } value={ this.state.intent ? this.state.intent.type : IntentType.NORMAL } options={ intentTypeOptions } />
           </Form.Field>
@@ -258,6 +262,18 @@ class IntentEditor extends React.Component<Props, State> {
       intent: { ... intent, quickResponse: data.value as string }
     });
   }
+
+  private onIntentQuickResponseOrderChange = async (event: any, data: InputOnChangeData) => {
+    const { intent } = this.state;
+    if (!intent) {
+      return;
+    }
+  
+    this.setState({
+      intent: { ... intent, quickResponseOrder: parseInt(data.value as string) }
+    });
+  }
+
 
   /**
    * Event handler for intent type change

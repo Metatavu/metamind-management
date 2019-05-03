@@ -9,5 +9,6 @@
   "contracts": "Contracts",
   "welcome": "Welcome",
   "redirectingTokeycloak": "Redirecting to keycloak...",
-  "layoutAutomatically": "Layout automatically"
+  "layoutAutomatically": "Layout automatically",
+  "search": "Search"
 }

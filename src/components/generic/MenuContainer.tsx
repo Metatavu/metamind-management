@@ -7,7 +7,9 @@ import {
   Image,
   Menu,
   Dropdown,
-  Button
+  Button,
+  Input,
+  InputOnChangeData
 } from "semantic-ui-react"
 import { StoreState } from "src/types";
 import { Dispatch } from "redux";
@@ -20,8 +22,9 @@ export interface Props {
   authenticated: boolean,
   autolayout: boolean,
   keycloak?: KeycloakInstance,
-  onLogout?: () => void
-  onAutoLayoutToggle?: (a: boolean) => void
+  onLogout?: () => void,
+  onAutoLayoutToggle?: (a: boolean) => void,
+  onSearch: (searchText: string) => void
 }
 
 class MenuContainer extends React.Component<Props, object> {
@@ -54,6 +57,9 @@ class MenuContainer extends React.Component<Props, object> {
                 {strings.layoutAutomatically}
               </Button>
             </Menu.Item>
+            <Menu.Item>
+              <Input placeholder={ strings.search } onChange={ (event: React.ChangeEvent<HTMLInputElement>, data: InputOnChangeData) => { this.props.onSearch(data.value); }  }/>
+            </Menu.Item>
             { this.props.authenticated &&
             <Dropdown item simple text={strings.menuBarUserItemText}>
               <Dropdown.Menu>
@@ -80,7 +86,8 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onLogout: () => dispatch(actions.userLogout()),
-    onAutoLayoutToggle: (a: boolean) => dispatch(actions.autoLayoutToggle(a))
+    onAutoLayoutToggle: (a: boolean) => dispatch(actions.autoLayoutToggle(a)),
+    onSearch: (searchText: string) => dispatch(actions.search(searchText)),
   };
 }
 

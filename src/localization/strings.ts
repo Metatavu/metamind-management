@@ -13,7 +13,8 @@ export interface IStrings extends LocalizedStringsMethods {
   contracts: string
   welcome: string
   redirectingTokeycloak: string
-  layoutAutomatically: string
+  layoutAutomatically: string,
+  search: string
 }
 
 const strings: IStrings = new LocalizedStrings({

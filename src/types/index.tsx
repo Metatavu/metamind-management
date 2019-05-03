@@ -6,5 +6,6 @@ export interface StoreState {
   authenticated: boolean,
   autolayout: boolean
   knots: Knot[],
-  intents: Intent[]
+  intents: Intent[],
+  searchText: string
 }

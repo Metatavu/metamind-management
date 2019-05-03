@@ -5,8 +5,8 @@ import  { GraphUtils, INode } from "react-digraph"
  * Component properties
  */
 interface Props {
-  data: INode;
-  isSelected: boolean;
+  data: INode,
+  isSelected: boolean
 }
 
 /**
