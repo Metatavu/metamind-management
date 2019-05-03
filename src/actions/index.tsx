@@ -17,6 +17,11 @@ export interface AutoLayoutToggle {
   autolayout: boolean
 }
 
+export interface Search {
+  type: constants.SEARCH,
+  searchText: string
+}
+
 export interface KnotsFound {
   type: constants.KNOTS_FOUND;
   knots: Knot[];
@@ -47,7 +52,7 @@ export interface IntentDeleted {
   intentId: string
 }
 
-export type AppAction = UserLogin | UserLogout | AutoLayoutToggle | KnotsFound | KnotUpdated | KnotDeleted | IntentsFound | IntentUpdated | IntentDeleted;
+export type AppAction = UserLogin | UserLogout | AutoLayoutToggle | KnotsFound | KnotUpdated | KnotDeleted | IntentsFound | IntentUpdated | IntentDeleted | Search;
 
 export function userLogin(keycloak: KeycloakInstance, authenticated: boolean): UserLogin {
   return {
@@ -61,6 +66,13 @@ export function autoLayoutToggle(autolayout: boolean): AutoLayoutToggle {
   return {
     type: constants.AUTO_LAYOUT_TOGGLE,
     autolayout: autolayout
+  }
+}
+
+export function search(searchText: string): Search {
+  return {
+    type: constants.SEARCH,
+    searchText: searchText
   }
 }
 

@@ -1,6 +1,6 @@
 import { AppAction } from '../actions';
 import { StoreState } from '../types/index';
-import { USER_LOGIN, USER_LOGOUT, AUTO_LAYOUT_TOGGLE, KNOTS_FOUND, KNOT_DELETED, KNOT_UPDATED, INTENTS_FOUND, INTENT_DELETED, INTENT_UPDATED } from '../constants/index';
+import { USER_LOGIN, USER_LOGOUT, AUTO_LAYOUT_TOGGLE, KNOTS_FOUND, KNOT_DELETED, KNOT_UPDATED, INTENTS_FOUND, INTENT_DELETED, INTENT_UPDATED, SEARCH } from '../constants/index';
 
 export function processAction(state: StoreState, action: AppAction): StoreState {
   switch (action.type) {
@@ -10,6 +10,8 @@ export function processAction(state: StoreState, action: AppAction): StoreState 
       return { ...state, keycloak: undefined, authenticated: false };
     case AUTO_LAYOUT_TOGGLE:
       return { ...state, autolayout: action.autolayout};
+    case SEARCH:
+    return { ...state, searchText: action.searchText};
     case KNOTS_FOUND:
       return { ...state, knots: (state.knots || []).concat(action.knots)};
     case KNOT_DELETED:

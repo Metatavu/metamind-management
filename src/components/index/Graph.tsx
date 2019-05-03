@@ -30,10 +30,12 @@ interface Props {
   onIntentsFound: (intents: Intent[]) => void
   onIntentUpdated: (intent: Intent) => void
   onIntentDeleted: (intentId: string) => void
+
   keycloak?: KeycloakInstance
   knots: Knot[]
   intents: Intent[]
-  autolayout: boolean
+  autolayout: boolean,
+  searchText: string,
   storyId: string
 };
 
@@ -42,6 +44,7 @@ interface State {
   selected: any;
   copiedNode: any;
   layoutEngineType?: LayoutEngineType;
+  searchResultKnotIds: string[]
 };
 
 const GLOBAL_NODE_ID = "GLOBAL";
@@ -59,7 +62,8 @@ class Graph extends React.Component<Props, State> {
         nodes: []
       },
       layoutEngineType: undefined,
-      selected: null
+      selected: null,
+      searchResultKnotIds: []
     };
 
     this.GraphViewRef = React.createRef();
@@ -111,6 +115,39 @@ class Graph extends React.Component<Props, State> {
     this.props.onIntentsFound(intents);
   }
 
+  public componentDidUpdate(prevProps: Props, prevState: State) {
+    if (this.props.searchText !== prevProps.searchText) {
+      this.setState({
+        searchResultKnotIds: this.searchKnots()
+      });
+    }
+  }
+
+  private searchKnots = (): string[] => {
+    if (!this.props.searchText) {
+      return [];
+    }
+
+    const searchText = this.props.searchText.toLowerCase();
+
+    return this.props.knots.filter((knot) => {
+      const name = knot.name.toLowerCase();
+      if (name && name.includes(searchText)) {
+        return true;
+      }
+
+      const content = knot.content.toLowerCase();
+      if (content && content.includes(searchText)) {
+        return true;
+      }
+
+      return false;
+    })
+    .map((knot) => {
+      return knot.id!;
+    });
+  }
+
   /*
    * Render
    */
@@ -144,6 +181,7 @@ class Graph extends React.Component<Props, State> {
           onPasteSelected={this.onPasteSelected}
           layoutEngineType={ this.props.autolayout ? "VerticalTree" : undefined}
           renderNodeText={this.renderNodeText}
+          renderNode={this.renderNode}
         />
       </div>
     );
@@ -189,6 +227,21 @@ class Graph extends React.Component<Props, State> {
    */
   private renderNodeText(data: INode, id: string | number, isSelected: boolean): JSX.Element {
     return <KnotText data={data} isSelected={isSelected} />
+  }
+
+  private renderNode = (nodeRef: any, data: any, id: string, selected: boolean, hovered: boolean) => {
+    const x = -88 / 2;
+    const y = -88 / 2;
+    const hasSearchResults = !!this.props.searchText;
+    const isSearchResult = this.state.searchResultKnotIds.includes(id);
+    const color = selected || hovered ? "blue" : isSearchResult ? "red" : "black";
+    const opacity = !hasSearchResults || isSearchResult ? 1.0 : 0.25; 
+
+    return (
+      <g opacity={ opacity } transform={ `translate(${x}, ${y})` } color={ color }>
+        { GraphConfig.NodeTypes[data.type].shape }
+      </g>
+    );
   }
 
   /**
@@ -301,6 +354,7 @@ class Graph extends React.Component<Props, State> {
     const intent = await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").createIntent({
       type: "NORMAL",
       name: "New intent",
+      quickResponseOrder: 0,
       global: sourceViewNode.id === GLOBAL_NODE_ID,
       sourceKnotId: sourceViewNode.id === GLOBAL_NODE_ID ? undefined : sourceViewNode.id ,
       targetKnotId: targetViewNode.id,
@@ -421,6 +475,7 @@ class Graph extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     autolayout: state.autolayout,
+    searchText: state.searchText,
     knots: state.knots,
     intents: state.intents,
     keycloak: state.keycloak

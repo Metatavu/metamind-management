@@ -7,6 +7,9 @@ export type USER_LOGOUT = typeof USER_LOGOUT;
 export const AUTO_LAYOUT_TOGGLE = "AUTO_LAYOUT_TOGGLE";
 export type AUTO_LAYOUT_TOGGLE = typeof AUTO_LAYOUT_TOGGLE;
 
+export const SEARCH = "SEARCH";
+export type SEARCH = typeof SEARCH;
+
 export const KNOTS_FOUND = "KNOTS_FOUND";
 export type KNOTS_FOUND = typeof KNOTS_FOUND;
 
