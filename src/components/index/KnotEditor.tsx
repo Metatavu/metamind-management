@@ -6,7 +6,7 @@ import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { KeycloakInstance } from "keycloak-js";
 
-import Api, { Knot, TokenizerType } from "metamind-client";
+import Api, { Knot, TokenizerType, KnotType } from "metamind-client";
 import { Segment, Input, Form, InputOnChangeData, Loader, TextArea, TextAreaProps, Dropdown, DropdownProps } from "semantic-ui-react";
 
 /**
@@ -80,12 +80,26 @@ class KnotEditor extends React.Component<Props, State> {
       value: TokenizerType.UNTOKENIZED,
     }];
 
+    const knotTypeOptions = [{
+      key: KnotType.TEXT,
+      text: "Text", // TODO: Localize
+      value: KnotType.TEXT
+    }, {
+      key: KnotType.IMAGE,
+      text: "Image",  // TODO: Localize
+      value: KnotType.IMAGE
+    }];
+
     return (
       <Segment inverted style={{padding: "15px", paddingTop: "100px"}}>
         <Form inverted>
           <Form.Field>
             <label>Knot name</label>
             <Input value={ this.state.knotName } style={ { width: "100%" } } onChange={ this.onKnotNameChange } />
+          </Form.Field>
+          <Form.Field>
+            <label>Knot type</label>
+            <Dropdown onChange={ this.onKnotTypeChange } value={ this.state.knot ? this.state.knot.type : KnotType.TEXT } options={ knotTypeOptions } />
           </Form.Field>
           <Form.Field>
             <label>Knot contents</label>
@@ -221,6 +235,33 @@ class KnotEditor extends React.Component<Props, State> {
 
     const { storyId, knotId } = this.props;
     knot.tokenizer = data.value as TokenizerType;
+    
+    this.setState({
+      loading: true
+    });
+    
+    const updatedKnot = await this.updateKnot(knot, storyId, knotId);
+
+    this.setState({
+      loading: false,
+      knot: updatedKnot
+    });
+  }
+
+  /**
+   * Event handler for knot type change
+   * 
+   * @param event event
+   * @param data data
+   */
+  private onKnotTypeChange = async (event: React.SyntheticEvent<HTMLElement, Event>, data: DropdownProps) => {
+    const { knot } = this.state;
+    if (!knot || !data.value) {
+      return;
+    }
+
+    const { storyId, knotId } = this.props;
+    knot.type = data.value as KnotType;
     
     this.setState({
       loading: true
