@@ -1,0 +1,11 @@
+
+.search-active .view-wrapper .node .shape > use.node {
+
+  opacity: 0.35;
+
+  &.search-hit {
+    opacity: 1;
+    color: red;
+  }
+
+}

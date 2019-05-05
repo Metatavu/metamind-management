@@ -4,7 +4,7 @@ import { StoreState } from "src/types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import * as actions from "../../actions/"
-import { GraphView, IEdge, INode, LayoutEngineType } from 'react-digraph';
+import { GraphView, IEdge, INode, LayoutEngineType, GraphUtils } from 'react-digraph';
 import Api, { Intent, Knot } from "metamind-client";
 import GraphConfig, {
   NODE_KEY,
@@ -15,6 +15,7 @@ import GraphConfig, {
 } from '../../utils/graph-config'; // Configures node/edge types
 import { KeycloakInstance } from 'keycloak-js';
 import KnotText from '../generic/KnotText';
+import '../../styles/graph.css'
 
 interface IGraph {
   nodes: INode[];
@@ -157,7 +158,7 @@ class Graph extends React.Component<Props, State> {
     const { NodeTypes, NodeSubtypes, EdgeTypes } = GraphConfig;
 
     return (
-      <div id="graph" style={{width: "100vw", height: "100vh"}}>
+      <div id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
         <GraphView
           nodeSize={ 400 }
           ref={(el) => (this.GraphViewRef = el)}
@@ -228,20 +229,89 @@ class Graph extends React.Component<Props, State> {
   private renderNodeText(data: INode, id: string | number, isSelected: boolean): JSX.Element {
     return <KnotText data={data} isSelected={isSelected} />
   }
-
+  
+  /**
+   * Renders a node
+   */
   private renderNode = (nodeRef: any, data: any, id: string, selected: boolean, hovered: boolean) => {
-    const x = -88 / 2;
-    const y = -88 / 2;
-    const hasSearchResults = !!this.props.searchText;
-    const isSearchResult = this.state.searchResultKnotIds.includes(id);
-    const color = selected || hovered ? "blue" : isSearchResult ? "red" : "black";
-    const opacity = !hasSearchResults || isSearchResult ? 1.0 : 0.25; 
+    const props = {
+      height: 0,
+      width: 0
+    };
+
+    const nodeShapeContainerClassName = GraphUtils.classNames('shape');
+    let nodeClassName = GraphUtils.classNames('node', { selected, hovered });
+    const nodeSubtypeClassName = GraphUtils.classNames('subtype-shape', { selected: this.state.selected });
+    const nodeTypeXlinkHref = this.getNodeTypeXlinkHref(data, GraphConfig.NodeTypes) || '';
+    const nodeSubtypeXlinkHref = this.getNodeSubtypeXlinkHref(data, GraphConfig.NodeSubtypes) || '';
+
+    const defSvgNodeElement: any = nodeTypeXlinkHref ? document.querySelector(`defs>${nodeTypeXlinkHref}`) : null;
+    const nodeWidthAttr = defSvgNodeElement ? defSvgNodeElement.getAttribute('width') : 0;
+    const nodeHeightAttr = defSvgNodeElement ? defSvgNodeElement.getAttribute('height') : 0;
+    props.width = nodeWidthAttr ? parseInt(nodeWidthAttr, 10) : props.width;
+    props.height = nodeHeightAttr ? parseInt(nodeHeightAttr, 10) : props.height;
+    const index = this.props.knots.findIndex((knot) => {
+      return knot.id === id;
+    });
+
+    if (!!this.props.searchText && this.state.searchResultKnotIds.includes(id)) {
+      nodeClassName += " search-hit";
+    }
 
     return (
-      <g opacity={ opacity } transform={ `translate(${x}, ${y})` } color={ color }>
-        { GraphConfig.NodeTypes[data.type].shape }
+      <g className={nodeShapeContainerClassName} {...props}>
+        {!!data.subtype && (
+          <use
+            data-index={index}
+            className={nodeSubtypeClassName}
+            x={-props.width / 2}
+            y={-props.height / 2}
+            width={props.width}
+            height={props.height}
+            xlinkHref={nodeSubtypeXlinkHref}
+          />
+        )}
+        <use
+          data-index={index}
+          className={nodeClassName}
+          x={-props.width / 2}
+          y={-props.height / 2}
+          width={props.width}
+          height={props.height}
+          xlinkHref={nodeTypeXlinkHref}
+        />
       </g>
     );
+  }
+
+  /**
+   * Resolves xlinkhref attribute for node
+   * 
+   * @param data node
+   * @param nodeTypes subtypes 
+   */
+  private getNodeTypeXlinkHref(data: INode, nodeTypes: any) {
+    if (data.type && nodeTypes[data.type]) {
+      return nodeTypes[data.type].shapeId;
+    } else if (nodeTypes.emptyNode) {
+      return nodeTypes.emptyNode.shapeId;
+    }
+    return null;
+  }
+
+  /**
+   * Resolves xlinkhref attribute for node subtype
+   * 
+   * @param data node
+   * @param nodeSubtypes subtypes 
+   */
+  private getNodeSubtypeXlinkHref(data: INode, nodeSubtypes?: any) {
+    if (data.subtype && nodeSubtypes && nodeSubtypes[data.subtype]) {
+      return nodeSubtypes[data.subtype].shapeId;
+    } else if (nodeSubtypes && nodeSubtypes.emptyNode) {
+      return nodeSubtypes.emptyNode.shapeId;
+    }
+    return null;
   }
 
   /**
