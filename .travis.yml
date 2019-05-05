@@ -1,6 +1,6 @@
 language: node_js
 node_js: v11.14.0
-script: true
+script: npm run uild
 notifications:
   email: false
   webhooks:
