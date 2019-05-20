@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import * as actions from "../../actions/"
 import { GraphView, IEdge, INode, LayoutEngineType, GraphUtils } from 'react-digraph';
 import Api, { Intent, Knot } from "metamind-client";
+import {ForceGraph2D} from "react-force-graph";
 import GraphConfig, {
   NODE_KEY,
   TEXT_TYPE,
@@ -86,7 +87,7 @@ class Graph extends React.Component<Props, State> {
       const previousNode = nodes.find((node) => node.id == knot.id);
       const x = previousNode ? previousNode.x : undefined;
       const y = previousNode ? previousNode.y : undefined;
-      return Graph.translateKnot(knot, x || undefined, y || undefined);
+      return Graph.translateKnot(knot, x || undefined, y || undefined);
     });
     const pendingNodes = nodes.filter(node => node.id && node.id.startsWith("pending"));
     const newStateNodes = nodes.filter(node => node.id && node.id.startsWith("new"));
@@ -94,7 +95,7 @@ class Graph extends React.Component<Props, State> {
 
     return {
       graph: {
-        nodes: [ globalNode ].concat( newNodes ).concat( pendingNodes ).concat( newStateNodes ),
+        nodes: [ globalNode ].concat( newNodes ).concat( pendingNodes ).concat( newStateNodes ),
         edges: intents.map(intent => Graph.translateIntent(intent))
       }
     };
@@ -124,7 +125,7 @@ class Graph extends React.Component<Props, State> {
     }
   }
 
-  private searchKnots = (): string[] => {
+  private searchKnots = (): string[] => {
     if (!this.props.searchText) {
       return [];
     }
@@ -156,7 +157,13 @@ class Graph extends React.Component<Props, State> {
     const { nodes, edges } = this.state.graph;
     const selected = this.state.selected;
     const { NodeTypes, NodeSubtypes, EdgeTypes } = GraphConfig;
-
+    const newNodes = nodes.map(node=>{
+      return {name:node.name,id:node.id,val:node.id};
+    });
+    const newEdges = edges.map(edge=>{
+      return {source:edge.source,target:edge.target};
+    });
+    const graphData = {nodes:newNodes,links:newEdges}
     return (
       <div id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
         <GraphView
@@ -184,13 +191,14 @@ class Graph extends React.Component<Props, State> {
           renderNodeText={this.renderNodeText}
           renderNode={this.renderNode}
         />
+        <ForceGraph2D graphData={graphData}/>
       </div>
     );
   }
 
   /**
    * Translates intent into edge
-   * 
+   *
    * @param intent intent to translate
    */
   private static translateIntent(intent: Intent): IEdge {
@@ -204,7 +212,7 @@ class Graph extends React.Component<Props, State> {
 
   /**
    * Translates knot into node
-   * 
+   *
    * @param knot knot to translate
    * @param x x coordinate
    * @param y  y coordinate
@@ -221,15 +229,15 @@ class Graph extends React.Component<Props, State> {
 
   /**
    * Renders text for single node
-   * 
+   *
    * @param data node data
    * @param id node id
-   * @param isSelected is node currently selected 
+   * @param isSelected is node currently selected
    */
   private renderNodeText(data: INode, id: string | number, isSelected: boolean): JSX.Element {
     return <KnotText data={data} isSelected={isSelected} />
   }
-  
+
   /**
    * Renders a node
    */
@@ -286,9 +294,9 @@ class Graph extends React.Component<Props, State> {
 
   /**
    * Resolves xlinkhref attribute for node
-   * 
+   *
    * @param data node
-   * @param nodeTypes subtypes 
+   * @param nodeTypes subtypes
    */
   private getNodeTypeXlinkHref(data: INode, nodeTypes: any) {
     if (data.type && nodeTypes[data.type]) {
@@ -301,9 +309,9 @@ class Graph extends React.Component<Props, State> {
 
   /**
    * Resolves xlinkhref attribute for node subtype
-   * 
+   *
    * @param data node
-   * @param nodeSubtypes subtypes 
+   * @param nodeSubtypes subtypes
    */
   private getNodeSubtypeXlinkHref(data: INode, nodeSubtypes?: any) {
     if (data.subtype && nodeSubtypes && nodeSubtypes[data.subtype]) {
@@ -316,7 +324,7 @@ class Graph extends React.Component<Props, State> {
 
   /**
    * Helper to find the index of a given node
-   * 
+   *
    * @param searchNode node to find the index for
    */
   private getNodeIndex(searchNode: INode | any) {
@@ -325,10 +333,10 @@ class Graph extends React.Component<Props, State> {
     });
   }
 
-  // 
+  //
   /**
    * Helper to find the index of a given edge
-   * 
+   *
    * @param searchEdge edge to find the index for
    */
   private getEdgeIndex(searchEdge: IEdge) {
@@ -339,7 +347,7 @@ class Graph extends React.Component<Props, State> {
 
   /**
    * Deletes an intent
-   * 
+   *
    * @param id id of intent to delete
    */
   private deleteIntent = async (id: string) => {
@@ -472,7 +480,7 @@ class Graph extends React.Component<Props, State> {
 
   /**
    * Event handler for edge deletion
-   * 
+   *
    * @param viewEdge edge
    * @param edges edges after deletion
    */
@@ -485,7 +493,7 @@ class Graph extends React.Component<Props, State> {
 
   /**
    * Event handler for node deletion
-   * 
+   *
    * @param viewNode node
    * @param nodeId node id
    * @param nodes nodes after deletion
