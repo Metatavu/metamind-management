@@ -7,6 +7,8 @@ import * as actions from "../../actions/"
 import { GraphView, IEdge, INode, LayoutEngineType, GraphUtils } from 'react-digraph';
 import Api, { Intent, Knot } from "metamind-client";
 import {ForceGraph2D} from "react-force-graph";
+
+
 import GraphConfig, {
   NODE_KEY,
   TEXT_TYPE,
@@ -117,6 +119,17 @@ class Graph extends React.Component<Props, State> {
 
     this.props.onKnotsFound(knots);
     this.props.onIntentsFound(intents);
+    window.addEventListener("keydown",event=>{
+      if(event.keyCode===46){
+        if(this.state.selected){
+            this.onDeleteNode(this.state.selected,this.state.selected.id,this.state.graph.nodes);
+        };
+
+      };
+
+    });
+
+
   }
 
   public componentDidUpdate(prevProps: Props, prevState: State) {
@@ -155,6 +168,16 @@ class Graph extends React.Component<Props, State> {
     this.setState({newSystem:!this.state.newSystem});
   }
 
+
+  graphClick = (event:any):void=>{
+
+    if(event.shiftKey){
+
+      this.onCreateNode(0,0);
+    }
+
+  }
+
   /*
    * Render
    */
@@ -163,6 +186,9 @@ class Graph extends React.Component<Props, State> {
     const selected = this.state.selected;
     const { NodeTypes, NodeSubtypes, EdgeTypes } = GraphConfig;
     const newNodes = nodes.map(node=>{
+      if(node.id==="GLOBAL"){
+        return {...node,name:node.title,val:3};
+      }
       return {...node,name:node.title,val:1};
     });
     const newEdges = edges;
@@ -170,8 +196,10 @@ class Graph extends React.Component<Props, State> {
 
     return (
       <div>
-      <div id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
-      {this.state.newSystem!=false?<ForceGraph2D onLinkClick={this.onSelectEdge}  nodeColor={"#4286f4"} onNodeClick={this.onSelectNode} graphData={graphData}/>:<GraphView
+
+      <div  onClick={this.graphClick} id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
+
+      {this.state.newSystem!=false?<ForceGraph2D  onLinkClick={this.onSelectEdge}  nodeColor={"#4286f4"} onNodeClick={this.onSelectNode} graphData={graphData}/>:<GraphView
         nodeSize={ 400 }
         ref={(el) => (this.GraphViewRef = el)}
         nodeKey={NODE_KEY}
@@ -199,6 +227,7 @@ class Graph extends React.Component<Props, State> {
 
 
       </div>
+
       <button onClick={this.onSystemChange}>Change system</button>
 
       </div>
@@ -300,6 +329,7 @@ class Graph extends React.Component<Props, State> {
       </g>
     );
   }
+
 
   /**
    * Resolves xlinkhref attribute for node
@@ -427,6 +457,7 @@ class Graph extends React.Component<Props, State> {
     });
 
     graph.nodes = newNodes;
+
     this.setState({ graph });
 
     this.props.onKnotsFound([knot]);
