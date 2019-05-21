@@ -46,7 +46,8 @@ interface State {
   selected: any;
   copiedNode: any;
   layoutEngineType?: LayoutEngineType;
-  searchResultKnotIds: string[]
+  searchResultKnotIds: string[],
+  newSystem:boolean
 };
 
 const GLOBAL_NODE_ID = "GLOBAL";
@@ -65,7 +66,8 @@ class Graph extends React.Component<Props, State> {
       },
       layoutEngineType: undefined,
       selected: null,
-      searchResultKnotIds: []
+      searchResultKnotIds: [],
+      newSystem : false
     };
 
     this.GraphViewRef = React.createRef();
@@ -149,6 +151,9 @@ class Graph extends React.Component<Props, State> {
       return knot.id!;
     });
   }
+  onSystemChange = ():void=>{
+    this.setState({newSystem:!this.state.newSystem});
+  }
 
   /*
    * Render
@@ -158,40 +163,44 @@ class Graph extends React.Component<Props, State> {
     const selected = this.state.selected;
     const { NodeTypes, NodeSubtypes, EdgeTypes } = GraphConfig;
     const newNodes = nodes.map(node=>{
-      return {name:node.name,id:node.id,val:node.id};
+      return {...node,name:node.title,val:1};
     });
-    const newEdges = edges.map(edge=>{
-      return {source:edge.source,target:edge.target};
-    });
-    const graphData = {nodes:newNodes,links:newEdges}
+    const newEdges = edges;
+    const graphData = {nodes:newNodes,links:newEdges};
+
     return (
+      <div>
       <div id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
-        <GraphView
-          nodeSize={ 400 }
-          ref={(el) => (this.GraphViewRef = el)}
-          nodeKey={NODE_KEY}
-          nodes={nodes}
-          edges={edges}
-          selected={selected}
-          nodeTypes={NodeTypes}
-          nodeSubtypes={NodeSubtypes}
-          edgeTypes={EdgeTypes}
-          onSelectNode={this.onSelectNode}
-          onCreateNode={this.onCreateNode}
-          onUpdateNode={this.onUpdateNode}
-          onDeleteNode={this.onDeleteNode}
-          onSelectEdge={this.onSelectEdge}
-          onCreateEdge={this.onCreateEdge}
-          onSwapEdge={this.onSwapEdge}
-          onDeleteEdge={this.onDeleteEdge}
-          onUndo={this.onUndo}
-          onCopySelected={this.onCopySelected}
-          onPasteSelected={this.onPasteSelected}
-          layoutEngineType={ this.props.autolayout ? "VerticalTree" : undefined}
-          renderNodeText={this.renderNodeText}
-          renderNode={this.renderNode}
-        />
-        <ForceGraph2D graphData={graphData}/>
+      {this.state.newSystem!=false?<ForceGraph2D onLinkClick={this.onSelectEdge}  nodeColor={"#4286f4"} onNodeClick={this.onSelectNode} graphData={graphData}/>:<GraphView
+        nodeSize={ 400 }
+        ref={(el) => (this.GraphViewRef = el)}
+        nodeKey={NODE_KEY}
+        nodes={nodes}
+        edges={edges}
+        selected={selected}
+        nodeTypes={NodeTypes}
+        nodeSubtypes={NodeSubtypes}
+        edgeTypes={EdgeTypes}
+        onSelectNode={this.onSelectNode}
+        onCreateNode={this.onCreateNode}
+        onUpdateNode={this.onUpdateNode}
+        onDeleteNode={this.onDeleteNode}
+        onSelectEdge={this.onSelectEdge}
+        onCreateEdge={this.onCreateEdge}
+        onSwapEdge={this.onSwapEdge}
+        onDeleteEdge={this.onDeleteEdge}
+        onUndo={this.onUndo}
+        onCopySelected={this.onCopySelected}
+        onPasteSelected={this.onPasteSelected}
+        layoutEngineType={ this.props.autolayout ? "VerticalTree" : undefined}
+        renderNodeText={this.renderNodeText}
+        renderNode={this.renderNode}
+      />}
+
+
+      </div>
+      <button onClick={this.onSystemChange}>Change system</button>
+
       </div>
     );
   }
