@@ -176,8 +176,18 @@ class Graph extends React.Component<Props, State> {
       this.onCreateNode(0,0);
     }
 
-  }
 
+  };
+  nodeColor = (viewNode:INode)=>{
+    if(this.state.selected&&this.state.selected.id===viewNode.id){
+      return "red";
+    }
+
+
+
+
+    return "blue";
+  }
   /*
    * Render
    */
@@ -187,9 +197,9 @@ class Graph extends React.Component<Props, State> {
     const { NodeTypes, NodeSubtypes, EdgeTypes } = GraphConfig;
     const newNodes = nodes.map(node=>{
       if(node.id==="GLOBAL"){
-        return {...node,name:node.title,val:3};
+        return {...node,selected:false,name:node.title,val:3};
       }
-      return {...node,name:node.title,val:1};
+      return {...node,selected:false,name:node.title,val:1};
     });
     const newEdges = edges;
     const graphData = {nodes:newNodes,links:newEdges};
@@ -199,7 +209,7 @@ class Graph extends React.Component<Props, State> {
 
       <div  onClick={this.graphClick} id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
 
-      {this.state.newSystem!=false?<ForceGraph2D  onLinkClick={this.onSelectEdge}  nodeColor={"#4286f4"} onNodeClick={this.onSelectNode} graphData={graphData}/>:<GraphView
+      {this.state.newSystem!=false?<ForceGraph2D  onLinkClick={this.onSelectEdge}  nodeColor={this.nodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>:<GraphView
         nodeSize={ 400 }
         ref={(el) => (this.GraphViewRef = el)}
         nodeKey={NODE_KEY}
