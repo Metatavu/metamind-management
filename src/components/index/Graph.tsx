@@ -178,10 +178,13 @@ class Graph extends React.Component<Props, State> {
         this.setState({selected:null});
 
         if(selected!==this.state.edgeDrawStart){
-          this.setState({edgeDrawStart:null});
           if(selected===null){
             this.onCreateNode(0,0);
+          }else{
+            this.onCreateEdge(this.state.edgeDrawStart,selected);
           }
+          this.setState({edgeDrawStart:null});
+
         }else{
           this.onCreateNode(0,0);
         }
