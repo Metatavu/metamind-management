@@ -4,12 +4,12 @@ import { StoreState } from "src/types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import * as actions from "../../actions/"
-import { GraphView, IEdge, INode, LayoutEngineType, GraphUtils } from 'react-digraph';
+import { IEdge, INode, LayoutEngineType } from 'react-digraph';
 import Api, { Intent, Knot } from "metamind-client";
 import {ForceGraph2D} from "react-force-graph";
 
 
-import GraphConfig, {
+import  {
   NODE_KEY,
   TEXT_TYPE,
   OPENNLP_EDGE_TYPE,
@@ -17,7 +17,6 @@ import GraphConfig, {
   PENDING_TYPE
 } from '../../utils/graph-config'; // Configures node/edge types
 import { KeycloakInstance } from 'keycloak-js';
-import KnotText from '../generic/KnotText';
 import '../../styles/graph.css'
 
 interface IGraph {
@@ -243,8 +242,8 @@ class Graph extends React.Component<Props, State> {
    */
   public render() {
     const { nodes, edges } = this.state.graph;
-    const selected = this.state.selected;
-    const { NodeTypes, NodeSubtypes, EdgeTypes } = GraphConfig;
+
+
     const newNodes = nodes.map(node=>{
       if(node.id==="GLOBAL"){
         return {...node,name:node.title,val:3,x:0,y:0};
@@ -261,31 +260,7 @@ class Graph extends React.Component<Props, State> {
 
       <div  onClick={this.onGraphClick} id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
 
-      {this.state.newSystem!=false?<ForceGraph2D d3VelocityDecay={0.9} d3AlphaDecay={0.15} linkDirectionalArrowLength={3} nodeId={NODE_KEY} onLinkClick={this.onSelectEdge} linkColor={this.getLinkColor} nodeColor={this.getNodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>:<GraphView
-        nodeSize={ 400 }
-        ref={(el) => (this.GraphViewRef = el)}
-        nodeKey={NODE_KEY}
-        nodes={nodes}
-        edges={edges}
-        selected={selected}
-        nodeTypes={NodeTypes}
-        nodeSubtypes={NodeSubtypes}
-        edgeTypes={EdgeTypes}
-        onSelectNode={this.onSelectNode}
-        onCreateNode={this.onCreateNode}
-        onUpdateNode={this.onUpdateNode}
-        onDeleteNode={this.onDeleteNode}
-        onSelectEdge={this.onSelectEdge}
-        onCreateEdge={this.onCreateEdge}
-        onSwapEdge={this.onSwapEdge}
-        onDeleteEdge={this.onDeleteEdge}
-        onUndo={this.onUndo}
-        onCopySelected={this.onCopySelected}
-        onPasteSelected={this.onPasteSelected}
-        layoutEngineType={ this.props.autolayout ? "VerticalTree" : undefined}
-        renderNodeText={this.renderNodeText}
-        renderNode={this.renderNode}
-      />}
+      {this.state.newSystem!=false?<ForceGraph2D linkDirectionalArrowLength={3} nodeId={NODE_KEY} onLinkClick={this.onSelectEdge} linkColor={this.getLinkColor} nodeColor={this.getNodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>:<h1>Old</h1>}
 
 
       </div>
@@ -327,124 +302,9 @@ class Graph extends React.Component<Props, State> {
     }
   }
 
-  /**
-   * Renders text for single node
-   *
-   * @param data node data
-   * @param id node id
-   * @param isSelected is node currently selected
-   */
-  private renderNodeText(data: INode, id: string | number, isSelected: boolean): JSX.Element {
-    return <KnotText data={data} isSelected={isSelected} />
-  }
-
-  /**
-   * Renders a node
-   */
-  private renderNode = (nodeRef: any, data: any, id: string, selected: boolean, hovered: boolean) => {
-    const props = {
-      height: 0,
-      width: 0
-    };
-
-    const nodeShapeContainerClassName = GraphUtils.classNames('shape');
-    let nodeClassName = GraphUtils.classNames('node', { selected, hovered });
-    const nodeSubtypeClassName = GraphUtils.classNames('subtype-shape', { selected: this.state.selected });
-    const nodeTypeXlinkHref = this.getNodeTypeXlinkHref(data, GraphConfig.NodeTypes) || '';
-    const nodeSubtypeXlinkHref = this.getNodeSubtypeXlinkHref(data, GraphConfig.NodeSubtypes) || '';
-
-    const defSvgNodeElement: any = nodeTypeXlinkHref ? document.querySelector(`defs>${nodeTypeXlinkHref}`) : null;
-    const nodeWidthAttr = defSvgNodeElement ? defSvgNodeElement.getAttribute('width') : 0;
-    const nodeHeightAttr = defSvgNodeElement ? defSvgNodeElement.getAttribute('height') : 0;
-    props.width = nodeWidthAttr ? parseInt(nodeWidthAttr, 10) : props.width;
-    props.height = nodeHeightAttr ? parseInt(nodeHeightAttr, 10) : props.height;
-    const index = this.props.knots.findIndex((knot) => {
-      return knot.id === id;
-    });
-
-    if (!!this.props.searchText && this.state.searchResultKnotIds.includes(id)) {
-      nodeClassName += " search-hit";
-    }
-
-    return (
-      <g className={nodeShapeContainerClassName} {...props}>
-        {!!data.subtype && (
-          <use
-            data-index={index}
-            className={nodeSubtypeClassName}
-            x={-props.width / 2}
-            y={-props.height / 2}
-            width={props.width}
-            height={props.height}
-            xlinkHref={nodeSubtypeXlinkHref}
-          />
-        )}
-        <use
-          data-index={index}
-          className={nodeClassName}
-          x={-props.width / 2}
-          y={-props.height / 2}
-          width={props.width}
-          height={props.height}
-          xlinkHref={nodeTypeXlinkHref}
-        />
-      </g>
-    );
-  }
 
 
-  /**
-   * Resolves xlinkhref attribute for node
-   *
-   * @param data node
-   * @param nodeTypes subtypes
-   */
-  private getNodeTypeXlinkHref(data: INode, nodeTypes: any) {
-    if (data.type && nodeTypes[data.type]) {
-      return nodeTypes[data.type].shapeId;
-    } else if (nodeTypes.emptyNode) {
-      return nodeTypes.emptyNode.shapeId;
-    }
-    return null;
-  }
 
-  /**
-   * Resolves xlinkhref attribute for node subtype
-   *
-   * @param data node
-   * @param nodeSubtypes subtypes
-   */
-  private getNodeSubtypeXlinkHref(data: INode, nodeSubtypes?: any) {
-    if (data.subtype && nodeSubtypes && nodeSubtypes[data.subtype]) {
-      return nodeSubtypes[data.subtype].shapeId;
-    } else if (nodeSubtypes && nodeSubtypes.emptyNode) {
-      return nodeSubtypes.emptyNode.shapeId;
-    }
-    return null;
-  }
-
-  /**
-   * Helper to find the index of a given node
-   *
-   * @param searchNode node to find the index for
-   */
-  private getNodeIndex(searchNode: INode | any) {
-    return this.state.graph.nodes.findIndex((node: INode) => {
-      return node[NODE_KEY] === searchNode[NODE_KEY];
-    });
-  }
-
-  //
-  /**
-   * Helper to find the index of a given edge
-   *
-   * @param searchEdge edge to find the index for
-   */
-  private getEdgeIndex(searchEdge: IEdge) {
-    return this.state.graph.edges.findIndex((edge: IEdge) => {
-      return edge.source === searchEdge.source && edge.target === searchEdge.target;
-    });
-  }
 
   /**
    * Deletes an intent
@@ -456,17 +316,7 @@ class Graph extends React.Component<Props, State> {
     this.props.onIntentDeleted(id);
   }
 
-  /**
-   * Called by 'drag' handler, etc..
-   * to sync updates from D3 with the graph
-   */
-  private onUpdateNode = (viewNode: INode) => {
-    const graph = this.state.graph;
-    const i = this.getNodeIndex(viewNode);
 
-    graph.nodes[i] = viewNode;
-    this.setState({ graph });
-  }
 
   /**
    * Handles node selection
@@ -552,33 +402,7 @@ class Graph extends React.Component<Props, State> {
     this.props.onIntentsFound([intent]);
   }
 
-  /**
-   * Called when an edge is reattached to a different target.
-   */
-  private onSwapEdge = async (sourceViewNode: INode, targetViewNode: INode, viewEdge: IEdge) => {
-    const graph = this.state.graph;
-    const intent = this.props.intents.find(intent => intent.id == viewEdge.id);
-    if (!intent) {
-      return;
-    }
 
-    intent.sourceKnotId = sourceViewNode.id;
-    intent.targetKnotId = targetViewNode.id;
-    const updatedIntent = await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").updateIntent(intent, this.props.storyId, intent.id!);
-    const i = this.getEdgeIndex(viewEdge);
-    const edge = JSON.parse(JSON.stringify(graph.edges[i]));
-
-    edge.source = sourceViewNode[NODE_KEY];
-    edge.target = targetViewNode[NODE_KEY];
-    graph.edges[i] = edge;
-    graph.edges = [...graph.edges];
-
-    this.setState({
-      graph,
-      selected: edge
-    });
-    this.props.onIntentUpdated(updatedIntent);
-  }
 
   /**
    * Event handler for edge deletion
