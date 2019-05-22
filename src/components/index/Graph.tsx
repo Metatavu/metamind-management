@@ -4,7 +4,7 @@ import { StoreState } from "src/types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import * as actions from "../../actions/"
-import { IEdge, INode, LayoutEngineType } from 'react-digraph';
+import {  LayoutEngineType } from 'react-digraph';
 import Api, { Intent, Knot } from "metamind-client";
 import {ForceGraph2D} from "react-force-graph";
 
@@ -19,6 +19,19 @@ import  {
 import { KeycloakInstance } from 'keycloak-js';
 import '../../styles/graph.css'
 
+interface INode{
+  id?: string,
+  title: string,
+  type: string,
+  x?: number,
+  y?: number
+}
+interface IEdge{
+  id?: string,
+  source:string,
+  target:string,
+  type:string
+}
 interface IGraph {
   nodes: INode[];
   edges: IEdge[];
@@ -84,7 +97,9 @@ class Graph extends React.Component<Props, State> {
     const globalNode: INode = {
       id: GLOBAL_NODE_ID,
       title: "Global", // Localize
-      type: GLOBAL_TYPE
+      type: GLOBAL_TYPE,
+      x:0,
+      y:0
     };
 
     const { nodes } = state.graph;
@@ -97,7 +112,11 @@ class Graph extends React.Component<Props, State> {
     });
     const pendingNodes = nodes.filter(node => node.id && node.id.startsWith("pending"));
     const newStateNodes = nodes.filter(node => node.id && node.id.startsWith("new"));
-    newStateNodes.forEach(((n) => {n.id = n.id.replace("new-", "")}));
+    newStateNodes.forEach(((n) => {
+      if(n.id){
+        n.id = n.id.replace("new-", "");
+      }
+    }));
 
     return {
       graph: {
@@ -217,9 +236,12 @@ class Graph extends React.Component<Props, State> {
     if(this.state.selected&&this.state.selected.id===viewNode.id){
       return "red";
     }
-    if(this.state.searchResultKnotIds.includes(viewNode.id)){
-      return "green";
+    if(viewNode.id){
+      if(this.state.searchResultKnotIds.includes(viewNode.id)){
+        return "green";
+      }
     }
+
 
 
 
@@ -381,25 +403,28 @@ class Graph extends React.Component<Props, State> {
    */
   private onCreateEdge = async (sourceViewNode: INode, targetViewNode: INode) => {
     const graph = this.state.graph;
-    const intent = await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").createIntent({
-      type: "NORMAL",
-      name: "New intent",
-      quickResponseOrder: 0,
-      global: sourceViewNode.id === GLOBAL_NODE_ID,
-      sourceKnotId: sourceViewNode.id === GLOBAL_NODE_ID ? undefined : sourceViewNode.id ,
-      targetKnotId: targetViewNode.id,
-      trainingMaterials: {}
-    }, this.props.storyId);
+    if(sourceViewNode.id&&targetViewNode.id){
+      const intent = await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").createIntent({
+        type: "NORMAL",
+        name: "New intent",
+        quickResponseOrder: 0,
+        global: sourceViewNode.id === GLOBAL_NODE_ID,
+        sourceKnotId: sourceViewNode.id === GLOBAL_NODE_ID ? undefined : sourceViewNode.id ,
+        targetKnotId: targetViewNode.id,
+        trainingMaterials: {}
+      }, this.props.storyId);
 
-    const viewEdge = Graph.translateIntent(intent);
+      const viewEdge = Graph.translateIntent(intent);
 
-    graph.edges = [...graph.edges, viewEdge];
-    this.setState({
-      graph,
-      selected: viewEdge
-    });
+      graph.edges = [...graph.edges, viewEdge];
+      this.setState({
+        graph,
+        selected: viewEdge
+      });
 
-    this.props.onIntentsFound([intent]);
+      this.props.onIntentsFound([intent]);
+    }
+
   }
 
 
@@ -411,10 +436,13 @@ class Graph extends React.Component<Props, State> {
    * @param edges edges after deletion
    */
   private onDeleteEdge = async (viewEdge: IEdge, edges: IEdge[]) => {
-    await this.deleteIntent(viewEdge.id);
-    this.setState({
-      selected: null
-    });
+    if(viewEdge.id){
+      await this.deleteIntent(viewEdge.id);
+      this.setState({
+        selected: null
+      });
+    }
+
   }
 
   /**
@@ -425,24 +453,30 @@ class Graph extends React.Component<Props, State> {
    * @param nodes nodes after deletion
    */
   private onDeleteNode = async (viewNode: INode, nodeId: string, nodes: INode[]) => {
-    const graph = this.state.graph;
-    const edges = [];
+    if(viewNode.id){
+      const graph = this.state.graph;
+      const edges = [];
 
-    for (let i = 0; i < graph.edges.length; i++) {
-      const edge = graph.edges[i];
+      for (let i = 0; i < graph.edges.length; i++) {
+        const edge = graph.edges[i];
 
-      if (edge.source[NODE_KEY] !== viewNode.id && edge.target[NODE_KEY] !== viewNode.id) {
-        edges.push(edge);
-      } else {
-        await this.deleteIntent(edge.id);
+        if (edge.source[NODE_KEY] !== viewNode.id && edge.target[NODE_KEY] !== viewNode.id) {
+          edges.push(edge);
+        } else {
+          if(edge.id){
+                    await this.deleteIntent(edge.id);
+          }
+
+        }
       }
+
+      await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").deleteKnot(this.props.storyId, viewNode.id);
+
+
+      this.props.onKnotDeleted(viewNode.id);
+      this.setState({ selected: null });
     }
 
-    await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").deleteKnot(this.props.storyId, viewNode.id);
-
-
-    this.props.onKnotDeleted(viewNode.id);
-    this.setState({ selected: null });
   }
 
   onUndo = () => {
