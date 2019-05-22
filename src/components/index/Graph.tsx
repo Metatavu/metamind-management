@@ -174,12 +174,25 @@ class Graph extends React.Component<Props, State> {
   graphClick = (event:any):void=>{
 
     if(event.shiftKey){
+        const selected = this.state.selected;
+        this.setState({selected:null});
 
-      this.onCreateNode(0,0);
+        if(selected!==this.state.edgeDrawStart){
+          this.setState({edgeDrawStart:null});
+          if(selected===null){
+            this.onCreateNode(0,0);
+          }
+        }else{
+          this.onCreateNode(0,0);
+        }
+
+
+
+
     }
     if(this.state.selected){
       this.setState({edgeDrawStart:this.state.selected});
-      console.log("Edge draw start");
+
     }
 
   };
