@@ -123,8 +123,20 @@ class Graph extends React.Component<Props, State> {
     this.props.onIntentsFound(intents);
     window.addEventListener("keydown",event=>{
       if(event.keyCode===46){
+
         if(this.state.selected){
-            this.onDeleteNode(this.state.selected,this.state.selected.id,this.state.graph.nodes);
+
+            if(this.state.selected.title){
+
+
+
+
+              this.onDeleteNode(this.state.selected,this.state.selected.id,this.state.graph.nodes);
+
+            }else{
+
+              this.onDeleteEdge(this.state.selected,this.state.graph.edges);
+            }
         };
 
       };
@@ -218,9 +230,9 @@ class Graph extends React.Component<Props, State> {
     const { NodeTypes, NodeSubtypes, EdgeTypes } = GraphConfig;
     const newNodes = nodes.map(node=>{
       if(node.id==="GLOBAL"){
-        return {...node,selected:false,name:node.title,val:3};
+        return {...node,selected:false,name:node.title,val:3,x:0,y:0};
       }
-      return {...node,selected:false,name:node.title,val:1};
+      return {...node,selected:false,name:node.title,val:1,x:0,y:0};
     });
     const newEdges = edges;
     const graphData = {nodes:newNodes,links:newEdges};
@@ -230,7 +242,7 @@ class Graph extends React.Component<Props, State> {
 
       <div  onClick={this.graphClick} id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
 
-      {this.state.newSystem!=false?<ForceGraph2D  onLinkClick={this.onSelectEdge}  nodeColor={this.nodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>:<GraphView
+      {this.state.newSystem!=false?<ForceGraph2D  nodeId={NODE_KEY} onLinkClick={this.onSelectEdge}  nodeColor={this.nodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>:<GraphView
         nodeSize={ 400 }
         ref={(el) => (this.GraphViewRef = el)}
         nodeKey={NODE_KEY}
@@ -571,19 +583,20 @@ class Graph extends React.Component<Props, State> {
    */
   private onDeleteNode = async (viewNode: INode, nodeId: string, nodes: INode[]) => {
     const graph = this.state.graph;
-
-    await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").deleteKnot(this.props.storyId, viewNode.id);
-
     const edges = [];
 
     for (let i = 0; i < graph.edges.length; i++) {
       const edge = graph.edges[i];
-      if (edge.source !== viewNode[NODE_KEY] && edge.target !== viewNode[NODE_KEY]) {
+      
+      if (edge.source[NODE_KEY] !== viewNode.id && edge.target[NODE_KEY] !== viewNode.id) {
         edges.push(edge);
       } else {
         await this.deleteIntent(edge.id);
       }
     }
+
+    await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").deleteKnot(this.props.storyId, viewNode.id);
+
 
     this.props.onKnotDeleted(viewNode.id);
     this.setState({ selected: null });
