@@ -46,6 +46,7 @@ interface Props {
 interface State {
   graph: IGraph;
   selected: any;
+  edgeDrawStart:any;
   copiedNode: any;
   layoutEngineType?: LayoutEngineType;
   searchResultKnotIds: string[],
@@ -68,6 +69,7 @@ class Graph extends React.Component<Props, State> {
       },
       layoutEngineType: undefined,
       selected: null,
+      edgeDrawStart:null,
       searchResultKnotIds: [],
       newSystem : false
     };
@@ -175,7 +177,10 @@ class Graph extends React.Component<Props, State> {
 
       this.onCreateNode(0,0);
     }
-
+    if(this.state.selected){
+      this.setState({edgeDrawStart:this.state.selected});
+      console.log("Edge draw start");
+    }
 
   };
   nodeColor = (viewNode:INode)=>{
