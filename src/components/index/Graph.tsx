@@ -184,7 +184,7 @@ class Graph extends React.Component<Props, State> {
 
 
   graphClick = (event:any):void=>{
-
+    console.log(this.state.graph.nodes);
     if(event.shiftKey){
         const selected = this.state.selected;
         this.setState({selected:null});
@@ -193,7 +193,7 @@ class Graph extends React.Component<Props, State> {
           if(selected===null){
             this.onCreateNode(0,0);
           }else{
-            this.onCreateEdge(this.state.edgeDrawStart,selected);
+            this.onCreateEdge(selected,this.state.edgeDrawStart);
           }
           this.setState({edgeDrawStart:null});
 
@@ -587,7 +587,7 @@ class Graph extends React.Component<Props, State> {
 
     for (let i = 0; i < graph.edges.length; i++) {
       const edge = graph.edges[i];
-      
+
       if (edge.source[NODE_KEY] !== viewNode.id && edge.target[NODE_KEY] !== viewNode.id) {
         edges.push(edge);
       } else {
