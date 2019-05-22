@@ -19,14 +19,14 @@ import  {
 import { KeycloakInstance } from 'keycloak-js';
 import '../../styles/graph.css'
 
-interface INode{
+export interface INode{
   id?: string,
-  title: string,
+  name: string,
   type: string,
   x?: number,
   y?: number
 }
-interface IEdge{
+export interface IEdge{
   id?: string,
   source:string,
   target:string,
@@ -62,8 +62,7 @@ interface State {
   edgeDrawStart:any;
   copiedNode: any;
   layoutEngineType?: LayoutEngineType;
-  searchResultKnotIds: string[],
-  newSystem:boolean
+  searchResultKnotIds: string[]
 };
 
 const GLOBAL_NODE_ID = "GLOBAL";
@@ -83,8 +82,7 @@ class Graph extends React.Component<Props, State> {
       layoutEngineType: undefined,
       selected: null,
       edgeDrawStart:null,
-      searchResultKnotIds: [],
-      newSystem : false
+      searchResultKnotIds: []
     };
 
     this.GraphViewRef = React.createRef();
@@ -96,7 +94,7 @@ class Graph extends React.Component<Props, State> {
   static getDerivedStateFromProps = (props: Props, state: State) => {
     const globalNode: INode = {
       id: GLOBAL_NODE_ID,
-      title: "Global", // Localize
+      name: "Global", // Localize
       type: GLOBAL_TYPE,
       x:0,
       y:0
@@ -145,7 +143,7 @@ class Graph extends React.Component<Props, State> {
 
         if(this.state.selected){
 
-            if(this.state.selected.title){
+            if(this.state.selected.name){
 
 
 
@@ -197,13 +195,11 @@ class Graph extends React.Component<Props, State> {
       return knot.id!;
     });
   }
-  onSystemChange = ():void=>{
-    this.setState({newSystem:!this.state.newSystem});
-  }
+
 
 
   onGraphClick = (event:any):void=>{
-    console.log(this.state.graph.nodes);
+
     if(event.shiftKey){
         const selected = this.state.selected;
         this.setState({selected:null});
@@ -259,6 +255,7 @@ class Graph extends React.Component<Props, State> {
 
     return "blue";
   }
+
   /*
    * Render
    */
@@ -266,30 +263,36 @@ class Graph extends React.Component<Props, State> {
     const { nodes, edges } = this.state.graph;
 
 
-    const newNodes = nodes.map(node=>{
+    const newNodes = nodes.map((node,i)=>{
+
+
       if(node.id==="GLOBAL"){
-        return {...node,name:node.title,val:3,x:0,y:0};
+
+        return {...node,name:node.name,val:3,x:0,y:0};
       }
-      return {...node,name:node.title,val:1,x:0,y:0};
+
+      return {...node,val:1,x:0,y:0};
+
+
     });
     const newEdges = edges;
     const graphData = {nodes:newNodes,links:newEdges};
     if(this.state.selected===null){
       this.props.onCloseSidebar();
     }
+  
     return (
-      <div>
+
 
       <div  onClick={this.onGraphClick} id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
 
-      {this.state.newSystem!=false?<ForceGraph2D linkDirectionalArrowLength={3} nodeId={NODE_KEY} onLinkClick={this.onSelectEdge} linkColor={this.getLinkColor} nodeColor={this.getNodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>:<h1>Old</h1>}
+      <ForceGraph2D  linkDirectionalArrowLength={3} nodeId={NODE_KEY} onLinkClick={this.onSelectEdge} linkColor={this.getLinkColor} nodeColor={this.getNodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>
 
 
       </div>
 
-      <button onClick={this.onSystemChange}>Change system</button>
 
-      </div>
+
     );
   }
 
@@ -317,7 +320,7 @@ class Graph extends React.Component<Props, State> {
   private static translateKnot(knot: Knot, x?: number, y?: number): INode {
     return {
       id: knot.id,
-      title: knot.name,
+      name: knot.name,
       type: TEXT_TYPE,
       x: x,
       y: y
@@ -365,7 +368,7 @@ class Graph extends React.Component<Props, State> {
     const tempNodeId = `pending-${new Date().getTime()}`;
     const node = {
       id: tempNodeId,
-      title: "loading",
+      name: "loading",
       type: PENDING_TYPE,
       x: x,
       y: y
@@ -457,6 +460,7 @@ class Graph extends React.Component<Props, State> {
       const graph = this.state.graph;
       const edges = [];
 
+
       for (let i = 0; i < graph.edges.length; i++) {
         const edge = graph.edges[i];
 
@@ -468,6 +472,7 @@ class Graph extends React.Component<Props, State> {
           }
 
         }
+
       }
 
       await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").deleteKnot(this.props.storyId, viewNode.id);
