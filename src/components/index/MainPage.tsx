@@ -75,7 +75,7 @@ class WelcomePage extends React.Component<Props, State> {
     if (!this.state.storyId) {
       return <div style={{ minHeight: "400px" }}><StorySelector onStorySelected={ (storyId) => { this.setState({ storyId: storyId}) } } /></div>
     } else {
-      return <Graph storyId={ this.state.storyId } onSelectNode={this.onSelectNode} onSelectEdge={this.onSelectEdge} />
+      return <Graph storyId={ this.state.storyId } onSelectNode={this.onSelectNode} onSelectEdge={this.onSelectEdge} onCloseSidebar={this.onCloseSidebar} />
     }
   }
 
@@ -112,6 +112,10 @@ class WelcomePage extends React.Component<Props, State> {
       selectedEdge: item,
       selectedNode: null
     });
+  }
+  private onCloseSidebar = () =>{
+  
+    this.setState({sidebarVisible:false});
   }
 }
 

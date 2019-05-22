@@ -34,6 +34,7 @@ interface Props {
   onIntentsFound: (intents: Intent[]) => void
   onIntentUpdated: (intent: Intent) => void
   onIntentDeleted: (intentId: string) => void
+  onCloseSidebar: () => void
 
   keycloak?: KeycloakInstance
   knots: Knot[]
@@ -183,7 +184,7 @@ class Graph extends React.Component<Props, State> {
   }
 
 
-  graphClick = (event:any):void=>{
+  onGraphClick = (event:any):void=>{
     console.log(this.state.graph.nodes);
     if(event.shiftKey){
         const selected = this.state.selected;
@@ -208,10 +209,12 @@ class Graph extends React.Component<Props, State> {
     if(this.state.selected){
       this.setState({edgeDrawStart:this.state.selected});
 
+
+
     }
 
   };
-  nodeColor = (viewNode:INode)=>{
+  getNodeColor = (viewNode:INode)=>{
     if(this.state.selected&&this.state.selected.id===viewNode.id){
       return "red";
     }
@@ -239,13 +242,15 @@ class Graph extends React.Component<Props, State> {
     });
     const newEdges = edges;
     const graphData = {nodes:newNodes,links:newEdges};
-
+    if(this.state.selected===null){
+      this.props.onCloseSidebar();
+    }
     return (
       <div>
 
-      <div  onClick={this.graphClick} id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
+      <div  onClick={this.onGraphClick} id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
 
-      {this.state.newSystem!=false?<ForceGraph2D  nodeId={NODE_KEY} onLinkClick={this.onSelectEdge}  nodeColor={this.nodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>:<GraphView
+      {this.state.newSystem!=false?<ForceGraph2D  nodeId={NODE_KEY} onLinkClick={this.onSelectEdge}  nodeColor={this.getNodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>:<GraphView
         nodeSize={ 400 }
         ref={(el) => (this.GraphViewRef = el)}
         nodeKey={NODE_KEY}
