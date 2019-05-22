@@ -149,7 +149,7 @@ class Graph extends React.Component<Props, State> {
   public componentDidUpdate(prevProps: Props, prevState: State) {
     if (this.props.searchText !== prevProps.searchText) {
       this.setState({
-        searchResultKnotIds: this.searchKnots()
+        searchResultKnotIds: this.searchKnots(), selected:null
       });
     }
   }
@@ -215,6 +215,9 @@ class Graph extends React.Component<Props, State> {
     if(this.state.selected&&this.state.selected.id===viewNode.id){
       return "red";
     }
+    if(this.state.searchResultKnotIds.includes(viewNode.id)){
+      return "green";
+    }
 
 
 
@@ -230,9 +233,9 @@ class Graph extends React.Component<Props, State> {
     const { NodeTypes, NodeSubtypes, EdgeTypes } = GraphConfig;
     const newNodes = nodes.map(node=>{
       if(node.id==="GLOBAL"){
-        return {...node,selected:false,name:node.title,val:3,x:0,y:0};
+        return {...node,name:node.title,val:3,x:0,y:0};
       }
-      return {...node,selected:false,name:node.title,val:1,x:0,y:0};
+      return {...node,name:node.title,val:1,x:0,y:0};
     });
     const newEdges = edges;
     const graphData = {nodes:newNodes,links:newEdges};
