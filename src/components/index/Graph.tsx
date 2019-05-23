@@ -69,7 +69,7 @@ const GLOBAL_NODE_ID = "GLOBAL";
 
 class Graph extends React.Component<Props, State> {
   GraphViewRef: any;
-  GraphCanvasViewRef:any;
+
 
   constructor(props: Props) {
     super(props);
@@ -87,7 +87,7 @@ class Graph extends React.Component<Props, State> {
     };
 
     this.GraphViewRef = React.createRef();
-    this.GraphCanvasViewRef = React.createRef();
+
   }
 
   /**
@@ -220,8 +220,8 @@ class Graph extends React.Component<Props, State> {
   }
 
 
-
-  onGraphClick = (event:any):void=>{
+  //Helps to handle node and edge creation
+  private onGraphClick = (event:any):void=>{
 
     const canvas = this.GraphViewRef.current.childNodes[0].childNodes[0].childNodes[0];
     const transform = canvas.__zoom;
@@ -236,7 +236,8 @@ class Graph extends React.Component<Props, State> {
         if(selected!==this.state.edgeDrawStart){
           if(selected===null){
             this.onCreateNode(x,y);
-          }else{
+          }else if(this.state.edgeDrawStart!==null){
+
             this.onCreateEdge(this.state.edgeDrawStart,selected);
           }
           this.setState({edgeDrawStart:null});
@@ -257,7 +258,7 @@ class Graph extends React.Component<Props, State> {
     }
 
   };
-  getNodeColor = (viewNode:INode)=>{
+  private getNodeColor = (viewNode:INode)=>{
 
 
     if(this.state.selected&&this.state.selected.id===viewNode.id){
@@ -288,7 +289,7 @@ class Graph extends React.Component<Props, State> {
 
     return "blue";
   }
-  getLinkColor = (viewLink:IEdge)=>{
+  private getLinkColor = (viewLink:IEdge)=>{
     if(this.state.selected&&this.state.selected.id===viewLink.id){
       return "red";
     }
@@ -305,7 +306,8 @@ class Graph extends React.Component<Props, State> {
 
     return "blue";
   }
-  onNodeDragEnd = (viewNode:INode)=>{
+  //Updates state after node dragging
+  private onNodeDragEnd = (viewNode:INode)=>{
     for(let i = 0;i<this.state.graph.nodes.length;i++){
       let nodes = this.state.graph.nodes;
       if(nodes[i].id===viewNode.id){
@@ -357,7 +359,7 @@ class Graph extends React.Component<Props, State> {
 
       <div ref={this.GraphViewRef}    onClick={this.onGraphClick} id="graph"  className={ !!this.props.searchText ? "search-active" : "" }>
 
-      <ForceGraph2D ref={this.GraphCanvasViewRef} d3AlphaDecay={1} zoom={1} d3VelocityDecay={1} onNodeDragEnd={this.onNodeDragEnd} linkDirectionalArrowLength={3} nodeId={NODE_KEY} onLinkClick={this.onSelectEdge} linkColor={this.getLinkColor} nodeColor={this.getNodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>
+      <ForceGraph2D d3AlphaDecay={1} zoom={1} d3VelocityDecay={1} onNodeDragEnd={this.onNodeDragEnd} linkDirectionalArrowLength={3} nodeId={NODE_KEY} onLinkClick={this.onSelectEdge} linkColor={this.getLinkColor} nodeColor={this.getNodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>
 
 
       </div>
