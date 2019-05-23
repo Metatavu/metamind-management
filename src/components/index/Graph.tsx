@@ -308,7 +308,6 @@ class Graph extends React.Component<Props, State> {
   }
   //Updates state after node dragging
   private onNodeDragEnd = (viewNode:INode)=>{
-    
     for(let i = 0;i<this.state.graph.nodes.length;i++){
       let nodes = this.state.graph.nodes;
       if(nodes[i].id===viewNode.id){
