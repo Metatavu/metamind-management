@@ -24,7 +24,8 @@ export interface INode{
   name: string,
   type: string,
   x?: number,
-  y?: number
+  y?: number,
+  newest?:boolean
 }
 export interface IEdge{
   id?: string,
@@ -81,6 +82,7 @@ class Graph extends React.Component<Props, State> {
       selected: null,
       edgeDrawStart:null,
       searchResultKnotIds: []
+
     };
 
     this.GraphViewRef = React.createRef();
@@ -126,6 +128,8 @@ class Graph extends React.Component<Props, State> {
    * Loads intents and knots while graph is mounted
    */
   public componentDidMount = async () => {
+
+
     const knotsService = Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "");
     const intentsService = Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "");
 
@@ -136,6 +140,10 @@ class Graph extends React.Component<Props, State> {
 
     this.props.onKnotsFound(knots);
     this.props.onIntentsFound(intents);
+
+
+
+
     window.addEventListener("keydown",event=>{
       if(event.keyCode===46){
 
@@ -157,7 +165,6 @@ class Graph extends React.Component<Props, State> {
       };
 
     });
-
 
   }
 
@@ -227,13 +234,22 @@ class Graph extends React.Component<Props, State> {
 
   };
   getNodeColor = (viewNode:INode)=>{
+
+
     if(this.state.selected&&this.state.selected.id===viewNode.id){
       return "red";
     }
     if(viewNode.id){
       if(this.state.searchResultKnotIds.includes(viewNode.id)){
-        return "green";
+
+          return "orange";
       }
+    }
+    if(viewNode.newest){
+        return "green";
+
+
+
     }
 
 
@@ -268,10 +284,13 @@ class Graph extends React.Component<Props, State> {
 
   }
 
+
   /*
    * Render
    */
   public render() {
+
+
     const { nodes, edges } = this.state.graph;
 
 
@@ -282,8 +301,8 @@ class Graph extends React.Component<Props, State> {
 
         return {...node,name:node.name,val:3};
       }
-
-      return {...node,val:1};
+      const newest = i === this.state.graph.nodes.length-1;
+      return {...node,val:1,newest};
 
 
     });
@@ -292,11 +311,11 @@ class Graph extends React.Component<Props, State> {
     if(this.state.selected===null){
       this.props.onCloseSidebar();
     }
-    console.log(newNodes);
+
     return (
 
 
-      <div  onClick={this.onGraphClick} id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
+      <div ref={this.GraphViewRef}    onClick={this.onGraphClick} id="graph"  className={ !!this.props.searchText ? "search-active" : "" }>
 
       <ForceGraph2D d3AlphaDecay={0.99} d3VelocityDecay={0.99} onNodeDragEnd={this.onNodeDragEnd} linkDirectionalArrowLength={3} nodeId={NODE_KEY} onLinkClick={this.onSelectEdge} linkColor={this.getLinkColor} nodeColor={this.getNodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>
 
