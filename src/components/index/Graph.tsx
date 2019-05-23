@@ -341,6 +341,7 @@ class Graph extends React.Component<Props, State> {
 
       let color = "blue";
 
+
       if(node.id==="GLOBAL"){
 
         return {...node,name:node.name,val:3,color};
@@ -368,8 +369,8 @@ class Graph extends React.Component<Props, State> {
     return (
 
 
-      <div ref={this.GraphViewRef}     id="graph"  className={ !!this.props.searchText ? "search-active" : "" }>
-      {!this.state.newSystem?<ForceGraph2D  onClick={this.onGraphClick} d3AlphaDecay={1} zoom={1} d3VelocityDecay={1} onNodeDragEnd={this.onNodeDragEnd} linkDirectionalArrowLength={3} nodeId={NODE_KEY} onLinkClick={this.onSelectEdge} linkColor={this.getLinkColor} nodeColor={this.getNodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>:<GraphV id={"graph-id"} onClickNode={this.onSelectNodeN} onClickLink={this.onClickLinkN} config={graphConfig} data={graphData}/>}
+      <div     id="graph"  className={ !!this.props.searchText ? "search-active" : "" }>
+      {!this.state.newSystem?<ForceGraph2D  onClick={this.onGraphClick} d3AlphaDecay={1} zoom={1} d3VelocityDecay={1} onNodeDragEnd={this.onNodeDragEnd} linkDirectionalArrowLength={3} nodeId={NODE_KEY} onLinkClick={this.onSelectEdge} linkColor={this.getLinkColor} nodeColor={this.getNodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>:<GraphV ref={this.GraphViewRef}  id={"graph-id"} onClickNode={this.onSelectNodeN} onClickLink={this.onClickLinkN} config={graphConfig} data={graphData}/>}
 
 
 
@@ -442,7 +443,11 @@ class Graph extends React.Component<Props, State> {
       if(this.state.graph.nodes[i].id===nodeId){
         this.props.onSelectNode(this.state.graph.nodes[i]);
 
+
+
+
       }
+      
 
 
     }
