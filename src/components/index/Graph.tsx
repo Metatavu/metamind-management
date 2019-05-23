@@ -68,7 +68,8 @@ interface State {
 const GLOBAL_NODE_ID = "GLOBAL";
 
 class Graph extends React.Component<Props, State> {
-  GraphViewRef: any
+  GraphViewRef: any;
+  GraphCanvasViewRef:any;
 
   constructor(props: Props) {
     super(props);
@@ -86,6 +87,7 @@ class Graph extends React.Component<Props, State> {
     };
 
     this.GraphViewRef = React.createRef();
+    this.GraphCanvasViewRef = React.createRef();
   }
 
   /**
@@ -221,20 +223,26 @@ class Graph extends React.Component<Props, State> {
 
   onGraphClick = (event:any):void=>{
 
+    const canvas = this.GraphViewRef.current.childNodes[0].childNodes[0].childNodes[0];
+    const transform = canvas.__zoom;
+
+    const x = (event.clientX-transform.x)/transform.k;
+    const y = (event.clientY-transform.y)/transform.k;
+
     if(event.shiftKey){
         const selected = this.state.selected;
         this.setState({selected:null});
 
         if(selected!==this.state.edgeDrawStart){
           if(selected===null){
-            this.onCreateNode(0,0);
+            this.onCreateNode(x,y);
           }else{
             this.onCreateEdge(this.state.edgeDrawStart,selected);
           }
           this.setState({edgeDrawStart:null});
 
         }else{
-          this.onCreateNode(0,0);
+          this.onCreateNode(x,y);
         }
 
 
@@ -288,7 +296,7 @@ class Graph extends React.Component<Props, State> {
     if(viewLink.id){
       if(this.state.searchResultKnotIds.includes(viewLink.id)){
 
-      
+
           return "orange";
       }
     }
@@ -327,7 +335,7 @@ class Graph extends React.Component<Props, State> {
 
       if(node.id==="GLOBAL"){
 
-        return {...node,name:node.name,val:3};
+        return {...node,name:node.name,val:3,x:0,y:0};
       }
 
       const newest = i===nodes.length-1;
@@ -349,7 +357,7 @@ class Graph extends React.Component<Props, State> {
 
       <div ref={this.GraphViewRef}    onClick={this.onGraphClick} id="graph"  className={ !!this.props.searchText ? "search-active" : "" }>
 
-      <ForceGraph2D d3AlphaDecay={0.99} d3VelocityDecay={0.99} onNodeDragEnd={this.onNodeDragEnd} linkDirectionalArrowLength={3} nodeId={NODE_KEY} onLinkClick={this.onSelectEdge} linkColor={this.getLinkColor} nodeColor={this.getNodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>
+      <ForceGraph2D ref={this.GraphCanvasViewRef} d3AlphaDecay={1} zoom={1} d3VelocityDecay={1} onNodeDragEnd={this.onNodeDragEnd} linkDirectionalArrowLength={3} nodeId={NODE_KEY} onLinkClick={this.onSelectEdge} linkColor={this.getLinkColor} nodeColor={this.getNodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>
 
 
       </div>
