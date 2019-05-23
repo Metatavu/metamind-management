@@ -4,7 +4,7 @@ import { StoreState } from "src/types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import * as actions from "../../actions/"
-import {  LayoutEngineType } from 'react-digraph';
+
 import Api, { Intent, Knot } from "metamind-client";
 import {ForceGraph2D} from "react-force-graph";
 
@@ -61,7 +61,6 @@ interface State {
   selected: any;
   edgeDrawStart:any;
   copiedNode: any;
-  layoutEngineType?: LayoutEngineType;
   searchResultKnotIds: string[]
 };
 
@@ -79,7 +78,6 @@ class Graph extends React.Component<Props, State> {
         edges: [],
         nodes: []
       },
-      layoutEngineType: undefined,
       selected: null,
       edgeDrawStart:null,
       searchResultKnotIds: []
@@ -255,6 +253,20 @@ class Graph extends React.Component<Props, State> {
 
     return "blue";
   }
+  onNodeDragEnd = (viewNode:INode)=>{
+    for(let i = 0;i<this.state.graph.nodes.length;i++){
+      let nodes = this.state.graph.nodes;
+      if(nodes[i].id===viewNode.id){
+        nodes[i].x = viewNode.x;
+        nodes[i].y = viewNode.y;
+        let graph = this.state.graph;
+        graph.nodes = nodes;
+        this.setState({graph});
+
+      }
+    }
+
+  }
 
   /*
    * Render
@@ -268,10 +280,10 @@ class Graph extends React.Component<Props, State> {
 
       if(node.id==="GLOBAL"){
 
-        return {...node,name:node.name,val:3,x:0,y:0};
+        return {...node,name:node.name,val:3};
       }
 
-      return {...node,val:1,x:0,y:0};
+      return {...node,val:1};
 
 
     });
@@ -280,13 +292,13 @@ class Graph extends React.Component<Props, State> {
     if(this.state.selected===null){
       this.props.onCloseSidebar();
     }
-  
+    console.log(newNodes);
     return (
 
 
       <div  onClick={this.onGraphClick} id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
 
-      <ForceGraph2D  linkDirectionalArrowLength={3} nodeId={NODE_KEY} onLinkClick={this.onSelectEdge} linkColor={this.getLinkColor} nodeColor={this.getNodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>
+      <ForceGraph2D d3AlphaDecay={0.99} d3VelocityDecay={0.99} onNodeDragEnd={this.onNodeDragEnd} linkDirectionalArrowLength={3} nodeId={NODE_KEY} onLinkClick={this.onSelectEdge} linkColor={this.getLinkColor} nodeColor={this.getNodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>
 
 
       </div>
