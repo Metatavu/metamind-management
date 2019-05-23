@@ -183,7 +183,7 @@ class Graph extends React.Component<Props, State> {
 
     const searchText = this.props.searchText.toLowerCase();
 
-    return this.props.knots.filter((knot) => {
+    const filteredKnots = this.props.knots.filter((knot) => {
       const name = knot.name.toLowerCase();
       if (name && name.includes(searchText)) {
         return true;
@@ -199,6 +199,22 @@ class Graph extends React.Component<Props, State> {
     .map((knot) => {
       return knot.id!;
     });
+    const filteredIntents = this.props.intents.filter((intent) => {
+      if(intent.name){
+        const name = intent.name.toLowerCase();
+        if (name && name.includes(searchText)) {
+          return true;
+        }
+      }
+
+
+
+      return false;
+    })
+    .map((intent) => {
+      return intent.id!;
+    });
+    return filteredKnots.concat(filteredIntents);
   }
 
 
@@ -237,15 +253,21 @@ class Graph extends React.Component<Props, State> {
 
 
     if(this.state.selected&&this.state.selected.id===viewNode.id){
+      viewNode.newest=false;
+
+
+
       return "red";
     }
     if(viewNode.id){
       if(this.state.searchResultKnotIds.includes(viewNode.id)){
 
+          viewNode.newest=false;
           return "orange";
       }
     }
     if(viewNode.newest){
+
         return "green";
 
 
@@ -263,7 +285,13 @@ class Graph extends React.Component<Props, State> {
       return "red";
     }
 
+    if(viewLink.id){
+      if(this.state.searchResultKnotIds.includes(viewLink.id)){
 
+      
+          return "orange";
+      }
+    }
 
 
 
@@ -301,7 +329,11 @@ class Graph extends React.Component<Props, State> {
 
         return {...node,name:node.name,val:3};
       }
-      const newest = i === this.state.graph.nodes.length-1;
+
+      const newest = i===nodes.length-1;
+
+
+
       return {...node,val:1,newest};
 
 
