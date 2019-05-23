@@ -7,7 +7,7 @@ import * as actions from "../../actions/"
 
 import Api, { Intent, Knot } from "metamind-client";
 import {ForceGraph2D} from "react-force-graph";
-
+import { Graph as GraphV } from 'react-d3-graph';
 
 import  {
   NODE_KEY,
@@ -25,7 +25,8 @@ export interface INode{
   type: string,
   x?: number,
   y?: number,
-  newest?:boolean
+  newest?:boolean,
+  color?:string
 }
 export interface IEdge{
   id?: string,
@@ -62,7 +63,8 @@ interface State {
   selected: any;
   edgeDrawStart:any;
   copiedNode: any;
-  searchResultKnotIds: string[]
+  searchResultKnotIds: string[],
+  newSystem:boolean
 };
 
 const GLOBAL_NODE_ID = "GLOBAL";
@@ -82,7 +84,8 @@ class Graph extends React.Component<Props, State> {
       },
       selected: null,
       edgeDrawStart:null,
-      searchResultKnotIds: []
+      searchResultKnotIds: [],
+      newSystem:true
 
     };
 
@@ -323,6 +326,7 @@ class Graph extends React.Component<Props, State> {
   }
 
 
+
   /*
    * Render
    */
@@ -335,31 +339,38 @@ class Graph extends React.Component<Props, State> {
     const newNodes = nodes.map((node,i)=>{
 
 
+      let color = "blue";
+
       if(node.id==="GLOBAL"){
 
-        return {...node,name:node.name,val:3};
+        return {...node,name:node.name,val:3,color};
       }
 
       const newest = i===nodes.length-1;
 
 
 
-      return {...node,val:1,newest};
+      return {...node,val:1,newest,color};
 
 
     });
-    const newEdges = edges;
+    const newEdges = edges.map((edge)=>{
+      return {...edge,color:"blue"}
+    });
     const graphData = {nodes:newNodes,links:newEdges};
     if(this.state.selected===null){
       this.props.onCloseSidebar();
     }
-
+    const graphConfig = {
+      height:screen.height,
+      width:screen.width
+}
     return (
 
 
-      <div ref={this.GraphViewRef}    onClick={this.onGraphClick} id="graph"  className={ !!this.props.searchText ? "search-active" : "" }>
+      <div ref={this.GraphViewRef}     id="graph"  className={ !!this.props.searchText ? "search-active" : "" }>
+      {!this.state.newSystem?<ForceGraph2D  onClick={this.onGraphClick} d3AlphaDecay={1} zoom={1} d3VelocityDecay={1} onNodeDragEnd={this.onNodeDragEnd} linkDirectionalArrowLength={3} nodeId={NODE_KEY} onLinkClick={this.onSelectEdge} linkColor={this.getLinkColor} nodeColor={this.getNodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>:<GraphV id={"graph-id"} onClickNode={this.onSelectNodeN} onClickLink={this.onClickLinkN} config={graphConfig} data={graphData}/>}
 
-      <ForceGraph2D d3AlphaDecay={1} zoom={1} d3VelocityDecay={1} onNodeDragEnd={this.onNodeDragEnd} linkDirectionalArrowLength={3} nodeId={NODE_KEY} onLinkClick={this.onSelectEdge} linkColor={this.getLinkColor} nodeColor={this.getNodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>
 
 
       </div>
@@ -419,10 +430,23 @@ class Graph extends React.Component<Props, State> {
   /**
    * Handles node selection
    */
-  private onSelectNode = (viewNode: INode | null) => {
+  private onSelectNode = (viewNode: INode | null ) => {
     // Deselect events will send Null viewNode
     this.setState({ selected: viewNode });
     this.props.onSelectNode(viewNode);
+  }
+  private onSelectNodeN = (nodeId:string)=>{
+    for(let i = 0;i<this.state.graph.nodes.length;i++){
+
+
+      if(this.state.graph.nodes[i].id===nodeId){
+        this.props.onSelectNode(this.state.graph.nodes[i]);
+
+      }
+
+
+    }
+
   }
 
   /**
@@ -431,6 +455,15 @@ class Graph extends React.Component<Props, State> {
   private onSelectEdge = (viewEdge: IEdge) => {
     this.setState({ selected: viewEdge });
     this.props.onSelectEdge(viewEdge);
+  }
+  private onClickLinkN = (source:string,target:string) => {
+    for(let i=0;i<this.state.graph.edges.length;i++){
+      if(this.state.graph.edges[i].target===target&&this.state.graph.edges[i].source===source){
+        this.onSelectEdge(this.state.graph.edges[i]);
+
+      }
+
+    }
   }
 
   /**
