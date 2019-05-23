@@ -337,7 +337,7 @@ class Graph extends React.Component<Props, State> {
 
       if(node.id==="GLOBAL"){
 
-        return {...node,name:node.name,val:3,x:0,y:0};
+        return {...node,name:node.name,val:3};
       }
 
       const newest = i===nodes.length-1;
