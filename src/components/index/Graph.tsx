@@ -4,12 +4,9 @@ import { StoreState } from "src/types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import * as actions from "../../actions/"
-
+import { GraphView, IEdge, INode, LayoutEngineType, GraphUtils } from 'react-digraph';
 import Api, { Intent, Knot } from "metamind-client";
-import {ForceGraph2D} from "react-force-graph";
-import { Graph as GraphV } from 'react-d3-graph';
-
-import  {
+import GraphConfig, {
   NODE_KEY,
   TEXT_TYPE,
   OPENNLP_EDGE_TYPE,
@@ -17,23 +14,9 @@ import  {
   PENDING_TYPE
 } from '../../utils/graph-config'; // Configures node/edge types
 import { KeycloakInstance } from 'keycloak-js';
+import KnotText from '../generic/KnotText';
 import '../../styles/graph.css'
 
-export interface INode{
-  id?: string,
-  name: string,
-  type: string,
-  x?: number,
-  y?: number,
-  newest?:boolean,
-  color?:string
-}
-export interface IEdge{
-  id?: string,
-  source:string,
-  target:string,
-  type:string
-}
 interface IGraph {
   nodes: INode[];
   edges: IEdge[];
@@ -48,7 +31,6 @@ interface Props {
   onIntentsFound: (intents: Intent[]) => void
   onIntentUpdated: (intent: Intent) => void
   onIntentDeleted: (intentId: string) => void
-  onCloseSidebar: () => void
 
   keycloak?: KeycloakInstance
   knots: Knot[]
@@ -61,17 +43,15 @@ interface Props {
 interface State {
   graph: IGraph;
   selected: any;
-  edgeDrawStart:any;
   copiedNode: any;
-  searchResultKnotIds: string[],
-  newSystem:boolean
+  layoutEngineType?: LayoutEngineType;
+  searchResultKnotIds: string[]
 };
 
 const GLOBAL_NODE_ID = "GLOBAL";
 
 class Graph extends React.Component<Props, State> {
-  GraphViewRef: any;
-
+  GraphViewRef: any
 
   constructor(props: Props) {
     super(props);
@@ -82,15 +62,12 @@ class Graph extends React.Component<Props, State> {
         edges: [],
         nodes: []
       },
+      layoutEngineType: undefined,
       selected: null,
-      edgeDrawStart:null,
-      searchResultKnotIds: [],
-      newSystem:true
-
+      searchResultKnotIds: []
     };
 
     this.GraphViewRef = React.createRef();
-
   }
 
   /**
@@ -99,10 +76,8 @@ class Graph extends React.Component<Props, State> {
   static getDerivedStateFromProps = (props: Props, state: State) => {
     const globalNode: INode = {
       id: GLOBAL_NODE_ID,
-      name: "Global", // Localize
-      type: GLOBAL_TYPE,
-      x:0,
-      y:0
+      title: "Global", // Localize
+      type: GLOBAL_TYPE
     };
 
     const { nodes } = state.graph;
@@ -115,11 +90,7 @@ class Graph extends React.Component<Props, State> {
     });
     const pendingNodes = nodes.filter(node => node.id && node.id.startsWith("pending"));
     const newStateNodes = nodes.filter(node => node.id && node.id.startsWith("new"));
-    newStateNodes.forEach(((n) => {
-      if(n.id){
-        n.id = n.id.replace("new-", "");
-      }
-    }));
+    newStateNodes.forEach(((n) => {n.id = n.id.replace("new-", "")}));
 
     return {
       graph: {
@@ -133,8 +104,6 @@ class Graph extends React.Component<Props, State> {
    * Loads intents and knots while graph is mounted
    */
   public componentDidMount = async () => {
-
-
     const knotsService = Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "");
     const intentsService = Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "");
 
@@ -145,38 +114,12 @@ class Graph extends React.Component<Props, State> {
 
     this.props.onKnotsFound(knots);
     this.props.onIntentsFound(intents);
-
-
-
-
-    window.addEventListener("keydown",event=>{
-      if(event.keyCode===46){
-
-        if(this.state.selected){
-
-            if(this.state.selected.name){
-
-
-
-
-              this.onDeleteNode(this.state.selected,this.state.selected.id,this.state.graph.nodes);
-
-            }else{
-
-              this.onDeleteEdge(this.state.selected,this.state.graph.edges);
-            }
-        };
-
-      };
-
-    });
-
   }
 
   public componentDidUpdate(prevProps: Props, prevState: State) {
     if (this.props.searchText !== prevProps.searchText) {
       this.setState({
-        searchResultKnotIds: this.searchKnots(), selected:null
+        searchResultKnotIds: this.searchKnots()
       });
     }
   }
@@ -188,7 +131,7 @@ class Graph extends React.Component<Props, State> {
 
     const searchText = this.props.searchText.toLowerCase();
 
-    const filteredKnots = this.props.knots.filter((knot) => {
+    return this.props.knots.filter((knot) => {
       const name = knot.name.toLowerCase();
       if (name && name.includes(searchText)) {
         return true;
@@ -204,180 +147,44 @@ class Graph extends React.Component<Props, State> {
     .map((knot) => {
       return knot.id!;
     });
-    const filteredIntents = this.props.intents.filter((intent) => {
-      if(intent.name){
-        const name = intent.name.toLowerCase();
-        if (name && name.includes(searchText)) {
-          return true;
-        }
-      }
-
-
-
-      return false;
-    })
-    .map((intent) => {
-      return intent.id!;
-    });
-    return filteredKnots.concat(filteredIntents);
   }
-
-
-  //Helps to handle node and edge creation
-  private onGraphClick = (event:any):void=>{
-
-    const canvas = this.GraphViewRef.current.childNodes[0].childNodes[0].childNodes[0];
-    const transform = canvas.__zoom;
-
-    const x = (event.clientX-transform.x)/transform.k;
-    const y = (event.clientY-transform.y)/transform.k;
-
-    if(event.shiftKey){
-        const selected = this.state.selected;
-        this.setState({selected:null});
-
-        if(selected!==this.state.edgeDrawStart){
-          if(selected===null){
-            this.onCreateNode(x,y);
-          }else if(this.state.edgeDrawStart!==null){
-
-            this.onCreateEdge(this.state.edgeDrawStart,selected);
-          }
-          this.setState({edgeDrawStart:null});
-
-        }else{
-          this.onCreateNode(x,y);
-        }
-
-
-
-
-    }
-    if(this.state.selected){
-      this.setState({edgeDrawStart:this.state.selected});
-
-
-
-    }
-
-  };
-  private getNodeColor = (viewNode:INode)=>{
-
-
-    if(this.state.selected&&this.state.selected.id===viewNode.id){
-      viewNode.newest=false;
-
-
-
-      return "red";
-    }
-    if(viewNode.id){
-      if(this.state.searchResultKnotIds.includes(viewNode.id)){
-
-          viewNode.newest=false;
-          return "orange";
-      }
-    }
-    if(viewNode.newest){
-
-        return "green";
-
-
-
-    }
-
-
-
-
-
-    return "blue";
-  }
-  private getLinkColor = (viewLink:IEdge)=>{
-    if(this.state.selected&&this.state.selected.id===viewLink.id){
-      return "red";
-    }
-
-    if(viewLink.id){
-      if(this.state.searchResultKnotIds.includes(viewLink.id)){
-
-
-          return "orange";
-      }
-    }
-
-
-
-    return "blue";
-  }
-  //Updates state after node dragging
-  private onNodeDragEnd = (viewNode:INode)=>{
-    for(let i = 0;i<this.state.graph.nodes.length;i++){
-      let nodes = this.state.graph.nodes;
-      if(nodes[i].id===viewNode.id){
-        nodes[i].x = viewNode.x;
-        nodes[i].y = viewNode.y;
-        let graph = this.state.graph;
-        graph.nodes = nodes;
-        this.setState({graph});
-
-      }
-    }
-
-  }
-
-
 
   /*
    * Render
    */
   public render() {
-
-
     const { nodes, edges } = this.state.graph;
+    const selected = this.state.selected;
+    const { NodeTypes, NodeSubtypes, EdgeTypes } = GraphConfig;
 
-
-    const newNodes = nodes.map((node,i)=>{
-
-
-      let color = "blue";
-
-
-      if(node.id==="GLOBAL"){
-
-        return {...node,name:node.name,val:3,color};
-      }
-
-      const newest = i===nodes.length-1;
-
-
-
-      return {...node,val:1,newest,color};
-
-
-    });
-    const newEdges = edges.map((edge)=>{
-      return {...edge,color:"blue"}
-    });
-    const graphData = {nodes:newNodes,links:newEdges};
-    if(this.state.selected===null){
-      this.props.onCloseSidebar();
-    }
-    const graphConfig = {
-      height:screen.height,
-      width:screen.width
-}
     return (
-
-
-      <div     id="graph"  className={ !!this.props.searchText ? "search-active" : "" }>
-      {!this.state.newSystem?<ForceGraph2D  onClick={this.onGraphClick} d3AlphaDecay={1} zoom={1} d3VelocityDecay={1} onNodeDragEnd={this.onNodeDragEnd} linkDirectionalArrowLength={3} nodeId={NODE_KEY} onLinkClick={this.onSelectEdge} linkColor={this.getLinkColor} nodeColor={this.getNodeColor} onNodeClick={this.onSelectNode} graphData={graphData}/>:<GraphV ref={this.GraphViewRef}  id={"graph-id"} onClickNode={this.onSelectNodeN} onClickLink={this.onClickLinkN} config={graphConfig} data={graphData}/>}
-
-
-
+      <div id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
+        <GraphView
+          nodeSize={ 400 }
+          ref={(el) => (this.GraphViewRef = el)}
+          nodeKey={NODE_KEY}
+          nodes={nodes}
+          edges={edges}
+          selected={selected}
+          nodeTypes={NodeTypes}
+          nodeSubtypes={NodeSubtypes}
+          edgeTypes={EdgeTypes}
+          onSelectNode={this.onSelectNode}
+          onCreateNode={this.onCreateNode}
+          onUpdateNode={this.onUpdateNode}
+          onDeleteNode={this.onDeleteNode}
+          onSelectEdge={this.onSelectEdge}
+          onCreateEdge={this.onCreateEdge}
+          onSwapEdge={this.onSwapEdge}
+          onDeleteEdge={this.onDeleteEdge}
+          onUndo={this.onUndo}
+          onCopySelected={this.onCopySelected}
+          onPasteSelected={this.onPasteSelected}
+          layoutEngineType={ this.props.autolayout ? "VerticalTree" : undefined}
+          renderNodeText={this.renderNodeText}
+          renderNode={this.renderNode}
+        />
       </div>
-
-
-
     );
   }
 
@@ -405,16 +212,130 @@ class Graph extends React.Component<Props, State> {
   private static translateKnot(knot: Knot, x?: number, y?: number): INode {
     return {
       id: knot.id,
-      name: knot.name,
+      title: knot.name,
       type: TEXT_TYPE,
       x: x,
       y: y
     }
   }
 
+  /**
+   * Renders text for single node
+   *
+   * @param data node data
+   * @param id node id
+   * @param isSelected is node currently selected
+   */
+  private renderNodeText(data: INode, id: string | number, isSelected: boolean): JSX.Element {
+    return <KnotText data={data} isSelected={isSelected} />
+  }
 
+  /**
+   * Renders a node
+   */
+  private renderNode = (nodeRef: any, data: any, id: string, selected: boolean, hovered: boolean) => {
+    const props = {
+      height: 0,
+      width: 0
+    };
 
+    const nodeShapeContainerClassName = GraphUtils.classNames('shape');
+    let nodeClassName = GraphUtils.classNames('node', { selected, hovered });
+    const nodeSubtypeClassName = GraphUtils.classNames('subtype-shape', { selected: this.state.selected });
+    const nodeTypeXlinkHref = this.getNodeTypeXlinkHref(data, GraphConfig.NodeTypes) || '';
+    const nodeSubtypeXlinkHref = this.getNodeSubtypeXlinkHref(data, GraphConfig.NodeSubtypes) || '';
 
+    const defSvgNodeElement: any = nodeTypeXlinkHref ? document.querySelector(`defs>${nodeTypeXlinkHref}`) : null;
+    const nodeWidthAttr = defSvgNodeElement ? defSvgNodeElement.getAttribute('width') : 0;
+    const nodeHeightAttr = defSvgNodeElement ? defSvgNodeElement.getAttribute('height') : 0;
+    props.width = nodeWidthAttr ? parseInt(nodeWidthAttr, 10) : props.width;
+    props.height = nodeHeightAttr ? parseInt(nodeHeightAttr, 10) : props.height;
+    const index = this.props.knots.findIndex((knot) => {
+      return knot.id === id;
+    });
+
+    if (!!this.props.searchText && this.state.searchResultKnotIds.includes(id)) {
+      nodeClassName += " search-hit";
+    }
+
+    return (
+      <g className={nodeShapeContainerClassName} {...props}>
+        {!!data.subtype && (
+          <use
+            data-index={index}
+            className={nodeSubtypeClassName}
+            x={-props.width / 2}
+            y={-props.height / 2}
+            width={props.width}
+            height={props.height}
+            xlinkHref={nodeSubtypeXlinkHref}
+          />
+        )}
+        <use
+          data-index={index}
+          className={nodeClassName}
+          x={-props.width / 2}
+          y={-props.height / 2}
+          width={props.width}
+          height={props.height}
+          xlinkHref={nodeTypeXlinkHref}
+        />
+      </g>
+    );
+  }
+
+  /**
+   * Resolves xlinkhref attribute for node
+   *
+   * @param data node
+   * @param nodeTypes subtypes
+   */
+  private getNodeTypeXlinkHref(data: INode, nodeTypes: any) {
+    if (data.type && nodeTypes[data.type]) {
+      return nodeTypes[data.type].shapeId;
+    } else if (nodeTypes.emptyNode) {
+      return nodeTypes.emptyNode.shapeId;
+    }
+    return null;
+  }
+
+  /**
+   * Resolves xlinkhref attribute for node subtype
+   *
+   * @param data node
+   * @param nodeSubtypes subtypes
+   */
+  private getNodeSubtypeXlinkHref(data: INode, nodeSubtypes?: any) {
+    if (data.subtype && nodeSubtypes && nodeSubtypes[data.subtype]) {
+      return nodeSubtypes[data.subtype].shapeId;
+    } else if (nodeSubtypes && nodeSubtypes.emptyNode) {
+      return nodeSubtypes.emptyNode.shapeId;
+    }
+    return null;
+  }
+
+  /**
+   * Helper to find the index of a given node
+   *
+   * @param searchNode node to find the index for
+   */
+  private getNodeIndex(searchNode: INode | any) {
+    return this.state.graph.nodes.findIndex((node: INode) => {
+      return node[NODE_KEY] === searchNode[NODE_KEY];
+    });
+  }
+
+  //
+  /**
+   * Helper to find the index of a given edge
+   *
+   * @param searchEdge edge to find the index for
+   */
+  private getEdgeIndex(searchEdge: IEdge) {
+    return this.state.graph.edges.findIndex((edge: IEdge) => {
+      return edge.source === searchEdge.source && edge.target === searchEdge.target;
+    });
+  }
 
   /**
    * Deletes an intent
@@ -426,32 +347,25 @@ class Graph extends React.Component<Props, State> {
     this.props.onIntentDeleted(id);
   }
 
+  /**
+   * Called by 'drag' handler, etc..
+   * to sync updates from D3 with the graph
+   */
+  private onUpdateNode = (viewNode: INode) => {
+    const graph = this.state.graph;
+    const i = this.getNodeIndex(viewNode);
 
+    graph.nodes[i] = viewNode;
+    this.setState({ graph });
+  }
 
   /**
    * Handles node selection
    */
-  private onSelectNode = (viewNode: INode | null ) => {
+  private onSelectNode = (viewNode: INode | null) => {
     // Deselect events will send Null viewNode
     this.setState({ selected: viewNode });
     this.props.onSelectNode(viewNode);
-  }
-  private onSelectNodeN = (nodeId:string)=>{
-    for(let i = 0;i<this.state.graph.nodes.length;i++){
-
-
-      if(this.state.graph.nodes[i].id===nodeId){
-        this.props.onSelectNode(this.state.graph.nodes[i]);
-
-
-
-
-      }
-      
-
-
-    }
-
   }
 
   /**
@@ -460,15 +374,6 @@ class Graph extends React.Component<Props, State> {
   private onSelectEdge = (viewEdge: IEdge) => {
     this.setState({ selected: viewEdge });
     this.props.onSelectEdge(viewEdge);
-  }
-  private onClickLinkN = (source:string,target:string) => {
-    for(let i=0;i<this.state.graph.edges.length;i++){
-      if(this.state.graph.edges[i].target===target&&this.state.graph.edges[i].source===source){
-        this.onSelectEdge(this.state.graph.edges[i]);
-
-      }
-
-    }
   }
 
   /**
@@ -479,7 +384,7 @@ class Graph extends React.Component<Props, State> {
     const tempNodeId = `pending-${new Date().getTime()}`;
     const node = {
       id: tempNodeId,
-      name: "loading",
+      title: "loading",
       type: PENDING_TYPE,
       x: x,
       y: y
@@ -505,7 +410,6 @@ class Graph extends React.Component<Props, State> {
     });
 
     graph.nodes = newNodes;
-
     this.setState({ graph });
 
     this.props.onKnotsFound([knot]);
@@ -517,31 +421,54 @@ class Graph extends React.Component<Props, State> {
    */
   private onCreateEdge = async (sourceViewNode: INode, targetViewNode: INode) => {
     const graph = this.state.graph;
-    if(sourceViewNode.id&&targetViewNode.id){
-      const intent = await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").createIntent({
-        type: "NORMAL",
-        name: "New intent",
-        quickResponseOrder: 0,
-        global: sourceViewNode.id === GLOBAL_NODE_ID,
-        sourceKnotId: sourceViewNode.id === GLOBAL_NODE_ID ? undefined : sourceViewNode.id ,
-        targetKnotId: targetViewNode.id,
-        trainingMaterials: {}
-      }, this.props.storyId);
+    const intent = await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").createIntent({
+      type: "NORMAL",
+      name: "New intent",
+      quickResponseOrder: 0,
+      global: sourceViewNode.id === GLOBAL_NODE_ID,
+      sourceKnotId: sourceViewNode.id === GLOBAL_NODE_ID ? undefined : sourceViewNode.id ,
+      targetKnotId: targetViewNode.id,
+      trainingMaterials: {}
+    }, this.props.storyId);
 
-      const viewEdge = Graph.translateIntent(intent);
+    const viewEdge = Graph.translateIntent(intent);
 
-      graph.edges = [...graph.edges, viewEdge];
-      this.setState({
-        graph,
-        selected: viewEdge
-      });
+    graph.edges = [...graph.edges, viewEdge];
+    this.setState({
+      graph,
+      selected: viewEdge
+    });
 
-      this.props.onIntentsFound([intent]);
-    }
-
+    this.props.onIntentsFound([intent]);
   }
 
+  /**
+   * Called when an edge is reattached to a different target.
+   */
+  private onSwapEdge = async (sourceViewNode: INode, targetViewNode: INode, viewEdge: IEdge) => {
+    const graph = this.state.graph;
+    const intent = this.props.intents.find(intent => intent.id == viewEdge.id);
+    if (!intent) {
+      return;
+    }
 
+    intent.sourceKnotId = sourceViewNode.id;
+    intent.targetKnotId = targetViewNode.id;
+    const updatedIntent = await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").updateIntent(intent, this.props.storyId, intent.id!);
+    const i = this.getEdgeIndex(viewEdge);
+    const edge = JSON.parse(JSON.stringify(graph.edges[i]));
+
+    edge.source = sourceViewNode[NODE_KEY];
+    edge.target = targetViewNode[NODE_KEY];
+    graph.edges[i] = edge;
+    graph.edges = [...graph.edges];
+
+    this.setState({
+      graph,
+      selected: edge
+    });
+    this.props.onIntentUpdated(updatedIntent);
+  }
 
   /**
    * Event handler for edge deletion
@@ -550,13 +477,10 @@ class Graph extends React.Component<Props, State> {
    * @param edges edges after deletion
    */
   private onDeleteEdge = async (viewEdge: IEdge, edges: IEdge[]) => {
-    if(viewEdge.id){
-      await this.deleteIntent(viewEdge.id);
-      this.setState({
-        selected: null
-      });
-    }
-
+    await this.deleteIntent(viewEdge.id);
+    this.setState({
+      selected: null
+    });
   }
 
   /**
@@ -567,32 +491,23 @@ class Graph extends React.Component<Props, State> {
    * @param nodes nodes after deletion
    */
   private onDeleteNode = async (viewNode: INode, nodeId: string, nodes: INode[]) => {
-    if(viewNode.id){
-      const graph = this.state.graph;
-      const edges = [];
+    const graph = this.state.graph;
 
+    await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").deleteKnot(this.props.storyId, viewNode.id);
 
-      for (let i = 0; i < graph.edges.length; i++) {
-        const edge = graph.edges[i];
+    const edges = [];
 
-        if (edge.source[NODE_KEY] !== viewNode.id && edge.target[NODE_KEY] !== viewNode.id) {
-          edges.push(edge);
-        } else {
-          if(edge.id){
-                    await this.deleteIntent(edge.id);
-          }
-
-        }
-
+    for (let i = 0; i < graph.edges.length; i++) {
+      const edge = graph.edges[i];
+      if (edge.source !== viewNode[NODE_KEY] && edge.target !== viewNode[NODE_KEY]) {
+        edges.push(edge);
+      } else {
+        await this.deleteIntent(edge.id);
       }
-
-      await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").deleteKnot(this.props.storyId, viewNode.id);
-
-
-      this.props.onKnotDeleted(viewNode.id);
-      this.setState({ selected: null });
     }
 
+    this.props.onKnotDeleted(viewNode.id);
+    this.setState({ selected: null });
   }
 
   onUndo = () => {

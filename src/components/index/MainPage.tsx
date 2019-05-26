@@ -10,9 +10,9 @@ import { connect } from "react-redux";
 import { KeycloakInstance } from "keycloak-js";
 
 import "../../styles/common.scss";
-import Graph,{ INode, IEdge } from "./Graph";
+import Graph from "./Graph";
 import { Sidebar, Segment } from "semantic-ui-react";
-
+import { INode, IEdge } from "react-digraph";
 import IntentEditor from "./IntentEditor";
 import StorySelector from "./StorySelector";
 import KnotEditor from "./KnotEditor";
@@ -43,6 +43,7 @@ class WelcomePage extends React.Component<Props, State> {
   }
 
   public render() {
+    
     return (
       <BasicLayout>
         { this.props.authenticated ? (
@@ -75,7 +76,7 @@ class WelcomePage extends React.Component<Props, State> {
     if (!this.state.storyId) {
       return <div style={{ minHeight: "400px" }}><StorySelector onStorySelected={ (storyId) => { this.setState({ storyId: storyId}) } } /></div>
     } else {
-      return <Graph storyId={ this.state.storyId } onSelectNode={this.onSelectNode} onSelectEdge={this.onSelectEdge} onCloseSidebar={this.onCloseSidebar} />
+      return <Graph storyId={ this.state.storyId } onSelectNode={this.onSelectNode} onSelectEdge={this.onSelectEdge} />
     }
   }
 
@@ -83,8 +84,7 @@ class WelcomePage extends React.Component<Props, State> {
    * Renders sidebar contents
    */
   private renderSidebarContent = (): JSX.Element | null => {
-
-    if (this.state.selectedEdge && this.state.storyId&&this.state.selectedEdge.id) {
+    if (this.state.selectedEdge && this.state.storyId) {
       return <IntentEditor storyId={ this.state.storyId } intentId={this.state.selectedEdge.id} />
     }
 
@@ -92,7 +92,7 @@ class WelcomePage extends React.Component<Props, State> {
       return <GlobalEditor storyId={ this.state.storyId } />
     }
 
-    if (this.state.selectedNode&&this.state.selectedNode.id && this.state.storyId && this.state.selectedNode.type !== GLOBAL_TYPE) {
+    if (this.state.selectedNode && this.state.storyId && this.state.selectedNode.type !== GLOBAL_TYPE) {
       return <KnotEditor storyId={ this.state.storyId } knotId={this.state.selectedNode.id} />
     }
 
@@ -113,10 +113,6 @@ class WelcomePage extends React.Component<Props, State> {
       selectedEdge: item,
       selectedNode: null
     });
-  }
-  private onCloseSidebar = () =>{
-
-    this.setState({sidebarVisible:false});
   }
 }
 

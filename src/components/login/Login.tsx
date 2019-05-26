@@ -13,7 +13,6 @@ import { Dispatch } from "redux";
 import { KeycloakInstance } from "keycloak-js";
 import { connect } from "react-redux";
 
-
 export interface Props {
   authenticated: boolean,
   keycloak?: Keycloak.KeycloakInstance,
@@ -40,7 +39,6 @@ class Login extends React.Component<Props, State> {
   }
 
   doLogin() {
-
     const kcConf = {
       "realm": process.env.REACT_APP_REALM,
       "url": process.env.REACT_APP_AUTH_SERVER_URL,
