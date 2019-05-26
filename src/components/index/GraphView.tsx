@@ -5,7 +5,8 @@ export interface INode{
   id:string,
   title:string,
   x:number,
-  y:number
+  y:number,
+  type?:string
 }
 export interface IEdge{
   id:string,
@@ -372,6 +373,8 @@ class GraphView extends React.Component<Props,State>{
     }
     return(
       <div id="GraphView">
+
+
       </div>
     );
   }

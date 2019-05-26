@@ -12,7 +12,7 @@ import { KeycloakInstance } from "keycloak-js";
 import "../../styles/common.scss";
 import Graph from "./Graph";
 import { Sidebar, Segment } from "semantic-ui-react";
-import { INode, IEdge } from "react-digraph";
+import { INode, IEdge } from "./GraphView";
 import IntentEditor from "./IntentEditor";
 import StorySelector from "./StorySelector";
 import KnotEditor from "./KnotEditor";
@@ -43,7 +43,7 @@ class WelcomePage extends React.Component<Props, State> {
   }
 
   public render() {
-    
+
     return (
       <BasicLayout>
         { this.props.authenticated ? (
