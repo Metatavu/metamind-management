@@ -68,7 +68,7 @@ class Graph extends React.Component<Props, State> {
    */
   public render() {
     console.log({api:Api});
-
+    console.log(this.state.graph.nodes);
     return (
       <div id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
       <GraphView
