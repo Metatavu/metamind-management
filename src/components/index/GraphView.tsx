@@ -24,7 +24,7 @@ interface Props{
   onCreateNode:(viewNode:INode)=>void,
   onDeleteNode:(viewNode:INode)=>void,
   onCreateEdge:(targetViewNode:INode,sourceViewNode:INode)=>void,
-  onDeleteEdge:(viewEdge:IEdge)=>void,
+  onDeleteEdge:(viewEdge:IEdge)=>Promise<void>,
   onEdgeClick:(viewEdge:IEdge)=>void
 }
 interface State{
@@ -168,6 +168,7 @@ class GraphView extends React.Component<Props,State>{
 
 
       }
+
       this.setSvg();
     }).on("mouseup",()=>{
         if(this.state.beingDragged){
@@ -317,8 +318,6 @@ class GraphView extends React.Component<Props,State>{
         for(let i=0;i<this.state.edges.length;i++){
           if(this.state.edges[i].source.id===this.state.selectedNode.id&&this.state.edges[i].target.id===d.id){
             alreadyExists = true;
-          }else if(this.state.edges[i].source.id===d.id&&this.state.edges[i].target.id===this.state.selectedNode.id){
-            alreadyExists = true;
           }
         }
         if(!alreadyExists){
@@ -413,14 +412,14 @@ class GraphView extends React.Component<Props,State>{
   componentDidMount(){
 
     this.setSvg();
-    this.setState({filterIds:this.props.filterIds});
+    
   }
 
 
   render(){
 
 
-    console.log(this.state);
+
 
     return(
       <div id="GraphView">

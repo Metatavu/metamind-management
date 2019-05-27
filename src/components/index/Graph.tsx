@@ -87,7 +87,8 @@ class Graph extends React.Component<Props, State> {
    const pendingNodes = nodes.filter(node => node.id && node.id.startsWith("pending"));
    const newStateNodes = nodes.filter(node => node.id && node.id.startsWith("new"));
    newStateNodes.forEach(((n) => {n.id = n.id.replace("new-", "")}));
-   const nodesToAssign = [ globalNode ].concat( newNodes ).concat( pendingNodes ).concat( newStateNodes );
+
+   const nodesToAssign = [ globalNode].concat( newNodes ).concat( pendingNodes ).concat( newStateNodes );
 
    return {
      graph: {
@@ -148,7 +149,7 @@ class Graph extends React.Component<Props, State> {
       onCreateNode={this.onCreateNode}
       onNodeDragEnd={this.onNodeDragEnd}
       onNodeClick={this.onNodeClick}
-      filterIds={[]}
+      filterIds={this.state.searchResultKnotIds}
       nodes={this.state.graph.nodes}
       edges={this.state.graph.edges}/>
       </div>
@@ -278,12 +279,27 @@ private onCreateEdge = async (sourceViewNode: INode, targetViewNode: INode) => {
 
     this.props.onIntentsFound([intent]);
 }
-  onDeleteEdge = (viewEdge:IEdge)=>{
-    console.log({message:"Edge deleted",viewEdge});
+/**
+ * Event handler for edge deletion
+ *
+ * @param viewEdge edge
+ * @param edges edges after deletion
+ */
+private onDeleteEdge = async (viewEdge: IEdge) => {
+  await this.deleteIntent(viewEdge.id);
+  this.setState({
+    selected: null
+  });
+}
+
+  /**
+   * Handles edge selection
+   */
+  private onEdgeClick = (viewEdge: IEdge) => {
+    this.setState({ selected: viewEdge });
+    this.props.onSelectEdge(viewEdge);
   }
-  onEdgeClick = (viewEdge:IEdge)=>{
-    console.log({message:"Edge clicked",viewEdge});
-  }
+
 
 
   /**
