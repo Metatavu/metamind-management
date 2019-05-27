@@ -278,6 +278,7 @@ private onCreateEdge = async (sourceViewNode: INode, targetViewNode: INode) => {
     });
 
     this.props.onIntentsFound([intent]);
+    
 }
 /**
  * Event handler for edge deletion

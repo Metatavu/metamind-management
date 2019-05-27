@@ -22,8 +22,8 @@ interface Props{
   onNodeClick:(viewNode:INode)=>void,
   onNodeDragEnd:(viewNode:INode)=>void,
   onCreateNode:(viewNode:INode)=>void,
-  onDeleteNode:(viewNode:INode)=>void,
-  onCreateEdge:(targetViewNode:INode,sourceViewNode:INode)=>void,
+  onDeleteNode:(viewNode:INode)=>Promise<void>,
+  onCreateEdge:(targetViewNode:INode,sourceViewNode:INode)=>Promise<void>,
   onDeleteEdge:(viewEdge:IEdge)=>Promise<void>,
   onEdgeClick:(viewEdge:IEdge)=>void
 }
@@ -195,7 +195,7 @@ class GraphView extends React.Component<Props,State>{
 
             this.props.onNodeDragEnd({...sendNode,x,y});
             this.setState({beingDragged:undefined,nodes});
-                  this.setSvg();
+            this.setSvg();
           }
 
 
@@ -329,11 +329,13 @@ class GraphView extends React.Component<Props,State>{
         if(!alreadyExists){
           if(d.id!==this.state.selectedNode.id){
             const newEdge = {id:Date.now().toString(),source:this.state.selectedNode,target:d};
-            this.props.onCreateEdge(newEdge.source,newEdge.target);
+            this.props.onCreateEdge(newEdge.source,newEdge.target).then(()=>{
+              this.setSvg();
+            });
             const edges = this.state.edges;
             edges.push(newEdge);
             this.setState({edges});
-            this.setSvg();
+
           }
 
         }
@@ -373,16 +375,20 @@ class GraphView extends React.Component<Props,State>{
           const newNodes = this.state.nodes.filter(node=>{
             if(this.state.selectedNode){
               if(node.id===this.state.selectedNode.id){
-                this.props.onDeleteNode(node);
-                const newEdges = this.state.edges.filter(edge=>{
-                  if(edge.source.id===node.id||edge.target.id===node.id){
-                    this.props.onDeleteEdge(edge);
-                    return false;
-                  }
 
-                  return true;
-                });
-                this.setState({edges:newEdges});
+
+                  this.deleteConnectedEdges(node).then(()=>{
+
+                                      this.props.onDeleteNode(node).then(()=>{
+                                          this.setSvg();
+                                      });
+                  });
+
+
+
+
+
+
                 return false;
               }
               return true;
@@ -391,21 +397,23 @@ class GraphView extends React.Component<Props,State>{
           });
 
           this.setState({selectedNode:undefined,nodes:newNodes});
-          this.setSvg();
+
         }
         if(this.state.selectedEdge){
           const newEdges = this.state.edges.filter(edge=>{
             if(this.state.selectedEdge){
               if(edge.id===this.state.selectedEdge.id){
 
-                this.props.onDeleteEdge(edge);
+                this.props.onDeleteEdge(edge).then(()=>{
+                      this.setSvg();
+                });
                 return false;
               }
             }
             return true;
           })
           this.setState({selectedEdge:undefined,edges:newEdges});
-          this.setSvg();
+
         }
 
       }
@@ -414,7 +422,14 @@ class GraphView extends React.Component<Props,State>{
 
 
   }
-
+  deleteConnectedEdges = async (node:INode) => {
+    for(let i=0;i<this.state.edges.length;i++){
+      const edge = this.state.edges[i];
+      if(edge.source.id===node.id||edge.target.id===node.id){
+        await this.props.onDeleteEdge(edge);
+      }
+    }
+  }
   componentDidMount(){
 
     this.setSvg();
