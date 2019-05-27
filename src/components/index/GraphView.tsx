@@ -60,7 +60,16 @@ class GraphView extends React.Component<Props,State>{
     const newNodes = props.nodes.map(node=>{
       return {...node,x:props.width/2+node.x,y:props.height/2+node.y};
     });
-    return {nodes:newNodes,edges:props.edges,changed:true};
+    const newEdges = props.edges.map(edge=>{
+      const sourceX = props.width/2+edge.source.x;
+      const sourceY = props.height/2+edge.source.y;
+      const targetX = props.width/2+edge.target.x;
+      const targetY = props.height/2+edge.target.y;
+      const source = {...edge.source,x:sourceX,y:sourceY};
+      const target = {...edge.target,x:targetX,y:targetY};
+      return {...edge,target,source};
+    });
+    return {nodes:newNodes,edges:newEdges,changed:true};
 
   }
   getMousePosition = (svg:any,eventX:number,eventY:number):any => {
@@ -99,7 +108,7 @@ class GraphView extends React.Component<Props,State>{
   }
 
   setSvg = () => {
-
+    console.log("set svg");
     //Rendering svg
 
     d3.select("svg").remove();
@@ -130,7 +139,6 @@ class GraphView extends React.Component<Props,State>{
 
     }).on("mousemove",()=>{
 
-
       if(this.state.beingDragged){
 
           const {x,y} = this.getMousePosition(svg.node(),d3.event.clientX+d3.event.movementX,d3.event.clientY+d3.event.movementY);
@@ -155,10 +163,12 @@ class GraphView extends React.Component<Props,State>{
             }
             return d.y;
           });
-        this.setSvg();
+
+
+
 
       }
-
+      this.setSvg();
     }).on("mouseup",()=>{
         if(this.state.beingDragged){
           let {x,y} = this.getMousePosition(svg.node(),d3.event.clientX,d3.event.clientY);
@@ -182,7 +192,6 @@ class GraphView extends React.Component<Props,State>{
           const sendNode =this.state.beingDragged;
           this.setState({beingDragged:undefined,nodes});
           this.props.onNodeDragEnd({...sendNode,x,y});
-
 
 
         }
@@ -411,8 +420,7 @@ class GraphView extends React.Component<Props,State>{
   render(){
 
 
-
-    console.log("render");
+    console.log(this.state);
 
     return(
       <div id="GraphView">

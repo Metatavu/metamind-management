@@ -138,6 +138,7 @@ class Graph extends React.Component<Props, State> {
     return (
       <div id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
       <GraphView
+
       height={window.innerHeight}
       width={window.innerWidth}
       onEdgeClick={this.onEdgeClick}
@@ -164,6 +165,7 @@ class Graph extends React.Component<Props, State> {
  * Called by 'drag' handler, etc..
  * to sync updates from D3 with the graph
  */
+
 private onNodeDragEnd = (viewNode: INode) => {
 
   if(this.props.knotPositions){
@@ -255,7 +257,26 @@ private onDeleteNode = async (viewNode: INode) => {
  * Creates a new edge between two nodes
  */
 private onCreateEdge = async (sourceViewNode: INode, targetViewNode: INode) => {
+  const graph = this.state.graph;
+    const intent = await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").createIntent({
+      type: "NORMAL",
+      name: "New intent",
+      quickResponseOrder: 0,
+      global: sourceViewNode.id === GLOBAL_NODE_ID,
+      sourceKnotId: sourceViewNode.id === GLOBAL_NODE_ID ? undefined : sourceViewNode.id ,
+      targetKnotId: targetViewNode.id,
+      trainingMaterials: {}
+    }, this.props.storyId);
 
+    const viewEdge = Graph.translateIntent(intent,sourceViewNode,targetViewNode);
+
+    graph.edges = [...graph.edges, viewEdge];
+    this.setState({
+      graph,
+      selected: viewEdge
+    });
+
+    this.props.onIntentsFound([intent]);
 }
   onDeleteEdge = (viewEdge:IEdge)=>{
     console.log({message:"Edge deleted",viewEdge});
