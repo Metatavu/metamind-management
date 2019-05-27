@@ -23,7 +23,7 @@ interface Props{
   onNodeDragEnd:(viewNode:INode)=>void,
   onCreateNode:(viewNode:INode)=>void,
   onDeleteNode:(viewNode:INode)=>void,
-  onCreateEdge:(viewEdge:IEdge)=>void,
+  onCreateEdge:(targetViewNode:INode,sourceViewNode:INode)=>void,
   onDeleteEdge:(viewEdge:IEdge)=>void,
   onEdgeClick:(viewEdge:IEdge)=>void
 }
@@ -36,7 +36,9 @@ interface State{
   selectedEdge?:IEdge,
   zoom:number,
   translateX:number,
-  translateY:number
+  translateY:number,
+  changed:boolean
+
 }
 
 class GraphView extends React.Component<Props,State>{
@@ -48,14 +50,17 @@ class GraphView extends React.Component<Props,State>{
       edges:[],
       zoom:1,
       translateX:0,
-      translateY:0
+      translateY:0,
+      changed:false
     };
   }
+
   static getDerivedStateFromProps = (props: Props, state: State) => {
+
     const newNodes = props.nodes.map(node=>{
       return {...node,x:props.width/2+node.x,y:props.height/2+node.y};
     });
-    return {nodes:newNodes,edges:props.edges};
+    return {nodes:newNodes,edges:props.edges,changed:true};
 
   }
   getMousePosition = (svg:any,eventX:number,eventY:number):any => {
@@ -123,14 +128,11 @@ class GraphView extends React.Component<Props,State>{
       this.setSvg();
 
 
-    })
-    .on("mouseup",()=>{
-      if(this.state.beingDragged){
-        this.props.onNodeDragEnd(this.state.beingDragged);
-        this.setState({beingDragged:undefined});
-      }
     }).on("mousemove",()=>{
+
+
       if(this.state.beingDragged){
+
           const {x,y} = this.getMousePosition(svg.node(),d3.event.clientX+d3.event.movementX,d3.event.clientY+d3.event.movementY);
 
           node.attr("cx", (d:any) =>{
@@ -154,9 +156,37 @@ class GraphView extends React.Component<Props,State>{
             return d.y;
           });
         this.setSvg();
+
       }
 
-    }).on("click",()=>{
+    }).on("mouseup",()=>{
+        if(this.state.beingDragged){
+          let {x,y} = this.getMousePosition(svg.node(),d3.event.clientX,d3.event.clientY);
+          if(Math.abs(this.state.beingDragged.x-x)<30&&Math.abs(this.state.beingDragged.y-y)<30){
+            x=this.state.beingDragged.x;
+            y=this.state.beingDragged.y;
+          }
+          x -= (this.props.width/2);
+          y -= (this.props.height/2);
+
+          const nodes = this.state.nodes.map(node=>{
+            if(this.state.beingDragged){
+              if(node.id===this.state.beingDragged.id){
+                return {...this.state.beingDragged,x,y};
+              }
+            }
+
+            return node;
+          });
+
+          const sendNode =this.state.beingDragged;
+          this.setState({beingDragged:undefined,nodes});
+          this.props.onNodeDragEnd({...sendNode,x,y});
+
+
+
+        }
+      }).on("click",()=>{
       if(d3.event.shiftKey){
         const {x,y} = this.getMousePosition(svg.node(),d3.event.clientX,d3.event.clientY);
 
@@ -195,6 +225,7 @@ class GraphView extends React.Component<Props,State>{
     .attr("y1",d=>(this.getElementPosition(undefined,d.source.y)))
     .attr("y2",d=>(this.getElementPosition(undefined,d.target.y)))
     .on("click",d=>{
+
       this.props.onEdgeClick(d);
       this.setState({selectedEdge:d});
       this.setState({selectedNode:undefined});
@@ -265,7 +296,10 @@ class GraphView extends React.Component<Props,State>{
     })
 
     .on("mousedown",(d)=>{
-      this.setState({beingDragged:d});
+      if(!this.state.beingDragged){
+              this.setState({beingDragged:d});
+      }
+
 
     }).on("contextmenu",(d)=>{
       d3.event.preventDefault();
@@ -281,7 +315,7 @@ class GraphView extends React.Component<Props,State>{
         if(!alreadyExists){
           if(d.id!==this.state.selectedNode.id){
             const newEdge = {id:Date.now().toString(),source:this.state.selectedNode,target:d};
-            this.props.onCreateEdge(newEdge);
+            this.props.onCreateEdge(newEdge.source,newEdge.target);
             const edges = this.state.edges;
             edges.push(newEdge);
             this.setState({edges});
@@ -366,16 +400,20 @@ class GraphView extends React.Component<Props,State>{
 
 
   }
+
   componentDidMount(){
+
     this.setSvg();
     this.setState({filterIds:this.props.filterIds});
   }
 
+
   render(){
-    if(this.state.filterIds!==this.props.filterIds){
-      this.setSvg();
-      this.setState({filterIds:this.props.filterIds});
-    }
+
+
+
+    console.log("render");
+
     return(
       <div id="GraphView">
 

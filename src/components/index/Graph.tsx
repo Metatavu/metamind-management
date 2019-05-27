@@ -107,7 +107,7 @@ class Graph extends React.Component<Props, State> {
          }
 
 
-         return Graph.translateIntent(intent,sourceNode,targetNode);
+         return Graph.translateIntent(intent,sourceNode||globalNode,targetNode||globalNode);
 
 
 
@@ -134,8 +134,7 @@ class Graph extends React.Component<Props, State> {
    * Render
    */
   public render() {
-    console.log({api:Api});
-    console.log(this.state.graph.nodes);
+
     return (
       <div id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
       <GraphView
@@ -154,12 +153,31 @@ class Graph extends React.Component<Props, State> {
       </div>
     );
   }
-  onNodeClick = (viewNode:INode)=>{
-    console.log({message:"Node clicked",viewNode});
+  /**
+  * Handles node selection
+  */
+ private onNodeClick = (viewNode:INode)=>{
+    this.setState({ selected: viewNode });
+   this.props.onSelectNode(viewNode);
   }
-  onNodeDragEnd = (viewNode:INode)=>{
-    console.log({message:"Node dragged",viewNode});
+  /**
+ * Called by 'drag' handler, etc..
+ * to sync updates from D3 with the graph
+ */
+private onNodeDragEnd = (viewNode: INode) => {
+
+  if(this.props.knotPositions){
+    this.props.writeKnotLocalPositions(this.props.knotPositions.map(pos=>{
+      if(pos.id===viewNode.id){
+        return {...pos,x:viewNode.x,y:viewNode.y}
+      }
+      return pos;
+    }));
   }
+
+
+}
+
   /**
   * Updates the graph with a new node
   */
@@ -199,16 +217,46 @@ class Graph extends React.Component<Props, State> {
    const knotLocalPositions = newNodes.map(node=>{
      return {id:node.id,x:node.x,y:node.y};
    });
+
+
    this.props.writeKnotLocalPositions(knotLocalPositions);
-   this.props.getKnotLocalPositions();
+
+
 
  }
-  onDeleteNode = (viewNode:INode)=>{
-    console.log({message:"Node deleted",viewNode});
-  }
-  onCreateEdge = (viewEdge:IEdge)=>{
-    console.log({message:"Edge created",viewEdge});
-  }
+ /**
+* Event handler for node deletion
+*
+* @param viewNode node
+* @param nodeId node id
+* @param nodes nodes after deletion
+*/
+private onDeleteNode = async (viewNode: INode) => {
+ const graph = this.state.graph;
+
+ await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").deleteKnot(this.props.storyId, viewNode.id);
+
+ const edges = [];
+
+ for (let i = 0; i < graph.edges.length; i++) {
+   const edge = graph.edges[i];
+   if (edge.source.id !== viewNode.id && edge.target.id !== viewNode.id) {
+     edges.push(edge);
+   } else {
+     await this.deleteIntent(edge.id);
+   }
+ }
+
+ this.props.onKnotDeleted(viewNode.id);
+ this.setState({ selected: null });
+ this.props.onSelectNode(null);
+}
+/**
+ * Creates a new edge between two nodes
+ */
+private onCreateEdge = async (sourceViewNode: INode, targetViewNode: INode) => {
+
+}
   onDeleteEdge = (viewEdge:IEdge)=>{
     console.log({message:"Edge deleted",viewEdge});
   }
@@ -238,22 +286,26 @@ class Graph extends React.Component<Props, State> {
    *
    * @param intent intent to translate
    */
-  private static translateIntent(intent: Intent,sourceNode?:INode,targetNode?:INode): IEdge {
-    if(sourceNode&&targetNode){
+  private static translateIntent(intent: Intent,sourceNode:INode,targetNode:INode): IEdge {
+
       return {
         id: intent.id||Date.now().toString(),
         source: sourceNode,
         target: targetNode
       }
-    }else{
-      return {
-        id: intent.id||Date.now().toString(),
-        source: globalNode,
-        target: globalNode
-      }
-    }
+
 
   }
+  /**
+  * Deletes an intent
+  *
+  * @param id id of intent to delete
+  */
+ private deleteIntent = async (id: string) => {
+   await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").deleteIntent(this.props.storyId, id);
+   this.props.onIntentDeleted(id);
+ }
+
 
 }
 

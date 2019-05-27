@@ -52,7 +52,8 @@ export interface IntentDeleted {
   intentId: string
 }
 export interface SetKnotPositions{
-  type: constants.SET_KNOT_POSITIONS
+  type: constants.SET_KNOT_POSITIONS,
+    knotPositions?: {id:string,x:number,y:number}[]
 }
 export interface GetKnotPositions{
   type: constants.GET_KNOT_POSITIONS,
@@ -131,23 +132,23 @@ export function knotDeleted(knotId: string): KnotDeleted {
   }
 }
 export const getKnotLocalPositions = ():GetKnotPositions => {
-  try {
+
     const serializedState = localStorage.getItem('knot-positions');
+
     if (serializedState === null) {
       return {type:constants.GET_KNOT_POSITIONS,knotPositions:undefined};
     }
+
       return {type:constants.GET_KNOT_POSITIONS,knotPositions:JSON.parse(serializedState)};
-  } catch (err) {
-    return {type:constants.GET_KNOT_POSITIONS,knotPositions:undefined};
-  }
+
 }
 export const writeKnotLocalPositions = (positions:{id:string,x:number,y:number}[]):SetKnotPositions => {
-  try {
+
+
     const serializedState = JSON.stringify(positions);
+
     localStorage.setItem('knot-positions', serializedState);
 
-  } catch {
-    // ignore write errors
-  }
-  return {type:constants.SET_KNOT_POSITIONS}
+
+  return {type:constants.SET_KNOT_POSITIONS,knotPositions:positions};
 };
