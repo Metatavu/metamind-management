@@ -7,5 +7,6 @@ export interface StoreState {
   autolayout: boolean
   knots: Knot[],
   intents: Intent[],
-  searchText: string
+  searchText: string,
+  knotPositions?:{id:string,x:number,y:number}[]
 }

@@ -44,14 +44,19 @@ class GraphView extends React.Component<Props,State>{
     super(props);
     this.state = {
 
-      nodes:this.props.nodes.map(node=>{
-        return {...node,x:this.props.width/2+node.x,y:this.props.height/2+node.y};
-      }),
-      edges:this.props.edges,
+      nodes:[],
+      edges:[],
       zoom:1,
       translateX:0,
       translateY:0
     };
+  }
+  static getDerivedStateFromProps = (props: Props, state: State) => {
+    const newNodes = props.nodes.map(node=>{
+      return {...node,x:props.width/2+node.x,y:props.height/2+node.y};
+    });
+    return {nodes:newNodes,edges:props.edges};
+
   }
   getMousePosition = (svg:any,eventX:number,eventY:number):any => {
     const rect = svg.getBoundingClientRect();
@@ -89,7 +94,7 @@ class GraphView extends React.Component<Props,State>{
   }
 
   setSvg = () => {
-  
+
     //Rendering svg
 
     d3.select("svg").remove();

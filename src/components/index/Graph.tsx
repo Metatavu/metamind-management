@@ -24,13 +24,16 @@ interface Props {
   onIntentsFound: (intents: Intent[]) => void
   onIntentUpdated: (intent: Intent) => void
   onIntentDeleted: (intentId: string) => void
+  getKnotLocalPositions: ()=>void
+  writeKnotLocalPositions: (knotPositions:KnotPosition[])=>void
 
   keycloak?: KeycloakInstance
   knots: Knot[]
   intents: Intent[]
   autolayout: boolean,
   searchText: string,
-  storyId: string
+  storyId: string,
+  knotPositions?:KnotPosition[];
 };
 
 interface State {
@@ -73,11 +76,13 @@ class Graph extends React.Component<Props, State> {
 
     const { nodes } = state.graph;
    const { knots, intents } = props;
+
    const newNodes = knots.map((knot: Knot) => {
-     const previousNode = nodes.find((node) => node.id == knot.id);
-     const x = previousNode ? previousNode.x : undefined;
-     const y = previousNode ? previousNode.y : undefined;
-     return Graph.translateKnot(knot, x || 0, y || 0);
+     const previousNode =props.knotPositions?props.knotPositions.find((node) => node.id == knot.id):undefined;
+
+     const x = previousNode ? previousNode.x : 0;
+     const y = previousNode ? previousNode.y : 0;
+     return Graph.translateKnot(knot, x,y);
    });
    const pendingNodes = nodes.filter(node => node.id && node.id.startsWith("pending"));
    const newStateNodes = nodes.filter(node => node.id && node.id.startsWith("new"));
@@ -122,6 +127,7 @@ class Graph extends React.Component<Props, State> {
 
     this.props.onKnotsFound(knots);
     this.props.onIntentsFound(intents);
+    this.props.getKnotLocalPositions();
   }
 
   /*
@@ -154,9 +160,49 @@ class Graph extends React.Component<Props, State> {
   onNodeDragEnd = (viewNode:INode)=>{
     console.log({message:"Node dragged",viewNode});
   }
-  onCreateNode = (viewNode:INode)=>{
-    console.log({message:"Node created",viewNode});
-  }
+  /**
+  * Updates the graph with a new node
+  */
+ private onCreateNode = async (viewNode:INode) => {
+   const graph = this.state.graph;
+   const tempNodeId = `pending-${new Date().getTime()}`;
+   const node = {
+     id: tempNodeId,
+     title: "loading",
+     x: viewNode.x,
+     y: viewNode.y
+   };
+   graph.nodes = [...graph.nodes, node];
+
+   this.setState({ graph });
+   const knot = await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").createKnot({
+     content: "New knot",
+     name: "New knot",
+     type: "TEXT",
+     tokenizer: "WHITESPACE"
+   }, this.props.storyId);
+
+   const newNodes = graph.nodes.map((n: INode) => {
+     if (n.id === tempNodeId) {
+       const translatedNode = Graph.translateKnot(knot, viewNode.x, viewNode.y);
+       translatedNode.id = `new-${translatedNode.id}`;
+       return translatedNode;
+     }
+
+     return n;
+   });
+
+   graph.nodes = newNodes;
+   this.setState({ graph });
+
+   this.props.onKnotsFound([knot]);
+   const knotLocalPositions = newNodes.map(node=>{
+     return {id:node.id,x:node.x,y:node.y};
+   });
+   this.props.writeKnotLocalPositions(knotLocalPositions);
+   this.props.getKnotLocalPositions();
+
+ }
   onDeleteNode = (viewNode:INode)=>{
     console.log({message:"Node deleted",viewNode});
   }
@@ -218,10 +264,13 @@ export function mapStateToProps(state: StoreState) {
     searchText: state.searchText,
     knots: state.knots,
     intents: state.intents,
-    keycloak: state.keycloak
+    keycloak: state.keycloak,
+    knotPositions:state.knotPositions
   };
 }
-
+interface KnotPosition{
+  x:number,y:number,id:string
+}
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onKnotsFound: (knots: Knot[]) => dispatch(actions.knotsFound(knots)),
@@ -230,6 +279,8 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
     onIntentsFound: (intents: Intent[]) => dispatch(actions.intentsFound(intents)),
     onIntentUpdated: (intent: Intent) => dispatch(actions.intentUpdated(intent)),
     onIntentDeleted: (intentId: string) => dispatch(actions.intentDeleted(intentId)),
+    getKnotLocalPositions: () => dispatch(actions.getKnotLocalPositions()),
+    writeKnotLocalPositions: (knotPositions:KnotPosition[]) => dispatch(actions.writeKnotLocalPositions(knotPositions))
   };
 }
 

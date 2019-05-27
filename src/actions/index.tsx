@@ -51,8 +51,15 @@ export interface IntentDeleted {
   type: constants.INTENT_DELETED,
   intentId: string
 }
+export interface SetKnotPositions{
+  type: constants.SET_KNOT_POSITIONS
+}
+export interface GetKnotPositions{
+  type: constants.GET_KNOT_POSITIONS,
+  knotPositions?: {id:string,x:number,y:number}[]
+}
 
-export type AppAction = UserLogin | UserLogout | AutoLayoutToggle | KnotsFound | KnotUpdated | KnotDeleted | IntentsFound | IntentUpdated | IntentDeleted | Search;
+export type AppAction = GetKnotPositions | SetKnotPositions| UserLogin | UserLogout | AutoLayoutToggle | KnotsFound | KnotUpdated | KnotDeleted | IntentsFound | IntentUpdated | IntentDeleted | Search;
 
 export function userLogin(keycloak: KeycloakInstance, authenticated: boolean): UserLogin {
   return {
@@ -123,3 +130,24 @@ export function knotDeleted(knotId: string): KnotDeleted {
     knotId: knotId
   }
 }
+export const getKnotLocalPositions = ():GetKnotPositions => {
+  try {
+    const serializedState = localStorage.getItem('knot-positions');
+    if (serializedState === null) {
+      return {type:constants.GET_KNOT_POSITIONS,knotPositions:undefined};
+    }
+      return {type:constants.GET_KNOT_POSITIONS,knotPositions:JSON.parse(serializedState)};
+  } catch (err) {
+    return {type:constants.GET_KNOT_POSITIONS,knotPositions:undefined};
+  }
+}
+export const writeKnotLocalPositions = (positions:{id:string,x:number,y:number}[]):SetKnotPositions => {
+  try {
+    const serializedState = JSON.stringify(positions);
+    localStorage.setItem('knot-positions', serializedState);
+
+  } catch {
+    // ignore write errors
+  }
+  return {type:constants.SET_KNOT_POSITIONS}
+};
