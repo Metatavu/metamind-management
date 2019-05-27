@@ -37,8 +37,7 @@ interface State{
   zoom:number,
   translateX:number,
   translateY:number,
-  changed:boolean
-
+  dragged:boolean
 }
 
 class GraphView extends React.Component<Props,State>{
@@ -51,7 +50,7 @@ class GraphView extends React.Component<Props,State>{
       zoom:1,
       translateX:0,
       translateY:0,
-      changed:false
+      dragged:false
     };
   }
 
@@ -69,7 +68,7 @@ class GraphView extends React.Component<Props,State>{
       const target = {...edge.target,x:targetX,y:targetY};
       return {...edge,target,source};
     });
-    return {nodes:newNodes,edges:newEdges,changed:true};
+    return {nodes:newNodes,edges:newEdges};
 
   }
   getMousePosition = (svg:any,eventX:number,eventY:number):any => {
@@ -164,38 +163,44 @@ class GraphView extends React.Component<Props,State>{
             return d.y;
           });
 
-
+          this.setSvg();
 
 
       }
 
-      this.setSvg();
+
     }).on("mouseup",()=>{
         if(this.state.beingDragged){
           let {x,y} = this.getMousePosition(svg.node(),d3.event.clientX,d3.event.clientY);
           if(Math.abs(this.state.beingDragged.x-x)<30&&Math.abs(this.state.beingDragged.y-y)<30){
             x=this.state.beingDragged.x;
             y=this.state.beingDragged.y;
-          }
-          x -= (this.props.width/2);
-          y -= (this.props.height/2);
+              this.setState({beingDragged:undefined});
+          }else{
+            this.setState({dragged:true});
+            x -= (this.props.width/2);
+            y -= (this.props.height/2);
 
-          const nodes = this.state.nodes.map(node=>{
-            if(this.state.beingDragged){
-              if(node.id===this.state.beingDragged.id){
-                return {...this.state.beingDragged,x,y};
+            const nodes = this.state.nodes.map(node=>{
+              if(this.state.beingDragged){
+                if(node.id===this.state.beingDragged.id){
+                  return {...this.state.beingDragged,x,y};
+                }
               }
-            }
 
-            return node;
-          });
+              return node;
+            });
 
-          const sendNode =this.state.beingDragged;
-          this.setState({beingDragged:undefined,nodes});
-          this.props.onNodeDragEnd({...sendNode,x,y});
+            const sendNode =this.state.beingDragged;
+
+            this.props.onNodeDragEnd({...sendNode,x,y});
+            this.setState({beingDragged:undefined,nodes});
+                  this.setSvg();
+          }
 
 
         }
+
       }).on("click",()=>{
       if(d3.event.shiftKey){
         const {x,y} = this.getMousePosition(svg.node(),d3.event.clientX,d3.event.clientY);
@@ -207,6 +212,7 @@ class GraphView extends React.Component<Props,State>{
         this.setState({nodes});
         this.setSvg();
       }
+
     });
 
 
@@ -414,9 +420,12 @@ class GraphView extends React.Component<Props,State>{
     this.setSvg();
 
   }
+  componentDidUpdate(){
 
+  }
 
   render(){
+
 
 
 
