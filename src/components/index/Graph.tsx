@@ -40,8 +40,13 @@ interface State {
   searchResultKnotIds: string[]
 };
 
-
-
+const GLOBAL_NODE_ID = "GLOBAL";
+const globalNode: INode = {
+  id: GLOBAL_NODE_ID,
+  title: "Global", // Localize
+  x:0,
+  y:0
+};
 class Graph extends React.Component<Props, State> {
   GraphViewRef: any
 
@@ -61,7 +66,63 @@ class Graph extends React.Component<Props, State> {
 
     this.GraphViewRef = React.createRef();
   }
+  /**
+   * Updates component state when knots or intents are changed
+   */
+  static getDerivedStateFromProps = (props: Props, state: State) => {
 
+    const { nodes } = state.graph;
+   const { knots, intents } = props;
+   const newNodes = knots.map((knot: Knot) => {
+     const previousNode = nodes.find((node) => node.id == knot.id);
+     const x = previousNode ? previousNode.x : undefined;
+     const y = previousNode ? previousNode.y : undefined;
+     return Graph.translateKnot(knot, x || 0, y || 0);
+   });
+   const pendingNodes = nodes.filter(node => node.id && node.id.startsWith("pending"));
+   const newStateNodes = nodes.filter(node => node.id && node.id.startsWith("new"));
+   newStateNodes.forEach(((n) => {n.id = n.id.replace("new-", "")}));
+   const nodesToAssign = [ globalNode ].concat( newNodes ).concat( pendingNodes ).concat( newStateNodes );
+
+   return {
+     graph: {
+       nodes:nodesToAssign,
+       edges: intents.map(intent =>{
+
+         let sourceNode:undefined|INode=undefined;
+         let targetNode:undefined|INode=undefined;
+         for(let i=0;i<nodesToAssign.length;i++){
+           if(nodesToAssign[i].id===intent.sourceKnotId){
+             sourceNode = nodesToAssign[i];
+           }
+           if(nodesToAssign[i].id===intent.targetKnotId){
+
+             targetNode= nodesToAssign[i];
+           }
+         }
+
+
+         return Graph.translateIntent(intent,sourceNode,targetNode);
+
+
+
+       })
+     }
+   };
+  }
+
+  public componentDidMount = async () =>{
+    const knotsService = Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "");
+    const intentsService = Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "");
+
+    const [ knots, intents ] = await Promise.all([
+      knotsService.listKnots(this.props.storyId),
+      intentsService.listIntents(this.props.storyId)
+    ]);
+
+    this.props.onKnotsFound(knots);
+    this.props.onIntentsFound(intents);
+  }
 
   /*
    * Render
@@ -109,7 +170,47 @@ class Graph extends React.Component<Props, State> {
     console.log({message:"Edge clicked",viewEdge});
   }
 
+
+  /**
+   * Translates knot into node
+   *
+   * @param knot knot to translate
+   * @param x x coordinate
+   * @param y  y coordinate
+   */
+  private static translateKnot(knot: Knot, x: number, y: number): INode {
+    return {
+      id: knot.id||Date.now().toString(),
+      title: knot.name,
+      x: x,
+      y: y
+    }
+  }
+
+  /**
+   * Translates intent into edge
+   *
+   * @param intent intent to translate
+   */
+  private static translateIntent(intent: Intent,sourceNode?:INode,targetNode?:INode): IEdge {
+    if(sourceNode&&targetNode){
+      return {
+        id: intent.id||Date.now().toString(),
+        source: sourceNode,
+        target: targetNode
+      }
+    }else{
+      return {
+        id: intent.id||Date.now().toString(),
+        source: globalNode,
+        target: globalNode
+      }
+    }
+
+  }
+
 }
+
 
 export function mapStateToProps(state: StoreState) {
   return {

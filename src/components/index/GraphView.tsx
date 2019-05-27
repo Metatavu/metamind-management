@@ -89,7 +89,7 @@ class GraphView extends React.Component<Props,State>{
   }
 
   setSvg = () => {
-    console.log("Redrawing svg");
+  
     //Rendering svg
 
     d3.select("svg").remove();
