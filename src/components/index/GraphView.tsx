@@ -28,7 +28,7 @@ interface Props{
   onEdgeClick:(viewEdge:IEdge)=>void
 }
 interface State{
-  filterIds?:string[],
+
   beingDragged?:INode,
   nodes:INode[],
   edges:IEdge[],
@@ -412,7 +412,7 @@ class GraphView extends React.Component<Props,State>{
   componentDidMount(){
 
     this.setSvg();
-    
+
   }
 
 
