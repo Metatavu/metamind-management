@@ -71,9 +71,6 @@ export function userLogin(keycloak: KeycloakInstance, authenticated: boolean): U
 }
 
 export function autoLayoutToggle(autolayout: boolean): AutoLayoutToggle {
-
-
-
   return {
     type: constants.AUTO_LAYOUT_TOGGLE,
     autolayout: autolayout

@@ -4,11 +4,9 @@
   "private": true,
   "dependencies": {
     "@types/d3": "^5.7.2",
-    "@types/dagre": "^0.7.42",
     "@types/react-redux": "^7.0.8",
     "@types/react-router": "^4.4.5",
     "add": "^2.0.6",
-    "dagre": "^0.8.4",
     "install": "^0.12.2",
     "keycloak-js": "^5.0.0",
     "localized-strings": "0.2.2",

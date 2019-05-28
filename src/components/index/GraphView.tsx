@@ -25,8 +25,7 @@ interface Props{
   onDeleteNode:(viewNode:INode)=>Promise<void>,
   onCreateEdge:(targetViewNode:INode,sourceViewNode:INode)=>Promise<void>,
   onDeleteEdge:(viewEdge:IEdge)=>Promise<void>,
-  onEdgeClick:(viewEdge:IEdge)=>void,
-  autolayout:boolean
+  onEdgeClick:(viewEdge:IEdge)=>void
 }
 interface State{
 
@@ -40,8 +39,7 @@ interface State{
   translateY:number,
   dragged:boolean,
   filterIds:string[],
-  filterIdsOld:string[],
-  autolayout:boolean
+  filterIdsOld:string[]
 }
 
 class GraphView extends React.Component<Props,State>{
@@ -55,8 +53,7 @@ class GraphView extends React.Component<Props,State>{
       translateY:0,
       dragged:false,
       filterIds:[],
-      filterIdsOld:[],
-      autolayout:true
+      filterIdsOld:[]
     };
   }
 
@@ -83,39 +80,13 @@ class GraphView extends React.Component<Props,State>{
     this.setSvg();
     this.keyHandler();
 
-
-
   }
 
   render(){
-    this.state.nodes.map(node=>{
-      if(!node.x||!node.y){
-        this.deleteConnectedEdges(node).then(()=>{
-                            this.props.onDeleteNode(node).then(()=>{
-                                this.setSvg();
-                            });
-        });
-      }
-    });
-
-
 
     if(this.state.filterIdsOld!==this.state.filterIds){
       this.setState({filterIdsOld:this.state.filterIds,selectedEdge:undefined,selectedNode:undefined});
         this.setSvg();
-
-    }
-    if(this.state.autolayout!==this.props.autolayout){
-
-        this.setState({autolayout:this.props.autolayout});
-
-        
-
-
-
-
-        console.log("Layout");
-
 
     }
 
@@ -123,7 +94,6 @@ class GraphView extends React.Component<Props,State>{
       <div id="GraphView"></div>
     );
   }
-
   setSvg = () => {
     //Rendering svg
 
@@ -137,15 +107,8 @@ class GraphView extends React.Component<Props,State>{
     .on("mouseup",()=>this.svgMouseUpHandler(svg))
     .on("click",()=>this.svgClickHandler(svg));
     //Rendering edges
-
-    let nodes = this.state.nodes;
-
-    let edges = this.state.edges;
-
-
-
-
-     svg.selectAll(".link")
+    const edges = this.state.edges;
+    svg.selectAll(".link")
     .data(edges)
     .enter()
     .append("line")
@@ -169,6 +132,7 @@ class GraphView extends React.Component<Props,State>{
     .on("click",d=>this.edgeClickHandler(d));
 
     //Rendering nodes
+    const nodes = this.state.nodes;
     const node = svg.selectAll(".node")
     .data(nodes)
     .enter()
@@ -184,10 +148,6 @@ class GraphView extends React.Component<Props,State>{
     .on("contextmenu",(d)=>this.nodeRightClickHandler(d));
 
     svg.on("mousemove",()=>this.handleDrag(svg,node));
-
-
-
-
   }
   handleDrag = (svg:any,node:any) => {
     if(this.state.beingDragged){
@@ -216,14 +176,13 @@ class GraphView extends React.Component<Props,State>{
     }
   }
   deleteConnectedEdges = async (node:INode) => {
-      const edges = this.state.edges.map(async (edge)=>{
-        if(edge.source.id===node.id||edge.target.id===node.id){
-          await this.props.onDeleteEdge(edge);
-        }
-      });
-      await Promise.all(edges);
+    for(let i=0;i<this.state.edges.length;i++){
+      const edge = this.state.edges[i];
+      if(edge.source.id===node.id||edge.target.id===node.id){
+        await this.props.onDeleteEdge(edge);
+      }
+    }
   }
-
   edgeClickHandler = (d:IEdge) => {
       this.props.onEdgeClick(d);
       this.setState({selectedEdge:d});
