@@ -145,7 +145,7 @@ class Graph extends React.Component<Props, State> {
 
    const searchText = this.props.searchText.toLowerCase();
 
-   return this.props.knots.filter((knot) => {
+   const filterNodes =  this.props.knots.filter((knot) => {
      const name = knot.name.toLowerCase();
      if (name && name.includes(searchText)) {
        return true;
@@ -161,6 +161,25 @@ class Graph extends React.Component<Props, State> {
    .map((knot) => {
      return knot.id!;
    });
+   const filterEdges =  this.props.intents.filter((intent) => {
+     if(intent.name){
+       const name = intent.name.toLowerCase();
+       if (name && name.includes(searchText)) {
+         return true;
+       }
+
+      
+     }
+
+
+     return false;
+   })
+   .map((intent) => {
+     return intent.id!;
+   });
+
+
+   return filterNodes.concat(filterEdges);
  }
 
   /*

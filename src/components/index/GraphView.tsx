@@ -81,12 +81,15 @@ class GraphView extends React.Component<Props,State>{
     this.keyHandler();
 
   }
+
   render(){
 
     if(this.state.filterIdsOld!==this.state.filterIds){
+      this.setState({filterIdsOld:this.state.filterIds,selectedEdge:undefined,selectedNode:undefined});
         this.setSvg();
-        this.setState({filterIdsOld:this.state.filterIds});
+
     }
+
     return(
       <div id="GraphView"></div>
     );
@@ -186,12 +189,13 @@ class GraphView extends React.Component<Props,State>{
     }
     giveColor = (d:IEdge|INode,selected:IEdge|INode|undefined) => {
       if(selected){
-        if(this.props.filterIds.includes(d.id)){
-          return "green";
-        }
+
         if(selected.id===d.id){
           return "red";
         }
+      }
+      if(this.props.filterIds.includes(d.id)){
+        return "green";
       }
       return "blue";
     }
