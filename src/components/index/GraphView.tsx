@@ -176,20 +176,13 @@ class GraphView extends React.Component<Props,State>{
     }
   }
   deleteConnectedEdges = async (node:INode) => {
-      const edges = this.state.edges.map(async (edge)=>{
-        if(edge.source.id===node.id||edge.target.id===node.id){
-          await this.props.onDeleteEdge(edge);
-
-
-        }
-      });
-      await Promise.all(edges);
-
-
-
-
+    for(let i=0;i<this.state.edges.length;i++){
+      const edge = this.state.edges[i];
+      if(edge.source.id===node.id||edge.target.id===node.id){
+        await this.props.onDeleteEdge(edge);
+      }
+    }
   }
-
   edgeClickHandler = (d:IEdge) => {
       this.props.onEdgeClick(d);
       this.setState({selectedEdge:d});
