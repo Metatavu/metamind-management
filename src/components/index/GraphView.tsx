@@ -37,7 +37,9 @@ interface State{
   zoom:number,
   translateX:number,
   translateY:number,
-  dragged:boolean
+  dragged:boolean,
+  filterIds:string[],
+  filterIdsOld:string[]
 }
 
 class GraphView extends React.Component<Props,State>{
@@ -49,11 +51,17 @@ class GraphView extends React.Component<Props,State>{
       zoom:1,
       translateX:0,
       translateY:0,
-      dragged:false
+      dragged:false,
+      filterIds:[],
+      filterIdsOld:[]
     };
   }
 
   static getDerivedStateFromProps = (props: Props, state: State) => {
+
+
+
+
     const newNodes = props.nodes.map(node=>{
       return {...node,x:props.width/2+node.x,y:props.height/2+node.y};
     });
@@ -66,19 +74,24 @@ class GraphView extends React.Component<Props,State>{
       const target = {...edge.target,x:targetX,y:targetY};
       return {...edge,target,source};
     });
-    return {nodes:newNodes,edges:newEdges};
+    return {nodes:newNodes,edges:newEdges,filterIds:props.filterIds};
   }
   componentDidMount(){
     this.setSvg();
     this.keyHandler();
+
   }
   render(){
+
+    if(this.state.filterIdsOld!==this.state.filterIds){
+        this.setSvg();
+        this.setState({filterIdsOld:this.state.filterIds});
+    }
     return(
       <div id="GraphView"></div>
     );
   }
   setSvg = () => {
-    console.log("set svg");
     //Rendering svg
 
     d3.select("svg").remove();

@@ -131,6 +131,38 @@ class Graph extends React.Component<Props, State> {
     this.props.getKnotLocalPositions();
   }
 
+  public componentDidUpdate(prevProps: Props, prevState: State) {
+   if (this.props.searchText !== prevProps.searchText) {
+     this.setState({
+       searchResultKnotIds: this.searchKnots()
+     });
+   }
+ }
+ private searchKnots = (): string[] => {
+   if (!this.props.searchText) {
+     return [];
+   }
+
+   const searchText = this.props.searchText.toLowerCase();
+
+   return this.props.knots.filter((knot) => {
+     const name = knot.name.toLowerCase();
+     if (name && name.includes(searchText)) {
+       return true;
+     }
+
+     const content = knot.content.toLowerCase();
+     if (content && content.includes(searchText)) {
+       return true;
+     }
+
+     return false;
+   })
+   .map((knot) => {
+     return knot.id!;
+   });
+ }
+
   /*
    * Render
    */
@@ -278,7 +310,7 @@ private onCreateEdge = async (sourceViewNode: INode, targetViewNode: INode) => {
     });
 
     this.props.onIntentsFound([intent]);
-    
+
 }
 /**
  * Event handler for edge deletion
