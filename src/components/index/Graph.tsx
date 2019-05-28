@@ -9,7 +9,10 @@ import Api, { Intent, Knot } from "metamind-client";
 
 import { KeycloakInstance } from 'keycloak-js';
 import '../../styles/graph.css';
+import {
 
+  GLOBAL_TYPE
+} from '../../utils/graph-config'; // Configures node/edge types
 interface IGraph {
   nodes: INode[];
   edges: IEdge[];
@@ -48,7 +51,8 @@ const globalNode: INode = {
   id: GLOBAL_NODE_ID,
   title: "Global", // Localize
   x:0,
-  y:0
+  y:0,
+  type: GLOBAL_TYPE
 };
 class Graph extends React.Component<Props, State> {
   GraphViewRef: any
@@ -220,6 +224,7 @@ class Graph extends React.Component<Props, State> {
   * Handles node selection
   */
  private onNodeClick = (viewNode:INode)=>{
+   console.log(viewNode);
     this.setState({ selected: viewNode });
    this.props.onSelectNode(viewNode);
   }
