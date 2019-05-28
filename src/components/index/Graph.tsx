@@ -87,8 +87,18 @@ class Graph extends React.Component<Props, State> {
    const pendingNodes = nodes.filter(node => node.id && node.id.startsWith("pending"));
    const newStateNodes = nodes.filter(node => node.id && node.id.startsWith("new"));
    newStateNodes.forEach(((n) => {n.id = n.id.replace("new-", "")}));
+  let nodesToAssign = [ globalNode].concat( newNodes ).concat( pendingNodes ).concat( newStateNodes );
+   if(props.knotPositions){
+     const globalNodePosition = props.knotPositions.find((node)=>node.id===GLOBAL_NODE_ID);
+     if(globalNodePosition){
+       if(typeof(globalNodePosition.x)==="number"&&typeof(globalNodePosition.y)==="number"){
+         nodesToAssign[0].x = globalNodePosition.x;
+         nodesToAssign[0].y = globalNodePosition.y;
+       }
+     }
 
-   const nodesToAssign = [ globalNode].concat( newNodes ).concat( pendingNodes ).concat( newStateNodes );
+   }
+
 
    return {
      graph: {
@@ -168,7 +178,7 @@ class Graph extends React.Component<Props, State> {
          return true;
        }
 
-      
+
      }
 
 
