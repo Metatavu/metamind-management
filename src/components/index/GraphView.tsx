@@ -105,33 +105,7 @@ class GraphView extends React.Component<Props,State>{
     .attr("class","graph-svg")
     .on("wheel",this.zoomHandler)
     .on("mouseup",()=>this.svgMouseUpHandler(svg))
-    .on("click",()=>this.svgClickHandler(svg))
-    .on("mousemove",()=>{
-      if(this.state.beingDragged){
-          const {x,y} = this.getMousePosition(svg.node(),d3.event.clientX+d3.event.movementX,d3.event.clientY+d3.event.movementY);
-          node.attr("cx", (d:any) =>{
-            if(this.state.beingDragged){
-              if(d.id===this.state.beingDragged.id){
-                d.x = x;
-                return x;
-              }
-              return d.x;
-            }
-            return d.x;
-
-          }).attr("cy", (d:any) =>{
-            if(this.state.beingDragged){
-              if(d.id===this.state.beingDragged.id){
-                d.y = y;
-                return y;
-              }
-              return d.y;
-            }
-            return d.y;
-          });
-          this.setSvg();
-      };
-    });
+    .on("click",()=>this.svgClickHandler(svg));
     //Rendering edges
     const edges = this.state.edges;
     svg.selectAll(".link")
@@ -172,6 +146,34 @@ class GraphView extends React.Component<Props,State>{
     .on("click",d=>this.nodeClickHandler(d))
     .on("mousedown",d=>this.nodeMouseDownHandler(d))
     .on("contextmenu",(d)=>this.nodeRightClickHandler(d));
+
+    svg.on("mousemove",()=>this.handleDrag(svg,node));
+  }
+  handleDrag = (svg:any,node:any) => {
+    if(this.state.beingDragged){
+        const {x,y} = this.getMousePosition(svg.node(),d3.event.clientX+d3.event.movementX,d3.event.clientY+d3.event.movementY);
+        node.attr("cx", (d:any) =>{
+          if(this.state.beingDragged){
+            if(d.id===this.state.beingDragged.id){
+              d.x = x;
+              return x;
+            }
+            return d.x;
+          }
+          return d.x;
+
+        }).attr("cy", (d:any) =>{
+          if(this.state.beingDragged){
+            if(d.id===this.state.beingDragged.id){
+              d.y = y;
+              return y;
+            }
+            return d.y;
+          }
+          return d.y;
+        });
+        this.setSvg();
+    }
   }
   deleteConnectedEdges = async (node:INode) => {
     for(let i=0;i<this.state.edges.length;i++){
