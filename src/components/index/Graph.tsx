@@ -77,16 +77,25 @@ class Graph extends React.Component<Props, State> {
    * Updates component state when knots or intents are changed
    */
   static getDerivedStateFromProps = (props: Props, state: State) => {
-
+  
     const { nodes } = state.graph;
    const { knots, intents } = props;
 
    const newNodes = knots.map((knot: Knot) => {
      const previousNode =props.knotPositions?props.knotPositions.find((node) => node.id == knot.id):undefined;
-
-     const x = previousNode ? previousNode.x : 0;
-     const y = previousNode ? previousNode.y : 0;
-     return Graph.translateKnot(knot, x,y);
+     let x =0;
+     let y =0;
+     if(previousNode){
+       x = previousNode.x;
+       y = previousNode.y;
+     }
+     const translatedKnot = Graph.translateKnot(knot, x,y);
+     if(!previousNode&&props.knotPositions){
+       const positions = props.knotPositions;
+       positions.push(translatedKnot);
+       props.writeKnotLocalPositions(positions);
+     }
+     return translatedKnot;
    });
    const pendingNodes = nodes.filter(node => node.id && node.id.startsWith("pending"));
    const newStateNodes = nodes.filter(node => node.id && node.id.startsWith("new"));
@@ -216,7 +225,9 @@ class Graph extends React.Component<Props, State> {
       onNodeClick={this.onNodeClick}
       filterIds={this.state.searchResultKnotIds}
       nodes={this.state.graph.nodes}
-      edges={this.state.graph.edges}/>
+      edges={this.state.graph.edges}
+      autolayout={this.props.autolayout}
+      />
       </div>
     );
   }
@@ -224,7 +235,6 @@ class Graph extends React.Component<Props, State> {
   * Handles node selection
   */
  private onNodeClick = (viewNode:INode)=>{
-   console.log(viewNode);
     this.setState({ selected: viewNode });
    this.props.onSelectNode(viewNode);
   }
