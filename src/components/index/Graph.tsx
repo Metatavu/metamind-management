@@ -216,9 +216,14 @@ class Graph extends React.Component<Props, State> {
       onNodeClick={this.onNodeClick}
       filterIds={this.state.searchResultKnotIds}
       nodes={this.state.graph.nodes}
-      edges={this.state.graph.edges}/>
+      edges={this.state.graph.edges}
+      onUpdateMultiple={this.onUpdateMultiple}/>
       </div>
     );
+  }
+  private onUpdateMultiple = async (viewNodes:INode[])=>{
+
+    await this.props.writeKnotLocalPositions(viewNodes);
   }
   /**
   * Handles node selection

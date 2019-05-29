@@ -26,7 +26,8 @@ interface Props{
   onDeleteNode:(viewNode:INode)=>Promise<void>,
   onCreateEdge:(targetViewNode:INode,sourceViewNode:INode)=>Promise<void>,
   onDeleteEdge:(viewEdge:IEdge)=>Promise<void>,
-  onEdgeClick:(viewEdge:IEdge)=>void
+  onEdgeClick:(viewEdge:IEdge)=>void,
+  onUpdateMultiple:(viewNodes:INode[])=>Promise<void>
 }
 interface State{
 
@@ -66,6 +67,8 @@ class GraphView extends React.Component<Props,State>{
 
 
     const newNodes = props.nodes.map(node=>{
+
+
       return {...node,x:props.width/2+node.x,y:props.height/2+node.y};
     });
     const newEdges = props.edges.map(edge=>{
@@ -93,7 +96,49 @@ class GraphView extends React.Component<Props,State>{
 
     }
     if(this.state.autolayout!==this.props.autolayout){
+
       this.setState({autolayout:this.props.autolayout});
+
+
+      let newNodes:any = [];
+      let edges = this.state.edges.map((edge,i)=>{
+        edge.source.x =0;
+        edge.source.y = 0;
+        return {...edge,i};
+      });
+
+      edges.forEach(edge=>{
+
+
+        newNodes = newNodes.filter((node:INode)=>node.id!==edge.target.id);
+        const x = edge.source.x+(20*this.state.edges.length);
+        const y = (20*this.state.edges.length)*Math.random()-(10*(this.state.edges.length));
+        newNodes.push({...edge.target,x,y});
+        const updatedEdges = edges.filter(oldEdge=>oldEdge.source.id===edge.target.id);
+        updatedEdges.forEach(oldEdge=>{
+          edges[oldEdge.i].source.x = x;
+          edges[oldEdge.i].source.y = y;
+        });
+      });
+
+      newNodes = this.state.nodes.map(node=>{
+        const possibleUpdate = newNodes.find((updatedNode:INode)=>node.id===updatedNode.id);
+        if(possibleUpdate){
+          return possibleUpdate;
+        }
+        if(node.id==="GLOBAL"){
+            return {...node,x:0,y:0};
+        }
+          return {...node,x:100,y:100};
+
+
+      });
+
+      this.props.onUpdateMultiple(newNodes).then(()=>{
+        this.setSvg();
+
+      });
+
     }
     return(
       <div id="GraphView"></div>
