@@ -42,7 +42,8 @@ interface State{
   dragged:boolean,
   filterIds:string[],
   filterIdsOld:string[],
-  autolayout:boolean
+  autolayout:boolean,
+  dataHasBeenLoaded:boolean
 }
 
 class GraphView extends React.Component<Props,State>{
@@ -57,7 +58,8 @@ class GraphView extends React.Component<Props,State>{
       dragged:false,
       filterIds:[],
       filterIdsOld:[],
-      autolayout:true
+      autolayout:true,
+      dataHasBeenLoaded:false
     };
   }
 
@@ -100,8 +102,13 @@ class GraphView extends React.Component<Props,State>{
       this.setLayout();
 
     }
+
+
     return(
-      <div id="GraphView"></div>
+      <div id="GraphView">
+      <svg width={this.props.width} onMouseUp={this.svgMouseUpHandler} onClick={this.svgClickHandler} onWheel={this.zoomHandler} height={this.props.height}>
+      </svg>
+      </div>
     );
   }
   setLayout = () => {
@@ -126,17 +133,9 @@ class GraphView extends React.Component<Props,State>{
     });
   }
   setSvg = () => {
-    //Rendering svg
-
-    d3.select("svg").remove();
-    const svg = d3.select("#GraphView")
-    .append("svg")
-    .attr("width",this.props.width)
-    .attr("height",this.props.height)
-    .attr("class","graph-svg")
-    .on("wheel",this.zoomHandler)
-    .on("mouseup",()=>this.svgMouseUpHandler(svg))
-    .on("click",()=>this.svgClickHandler(svg));
+    const svg =     d3.select("svg");
+    d3.selectAll("circle").remove();
+    d3.selectAll("line").remove();
     //Rendering edges
     const edges = this.state.edges;
     svg.selectAll(".link")
@@ -376,9 +375,10 @@ class GraphView extends React.Component<Props,State>{
     this.setSvg();
   }
 
-  svgMouseUpHandler = (svg:any) => {
+  svgMouseUpHandler = (event:any) => {
+    const svg = event.currentTarget;
     if(this.state.beingDragged){
-      let {x,y} = this.getMousePosition(svg.node(),d3.event.clientX,d3.event.clientY);
+      let {x,y} = this.getMousePosition(svg,event.clientX,event.clientY);
       if(Math.abs(this.state.beingDragged.x-x)<30&&Math.abs(this.state.beingDragged.y-y)<30){
         x=this.state.beingDragged.x;
         y=this.state.beingDragged.y;
@@ -404,9 +404,10 @@ class GraphView extends React.Component<Props,State>{
       }
     }
   }
-  svgClickHandler = (svg:any) => {
-    if(d3.event.shiftKey){
-      const {x,y} = this.getMousePosition(svg.node(),d3.event.clientX,d3.event.clientY);
+  svgClickHandler = (event:any) => {
+    const svg = event.currentTarget;
+    if(event.shiftKey){
+      const {x,y} = this.getMousePosition(svg,event.clientX,event.clientY);
       const newNode = {id:Date.now().toString(),title:"New Knot",x,y};
       this.props.onCreateNode({...newNode,x:x-(this.props.width/2),y:y-(this.props.height/2)});
       const nodes = this.state.nodes;
