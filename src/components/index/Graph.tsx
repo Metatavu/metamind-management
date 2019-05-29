@@ -6,13 +6,10 @@ import { connect } from "react-redux";
 import * as actions from "../../actions/";
 import GraphView,{ IEdge, INode} from "./GraphView";
 import Api, { Intent, Knot } from "metamind-client";
-
+import {GLOBAL_TYPE,
+  PENDING_TYPE} from '../../utils/graph-config';
 import { KeycloakInstance } from 'keycloak-js';
 import '../../styles/graph.css';
-import {
-
-  GLOBAL_TYPE
-} from '../../utils/graph-config'; // Configures node/edge types
 interface IGraph {
   nodes: INode[];
   edges: IEdge[];
@@ -43,7 +40,7 @@ interface State {
   graph: IGraph;
   selected: any;
   copiedNode: any;
-  searchResultKnotIds: string[]
+  filterIds: string[]
 };
 
 const GLOBAL_NODE_ID = "GLOBAL";
@@ -68,7 +65,7 @@ class Graph extends React.Component<Props, State> {
       },
 
       selected: null,
-      searchResultKnotIds: []
+      filterIds: []
     };
 
     this.GraphViewRef = React.createRef();
@@ -102,9 +99,6 @@ class Graph extends React.Component<Props, State> {
      }
 
    }
-
-
-
    return {
      graph: {
        nodes:nodesToAssign,
@@ -132,7 +126,7 @@ class Graph extends React.Component<Props, State> {
    };
   }
 
-  
+
   public componentDidMount = async () =>{
     const knotsService = Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "");
     const intentsService = Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "");
@@ -150,10 +144,11 @@ class Graph extends React.Component<Props, State> {
   public componentDidUpdate(prevProps: Props, prevState: State) {
    if (this.props.searchText !== prevProps.searchText) {
      this.setState({
-       searchResultKnotIds: this.searchKnots()
+       filterIds: this.searchKnots()
      });
    }
  }
+ //Handles node search
  private searchKnots = (): string[] => {
    if (!this.props.searchText) {
      return [];
@@ -206,6 +201,8 @@ class Graph extends React.Component<Props, State> {
     return (
       <div id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
       <GraphView
+      knots={this.props.knots}
+      searchText={this.props.searchText}
       autolayout={this.props.autolayout}
       height={window.innerHeight}
       width={window.innerWidth}
@@ -216,7 +213,7 @@ class Graph extends React.Component<Props, State> {
       onCreateNode={this.onCreateNode}
       onNodeDragEnd={this.onNodeDragEnd}
       onNodeClick={this.onNodeClick}
-      filterIds={this.state.searchResultKnotIds}
+      filterIds={this.state.filterIds}
       nodes={this.state.graph.nodes}
       edges={this.state.graph.edges}
       onUpdateMultiple={this.onUpdateMultiple}/>
@@ -236,8 +233,7 @@ class Graph extends React.Component<Props, State> {
    this.props.onSelectNode(viewNode);
   }
   /**
- * Called by 'drag' handler, etc..
- * to sync updates from D3 with the graph
+ Writes node position to local storage
  */
 
 private onNodeDragEnd = (viewNode: INode) => {
@@ -264,7 +260,8 @@ private onNodeDragEnd = (viewNode: INode) => {
      id: tempNodeId,
      title: "loading",
      x: viewNode.x,
-     y: viewNode.y
+     y: viewNode.y,
+     type: PENDING_TYPE
    };
    graph.nodes = [...graph.nodes, node];
 

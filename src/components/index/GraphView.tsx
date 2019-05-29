@@ -1,12 +1,15 @@
 import * as React from "react";
 import * as d3 from "d3";
 import * as dagre from "dagre";
+import {  Knot } from "metamind-client";
+import GraphConfig from '../../utils/graph-config';
 export interface INode{
   id:string,
   title:string,
   x:number,
   y:number,
-  type?:string
+  type?:string,
+  subtype?:string
 }
 export interface IEdge{
   id:string,
@@ -20,6 +23,7 @@ interface Props{
   edges:IEdge[],
   autolayout:boolean,
   filterIds:string[],
+  searchText:string,
   onNodeClick:(viewNode:INode)=>void,
   onNodeDragEnd:(viewNode:INode)=>void,
   onCreateNode:(viewNode:INode)=>void,
@@ -27,7 +31,8 @@ interface Props{
   onCreateEdge:(targetViewNode:INode,sourceViewNode:INode)=>Promise<void>,
   onDeleteEdge:(viewEdge:IEdge)=>Promise<void>,
   onEdgeClick:(viewEdge:IEdge)=>void,
-  onUpdateMultiple:(viewNodes:INode[])=>Promise<void>
+  onUpdateMultiple:(viewNodes:INode[])=>Promise<void>,
+  knots:Knot[]
 }
 interface State{
 
@@ -40,7 +45,6 @@ interface State{
   translateX:number,
   translateY:number,
   filterIds:string[],
-  filterIdsOld:string[],
   autolayout:boolean
 }
 
@@ -54,11 +58,10 @@ class GraphView extends React.Component<Props,State>{
       translateX:0,
       translateY:0,
       filterIds:[],
-      filterIdsOld:[],
       autolayout:true
     };
   }
-
+  //Get called when props change
   static getDerivedStateFromProps = (props: Props, state: State) => {
     const newNodes = props.nodes.map(node=>{
 
@@ -74,16 +77,22 @@ class GraphView extends React.Component<Props,State>{
       const target = {...edge.target,x:targetX,y:targetY};
       return {...edge,target,source};
     });
-    return {nodes:newNodes,edges:newEdges,filterIds:props.filterIds};
+    let selectedEdge=state.selectedEdge;
+    let selectedNode=state.selectedNode;
+    if(props.filterIds.length>0){
+      selectedEdge=undefined;
+      selectedNode=undefined
+    };
+    return {nodes:newNodes,edges:newEdges,filterIds:props.filterIds,selectedEdge,selectedNode};
   }
+
   componentDidMount(){
+    //Sets the key handler for events
     this.keyHandler();
   }
 
   render(){
-    if(this.state.filterIdsOld!==this.state.filterIds){
-      this.setState({filterIdsOld:this.state.filterIds,selectedEdge:undefined,selectedNode:undefined});
-    }
+    //Resets the layout when the "layout automatically"-button gets pressed
     if(this.state.autolayout!==this.props.autolayout){
       this.setLayout();
     }
@@ -97,12 +106,14 @@ class GraphView extends React.Component<Props,State>{
       </div>
     );
   }
+  //Gets all graphical elements of the graph
   getGraph = ():any[] => {
     const edgeLines = this.state.edges.map(edge=>this.getEdgeLines(edge));
     const edgeCircles = this.state.edges.map(edge=>this.getEdgeCircles(edge));
-    const nodeCircles = this.state.nodes.map(node=>this.getNodeCircles(node));
-    return edgeLines.concat(edgeCircles).concat(nodeCircles);
+    const nodeIcons = this.state.nodes.map(node=>this.getNodeIcons(node));
+    return edgeLines.concat(edgeCircles).concat(nodeIcons);
   }
+  //Gets the lines that represent edges between nodes
   getEdgeLines = (edge:IEdge) => {
     const color = this.giveColor(edge,this.state.selectedEdge);
     const x1 = this.getElementPosition(edge.source.x);
@@ -112,17 +123,19 @@ class GraphView extends React.Component<Props,State>{
 
     return <line  onClick={()=>this.edgeClickHandler(edge)} x1={x1} x2={x2} y1={y1} y2={y2} style={{"stroke":color}} stroke-width={2}></line>
   }
+  //Gets the clickable circles on top of the edges
   getEdgeCircles = (edge:IEdge)=>{
     const color = this.giveColor(edge,this.state.selectedEdge);
     const transform = ()=>{
-      const x = this.getElementPosition(((edge.source.x*0.5)+(edge.target.x*1.5))/2);
-      const y = this.getElementPosition(undefined,((edge.source.y*0.5)+(edge.target.y*1.5))/2);
+      const x = this.getElementPosition(((edge.source.x*0.7)+(edge.target.x*1.3))/2);
+      const y = this.getElementPosition(undefined,((edge.source.y*0.7)+(edge.target.y*1.3))/2);
       return `translate(${x},${y})`;
     }
     return <circle transform={transform()} fill={color} r={5*this.state.zoom} onClick={()=>this.edgeClickHandler(edge)}></circle>
   }
-  getNodeCircles = (node:INode)=>{
-    const radius = node.id==="GLOBAL"?15*this.state.zoom:10*this.state.zoom;
+  //Gets the node icons
+  getNodeIcons = (node:INode)=>{
+    const color = this.giveColor(node,this.state.selectedNode);
     const transform = ()=>{
 
       let {x,y} = this.getElementPosition(node.x,node.y);
@@ -132,11 +145,20 @@ class GraphView extends React.Component<Props,State>{
           y=this.getElementPosition(undefined,this.state.beingDragged.y);
         }
       }
-      return `translate(${x},${y})`;
+      return `translate(${x-(16*this.state.zoom)},${y-(16*this.state.zoom)})`;
     }
-    const color = this.giveColor(node,this.state.selectedNode);
-    return <circle onMouseDown={()=>this.nodeMouseDownHandler(node)} onContextMenu={(event)=>{event.preventDefault();this.nodeRightClickHandler(node)}} onClick={(event)=>this.nodeClickHandler(event,node)}  fill={color} transform={transform()} r={radius}></circle>
+
+
+    const nodetypes = GraphConfig.NodeTypes;
+    const textShape = nodetypes.text.shape;
+    const globalShape = nodetypes.global.shape;
+    let shape = textShape(25*this.state.zoom,25*this.state.zoom,color);
+    if(node.id==="GLOBAL"){
+      shape=globalShape(25*this.state.zoom,25*this.state.zoom,color);
+    }
+    return <g  onMouseDown={()=>this.nodeMouseDownHandler(node)} onContextMenu={(event)=>{event.preventDefault();this.nodeRightClickHandler(node)}} onClick={(event)=>this.nodeClickHandler(event,node)} transform={transform()} >{shape}</g>
   }
+  //Resets the layout
   setLayout = () => {
     this.setState({autolayout:this.props.autolayout});
     let newNodes:any = [];
@@ -156,7 +178,7 @@ class GraphView extends React.Component<Props,State>{
 
     this.props.onUpdateMultiple(newNodes);
   }
-
+  //Handles dragging nodes
   handleDrag = (event:any) => {
     const svg = event.currentTarget;
 
@@ -167,6 +189,7 @@ class GraphView extends React.Component<Props,State>{
 
     }
   };
+  //Deletes all edges that are connected to the node
   deleteConnectedEdges = async (node:INode) => {
     for(let i=0;i<this.state.edges.length;i++){
       const edge = this.state.edges[i];
@@ -175,12 +198,14 @@ class GraphView extends React.Component<Props,State>{
       }
     }
   }
+  //Handles edge selection
   edgeClickHandler = (edge:IEdge) => {
       this.props.onEdgeClick(edge);
       this.setState({selectedEdge:edge});
       this.setState({selectedNode:undefined});
 
     }
+    //Gives a color to a node or edge
     giveColor = (d:IEdge|INode,selected:IEdge|INode|undefined) => {
       if(selected){
 
@@ -193,6 +218,7 @@ class GraphView extends React.Component<Props,State>{
       }
       return "blue";
     }
+    //Handles selecting nodes
     nodeClickHandler = (event:any,node:INode) => {
       if(!event.shiftKey){
         this.props.onNodeClick(node);
@@ -201,12 +227,14 @@ class GraphView extends React.Component<Props,State>{
 
       }
     }
+    //Node can be dragged only if this function gets calle
     nodeMouseDownHandler = (node:INode) => {
 
       if(!this.state.beingDragged){
               this.setState({beingDragged:node});
       }
     }
+    //Handles creating new edges
     nodeRightClickHandler = (node:INode) => {
 
 
@@ -230,6 +258,7 @@ class GraphView extends React.Component<Props,State>{
         }
       }
     }
+    //Handles key events
     keyHandler = () => {
       d3.select("body").on("keydown",()=>{
         if(d3.event.keyCode===38){
@@ -294,6 +323,7 @@ class GraphView extends React.Component<Props,State>{
 
       });
     }
+  //Gets mouse position in relation to svg
   getMousePosition = (svg:any,eventX:number,eventY:number):any => {
     const rect = svg.getBoundingClientRect();
     const x = eventX -rect.left-svg.clientLeft-window.pageXOffset-this.state.translateX;
@@ -302,6 +332,7 @@ class GraphView extends React.Component<Props,State>{
     const distanceFromCenterY = y-(this.props.height/2)+this.state.translateY;
     return {x:x+(distanceFromCenterX/this.state.zoom-distanceFromCenterX),y:y+(distanceFromCenterY/this.state.zoom-distanceFromCenterY)};
   }
+  //Gets element position with zoom and translate values taken into account
   getElementPosition = (inputX?:number,inputY?:number):any => {
     let finalX:number|undefined=undefined;
     let finalY:number|undefined=undefined;
@@ -325,6 +356,7 @@ class GraphView extends React.Component<Props,State>{
       return finalY;
     }
   }
+  //Handles zooming
   zoomHandler = (event:any) => {
     const deltaY = event.deltaY;
     let {zoom}= this.state;
@@ -338,7 +370,7 @@ class GraphView extends React.Component<Props,State>{
     }
 
   }
-
+  //Saves the final position after dragging a node.
   svgMouseUpHandler = () => {
     if(this.state.beingDragged){
       let x = this.state.beingDragged.x;
@@ -363,9 +395,11 @@ class GraphView extends React.Component<Props,State>{
 
     }
   }
+  //Handles the creation of new nodes.
   svgClickHandler = (event:any) => {
-    const svg = event.currentTarget;
+
     if(event.shiftKey){
+      const svg = event.currentTarget;
       const {x,y} = this.getMousePosition(svg,event.clientX,event.clientY);
       const newNode = {id:Date.now().toString(),title:"New Knot",x,y};
       this.props.onCreateNode({...newNode,x:x-(this.props.width/2),y:y-(this.props.height/2)});
@@ -375,5 +409,7 @@ class GraphView extends React.Component<Props,State>{
 
     }
   }
+
+
 }
 export default GraphView;

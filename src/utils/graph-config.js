@@ -11,10 +11,10 @@ export const SPECIAL_CHILD_SUBTYPE = 'specialChild';
 export const nodeTypes = [TEXT_TYPE, PENDING_TYPE];
 export const edgeTypes = [OPENNLP_EDGE_TYPE];
 
-const TextShape = (
-  <svg width="88" height="88" id="text" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+const TextShape = (width,height,color)=>(
+  <svg  width={width} height={height} id="text" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
       <path d="M62,31c0-2.344-1.012-4.449-2.619-5.912C59.779,24.137,60,23.095,60,22c0-4.08-3.054-7.446-7-7.938 l-0.072,1.145c-0.347-2.607-2.348-4.69-4.926-5.124l-0.015,0.184C47.989,10.177,48,10.09,48,10c0-4.418-3.582-8-8-8s-8,3.582-8,8 v45c0,3.866,3.134,7,7,7c2.809,0,5.225-1.659,6.34-4.047C45.559,57.974,45.776,58,46,58c3.866,0,7-3.134,7-7v-0.422 c1.564-0.684,2.708-2.143,2.949-3.893L56,46.71c2.891-0.861,5-3.539,5-6.71c0-1.347-0.387-2.601-1.047-3.669 C61.222,34.915,62,33.051,62,31z M44,41l0.104,0.05C43.911,41.293,43.853,41.311,44,41z"
-      fill="currentColor" />
+      fill={color} />
       <path d="M32,47c-8.271,0-15-6.729-15-15s6.729-15,15-15v2c-7.168,0-13,5.832-13,13s5.832,13,13,13V47z"
       fill="#e56565" />
       <path d="M28.843,51.728c-5.251-0.834-10.041-3.804-13.141-8.146l1.628-1.162 c2.791,3.909,7.101,6.582,11.826,7.333L28.843,51.728z"
@@ -58,11 +58,11 @@ const OpenNlpEdgeShape = (
   </symbol>
 );
 
-const GlobalShape = (
-  <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" id="global" viewBox="0 0 64 64">
+const GlobalShape = (width,height,color)=>(
+  <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} id="global" viewBox="0 0 64 64">
     <g id="g1278">
       <g id="g1130">
-          <polygon points="20,31 25,27 44,27 44,49 20,49" id="polygon1128" fill="currentColor"
+          <polygon points="20,31 25,27 44,27 44,49 20,49" id="polygon1128" fill={color}
           />
       </g>
       <g id="g1134">
