@@ -104,6 +104,7 @@ class Graph extends React.Component<Props, State> {
    }
 
 
+
    return {
      graph: {
        nodes:nodesToAssign,
@@ -131,6 +132,7 @@ class Graph extends React.Component<Props, State> {
    };
   }
 
+  
   public componentDidMount = async () =>{
     const knotsService = Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "");
     const intentsService = Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "");

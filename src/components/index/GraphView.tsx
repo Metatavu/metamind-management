@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as d3 from "d3";
-
+import * as dagre from "dagre";
 export interface INode{
   id:string,
   title:string,
@@ -97,52 +97,33 @@ class GraphView extends React.Component<Props,State>{
     }
     if(this.state.autolayout!==this.props.autolayout){
 
-      this.setState({autolayout:this.props.autolayout});
-
-
-      let newNodes:any = [];
-      let edges = this.state.edges.map((edge,i)=>{
-        edge.source.x =0;
-        edge.source.y = 0;
-        return {...edge,i};
-      });
-
-      edges.forEach(edge=>{
-
-
-        newNodes = newNodes.filter((node:INode)=>node.id!==edge.target.id);
-        const x = edge.source.x+(20*this.state.edges.length);
-        const y = (20*this.state.edges.length)*Math.random()-(10*(this.state.edges.length));
-        newNodes.push({...edge.target,x,y});
-        const updatedEdges = edges.filter(oldEdge=>oldEdge.source.id===edge.target.id);
-        updatedEdges.forEach(oldEdge=>{
-          edges[oldEdge.i].source.x = x;
-          edges[oldEdge.i].source.y = y;
-        });
-      });
-
-      newNodes = this.state.nodes.map(node=>{
-        const possibleUpdate = newNodes.find((updatedNode:INode)=>node.id===updatedNode.id);
-        if(possibleUpdate){
-          return possibleUpdate;
-        }
-        if(node.id==="GLOBAL"){
-            return {...node,x:0,y:0};
-        }
-          return {...node,x:100,y:100};
-
-
-      });
-
-      this.props.onUpdateMultiple(newNodes).then(()=>{
-        this.setSvg();
-
-      });
+      this.setLayout();
 
     }
     return(
       <div id="GraphView"></div>
     );
+  }
+  setLayout = () => {
+    this.setState({autolayout:this.props.autolayout});
+    let newNodes:any = [];
+    const g = new dagre.graphlib.Graph();
+    g.setGraph({});
+    g.setDefaultEdgeLabel(function() { return {}; });
+    this.state.nodes.forEach(node=>{
+      g.setNode(node.id,{id:node.id});
+    });
+    this.state.edges.forEach(edge=>{
+      g.setEdge(edge.source.id,edge.target.id);
+    });
+    dagre.layout(g);
+    g.nodes().forEach(n=>{
+      newNodes.push({id:g.node(n).id,x:g.node(n).x,y:g.node(n).y});
+    });
+
+    this.props.onUpdateMultiple(newNodes).then(()=>{
+      this.setSvg();
+    });
   }
   setSvg = () => {
     //Rendering svg
