@@ -204,7 +204,7 @@ class Graph extends React.Component<Props, State> {
     return (
       <div id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
       <GraphView
-
+      autolayout={this.props.autolayout}
       height={window.innerHeight}
       width={window.innerWidth}
       onEdgeClick={this.onEdgeClick}

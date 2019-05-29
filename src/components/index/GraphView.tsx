@@ -18,6 +18,7 @@ interface Props{
   height:number,
   nodes:INode[],
   edges:IEdge[],
+  autolayout:boolean,
   filterIds:string[],
   onNodeClick:(viewNode:INode)=>void,
   onNodeDragEnd:(viewNode:INode)=>void,
@@ -39,7 +40,8 @@ interface State{
   translateY:number,
   dragged:boolean,
   filterIds:string[],
-  filterIdsOld:string[]
+  filterIdsOld:string[],
+  autolayout:boolean
 }
 
 class GraphView extends React.Component<Props,State>{
@@ -53,7 +55,8 @@ class GraphView extends React.Component<Props,State>{
       translateY:0,
       dragged:false,
       filterIds:[],
-      filterIdsOld:[]
+      filterIdsOld:[],
+      autolayout:true
     };
   }
 
@@ -89,7 +92,9 @@ class GraphView extends React.Component<Props,State>{
         this.setSvg();
 
     }
-
+    if(this.state.autolayout!==this.props.autolayout){
+      this.setState({autolayout:this.props.autolayout});
+    }
     return(
       <div id="GraphView"></div>
     );
