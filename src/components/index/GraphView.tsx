@@ -260,30 +260,35 @@ class GraphView extends React.Component<Props,State>{
     //Handles key events
     keyHandler = () => {
       window.addEventListener("keydown",(event:any)=>{
+        //Up arrow
         if(event.keyCode===38){
           let translateY = this.state.translateY;
           translateY+=(10/this.state.zoom);
           this.setState({translateY});
 
         }
+        //Down arrow
         if(event.keyCode===40){
           let translateY = this.state.translateY;
           translateY-=(10/this.state.zoom);
           this.setState({translateY});
 
         }
+        //Left arrow
         if(event.keyCode===37){
           let translateX = this.state.translateX;
           translateX+=(10/this.state.zoom);
           this.setState({translateX});
 
         }
+        //Right arrow
         if(event.keyCode===39){
           let translateX = this.state.translateX;
           translateX-=(10/this.state.zoom);
           this.setState({translateX});
 
         }
+        //Delete-key
         if(event.keyCode===46){
           if(this.state.selectedNode){
             const newNodes = this.state.nodes.filter(node=>{
