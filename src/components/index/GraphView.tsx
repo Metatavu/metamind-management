@@ -122,6 +122,7 @@ class GraphView extends React.Component<Props,State>{
 
     return <line  onClick={()=>this.edgeClickHandler(edge)} x1={x1} x2={x2} y1={y1} y2={y2} style={{"stroke":color}} stroke-width={2}></line>
   }
+  //Gets arrows that indicate the direction from soruce to target
   getEdgeArrows = (edge:IEdge) =>{
 
     const x = this.getElementPosition((((edge.source.x*0.5)+(edge.target.x*1.5)))/2);
