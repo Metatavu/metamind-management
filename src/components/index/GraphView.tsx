@@ -98,6 +98,7 @@ class GraphView extends React.Component<Props,State>{
     return(
       <div id="GraphView">
       <svg width={this.props.width} onMouseMove={this.handleDrag} onMouseUp={this.svgMouseUpHandler} onClick={this.svgClickHandler} onWheel={this.zoomHandler} height={this.props.height}>
+
       {this.getGraph()}
       </svg>
       </div>
@@ -107,8 +108,9 @@ class GraphView extends React.Component<Props,State>{
   getGraph = ():any[] => {
     const edgeLines = this.state.edges.map(edge=>this.getEdgeLines(edge));
     const edgeCircles = this.state.edges.map(edge=>this.getEdgeCircles(edge));
+    const edgeArrows = this.state.edges.map(edge=>this.getEdgeArrows(edge));
     const nodeIcons = this.state.nodes.map(node=>this.getNodeIcons(node));
-    return edgeLines.concat(edgeCircles).concat(nodeIcons);
+    return edgeLines.concat(edgeCircles).concat(nodeIcons).concat(edgeArrows);
   }
   //Gets the lines that represent edges between nodes
   getEdgeLines = (edge:IEdge) => {
@@ -120,15 +122,25 @@ class GraphView extends React.Component<Props,State>{
 
     return <line  onClick={()=>this.edgeClickHandler(edge)} x1={x1} x2={x2} y1={y1} y2={y2} style={{"stroke":color}} stroke-width={2}></line>
   }
+  getEdgeArrows = (edge:IEdge) =>{
+
+    const x = this.getElementPosition((((edge.source.x*0.5)+(edge.target.x*1.5)))/2);
+    const y = this.getElementPosition(undefined,(((edge.source.y*0.5)+(edge.target.y*1.5)))/2);
+    const rotation = Math.atan2(edge.target.y - edge.source.y, edge.target.x - edge.source.x) * 180 / Math.PI;
+    const arrowTransform = `translate(${x},${y}) rotate(${rotation})`;
+    const color = this.giveColor(edge,this.state.selectedEdge);
+    return <polygon onClick={()=>this.edgeClickHandler(edge)} fill={color} transform={arrowTransform} points={`${-5*this.state.zoom}, ${-5*this.state.zoom} ${5*this.state.zoom},0 ${-5*this.state.zoom} , ${5*this.state.zoom} ${-3*this.state.zoom},0` }/>;
+
+  }
   //Gets the clickable circles on top of the edges
   getEdgeCircles = (edge:IEdge)=>{
     const color = this.giveColor(edge,this.state.selectedEdge);
-    const transform = ()=>{
-      const x = this.getElementPosition(((edge.source.x*0.7)+(edge.target.x*1.3))/2);
-      const y = this.getElementPosition(undefined,((edge.source.y*0.7)+(edge.target.y*1.3))/2);
-      return `translate(${x},${y})`;
-    }
-    return <circle transform={transform()} fill={color} r={5*this.state.zoom} onClick={()=>this.edgeClickHandler(edge)}></circle>
+    const x = this.getElementPosition(((edge.source.x+edge.target.x))/2);
+    const y = this.getElementPosition(undefined,((edge.source.y+edge.target.y))/2);
+    const circleTransform = `translate(${x},${y})`;
+
+
+    return <circle onClick={()=>this.edgeClickHandler(edge)} transform={circleTransform}  fill={color} r={5*this.state.zoom} ></circle>
   }
   //Gets the node icons
   getNodeIcons = (node:INode)=>{
