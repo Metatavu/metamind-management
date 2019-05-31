@@ -122,11 +122,11 @@ class GraphView extends React.Component<Props,State>{
 
     return <line  onClick={()=>this.edgeClickHandler(edge)} x1={x1} x2={x2} y1={y1} y2={y2} style={{"stroke":color}} stroke-width={2}></line>
   }
-  //Gets arrows that indicate the direction from soruce to target
+  //Gets arrows that indicate the edge direction
   getEdgeArrows = (edge:IEdge) =>{
 
-    const x = this.getElementPosition((((edge.source.x*0.5)+(edge.target.x*1.5)))/2);
-    const y = this.getElementPosition(undefined,(((edge.source.y*0.5)+(edge.target.y*1.5)))/2);
+    const x = this.getElementPosition((((edge.source.x*0.3)+(edge.target.x*1.7)))/2);
+    const y = this.getElementPosition(undefined,(((edge.source.y*0.3)+(edge.target.y*1.7)))/2);
     const rotation = Math.atan2(edge.target.y - edge.source.y, edge.target.x - edge.source.x) * 180 / Math.PI;
     const arrowTransform = `translate(${x},${y}) rotate(${rotation})`;
     const color = this.giveColor(edge,this.state.selectedEdge);
@@ -136,8 +136,8 @@ class GraphView extends React.Component<Props,State>{
   //Gets the clickable circles on top of the edges
   getEdgeCircles = (edge:IEdge)=>{
     const color = this.giveColor(edge,this.state.selectedEdge);
-    const x = this.getElementPosition(((edge.source.x+edge.target.x))/2);
-    const y = this.getElementPosition(undefined,((edge.source.y+edge.target.y))/2);
+    const x = this.getElementPosition(((edge.source.x*0.5)+(edge.target.x*1.5))/2);
+    const y = this.getElementPosition(undefined,(((edge.source.y*0.5)+(edge.target.y*1.5)))/2);
     const circleTransform = `translate(${x},${y})`;
 
 
