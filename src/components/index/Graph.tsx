@@ -201,7 +201,6 @@ class Graph extends React.Component<Props, State> {
     return (
       <div id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
       <GraphView
-      knots={this.props.knots}
       searchText={this.props.searchText}
       autolayout={this.props.autolayout}
       height={window.innerHeight}

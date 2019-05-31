@@ -1,7 +1,6 @@
 import * as React from "react";
 import * as d3 from "d3";
 import * as dagre from "dagre";
-import {  Knot } from "metamind-client";
 import GraphConfig from '../../utils/graph-config';
 export interface INode{
   id:string,
@@ -31,8 +30,7 @@ interface Props{
   onCreateEdge:(targetViewNode:INode,sourceViewNode:INode)=>Promise<void>,
   onDeleteEdge:(viewEdge:IEdge)=>Promise<void>,
   onEdgeClick:(viewEdge:IEdge)=>void,
-  onUpdateMultiple:(viewNodes:INode[])=>Promise<void>,
-  knots:Knot[]
+  onUpdateMultiple:(viewNodes:INode[])=>Promise<void>
 }
 interface State{
 
