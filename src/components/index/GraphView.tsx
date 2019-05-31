@@ -1,5 +1,4 @@
 import * as React from "react";
-import * as d3 from "d3";
 import * as dagre from "dagre";
 import GraphConfig from '../../utils/graph-config';
 export interface INode{
@@ -189,12 +188,14 @@ class GraphView extends React.Component<Props,State>{
   };
   //Deletes all edges that are connected to the node
   deleteConnectedEdges = async (node:INode) => {
-    for(let i=0;i<this.state.edges.length;i++){
-      const edge = this.state.edges[i];
+    const promises = this.state.edges.map(async(edge)=>{
       if(edge.source.id===node.id||edge.target.id===node.id){
         await this.props.onDeleteEdge(edge);
       }
-    }
+    });
+    await Promise.all(promises);
+
+
   }
   //Handles edge selection
   edgeClickHandler = (edge:IEdge) => {
@@ -246,9 +247,7 @@ class GraphView extends React.Component<Props,State>{
         if(!alreadyExists){
           if(node.id!==this.state.selectedNode.id){
             const newEdge = {id:Date.now().toString(),source:this.state.selectedNode,target:node};
-            this.props.onCreateEdge(newEdge.source,newEdge.target).then(()=>{
-
-            });
+            this.props.onCreateEdge(newEdge.source,newEdge.target);
             const edges = this.state.edges;
             edges.push(newEdge);
             this.setState({edges});
@@ -258,40 +257,43 @@ class GraphView extends React.Component<Props,State>{
     }
     //Handles key events
     keyHandler = () => {
-      d3.select("body").on("keydown",()=>{
-        if(d3.event.keyCode===38){
+      window.addEventListener("keydown",(event:any)=>{
+        //Up arrow
+        if(event.keyCode===38){
           let translateY = this.state.translateY;
           translateY+=(10/this.state.zoom);
           this.setState({translateY});
 
         }
-        if(d3.event.keyCode===40){
+        //Down arrow
+        if(event.keyCode===40){
           let translateY = this.state.translateY;
           translateY-=(10/this.state.zoom);
           this.setState({translateY});
 
         }
-        if(d3.event.keyCode===37){
+        //Left arrow
+        if(event.keyCode===37){
           let translateX = this.state.translateX;
           translateX+=(10/this.state.zoom);
           this.setState({translateX});
 
         }
-        if(d3.event.keyCode===39){
+        //Right arrow
+        if(event.keyCode===39){
           let translateX = this.state.translateX;
           translateX-=(10/this.state.zoom);
           this.setState({translateX});
 
         }
-        if(d3.event.keyCode===46){
+        //Delete-key
+        if(event.keyCode===46){
           if(this.state.selectedNode){
             const newNodes = this.state.nodes.filter(node=>{
               if(this.state.selectedNode){
                 if(node.id===this.state.selectedNode.id){
                     this.deleteConnectedEdges(node).then(()=>{
-                                        this.props.onDeleteNode(node).then(()=>{
-
-                                        });
+                                        this.props.onDeleteNode(node);
                     });
                   return false;
                 }
@@ -306,9 +308,7 @@ class GraphView extends React.Component<Props,State>{
             const newEdges = this.state.edges.filter(edge=>{
               if(this.state.selectedEdge){
                 if(edge.id===this.state.selectedEdge.id){
-                  this.props.onDeleteEdge(edge).then(()=>{
-
-                  });
+                  this.props.onDeleteEdge(edge);
                   return false;
                 }
               }
