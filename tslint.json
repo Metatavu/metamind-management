@@ -1,6 +1,12 @@
 {
-  "extends": [],
+  "extends": "tslint:recommended",
   "defaultSeverity": "warning",
+  "rules": {
+    "max-line-length": {
+      "options": [160]
+    },
+    "import-sources-order": "any"
+  },
   "linterOptions": {
     "exclude": [
       "config/**/*.js",
