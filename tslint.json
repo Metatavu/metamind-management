@@ -4,7 +4,8 @@
   "rules": {
     "max-line-length": {
       "options": [160]
-    }
+    },
+    "import-sources-order": "any"
   },
   "linterOptions": {
     "exclude": [
