@@ -74,13 +74,14 @@ class GraphView extends React.Component<Props,State>{
       const target = {...edge.target,x:targetX,y:targetY};
       return {...edge,target,source};
     });
-    let selectedEdge=state.selectedEdge;
-    let selectedNode=state.selectedNode;
-    if(props.filterIds.length>0){
+    let selectedNode = state.selectedNode;
+    let selectedEdge = state.selectedEdge;
+    if(props.filterIds!==state.filterIds){
+      selectedNode = undefined;
       selectedEdge=undefined;
-      selectedNode=undefined
-    };
-    return {nodes:newNodes,edges:newEdges,filterIds:props.filterIds,selectedEdge,selectedNode};
+    }
+
+    return {nodes:newNodes,edges:newEdges,filterIds:props.filterIds,selectedNode,selectedEdge};
   }
 
   componentDidMount(){
