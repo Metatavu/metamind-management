@@ -1,22 +1,22 @@
+import * as Keycloak from "keycloak-js";
+import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
-import * as Keycloak from 'keycloak-js';
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import * as actions from "../../actions";
 import { IStoreState } from "../../types";
-import { Dispatch } from "redux";
-import { connect } from "react-redux";
-import { KeycloakInstance } from "keycloak-js";
 
-import ScriptEditor from "./ScriptEditor";
 import { Tab } from "semantic-ui-react";
+import ScriptEditor from "./ScriptEditor";
 import VariableEditor from "./VariableEditor";
 
 /**
  * Component props
  */
 interface Props {
-  storyId: string,
-  authenticated: boolean,
-  keycloak?: Keycloak.KeycloakInstance
+  storyId: string;
+  authenticated: boolean;
+  keycloak?: Keycloak.KeycloakInstance;
 }
 
 /**
@@ -38,7 +38,7 @@ class GlobalEditor extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      loading: false
+      loading: false,
     };
   }
 
@@ -47,8 +47,8 @@ class GlobalEditor extends React.Component<Props, State> {
    */
   public render() {
     const tabPanes = [
-      { menuItem: 'Scripts', render: () => <Tab.Pane style={{ padding: 0, border: "none" }}><ScriptEditor storyId={ this.props.storyId }/></Tab.Pane> },
-      { menuItem: 'Variables', render: () => <Tab.Pane style={{ padding: 0, border: "none" }}><VariableEditor storyId={ this.props.storyId }/></Tab.Pane> }
+      { menuItem: "Scripts", render: () => <Tab.Pane style={{ padding: 0, border: "none" }}><ScriptEditor storyId={ this.props.storyId }/></Tab.Pane> },
+      { menuItem: "Variables", render: () => <Tab.Pane style={{ padding: 0, border: "none" }}><VariableEditor storyId={ this.props.storyId }/></Tab.Pane> },
     ];
 
     return (
@@ -61,14 +61,14 @@ class GlobalEditor extends React.Component<Props, State> {
 export function mapStateToProps(state: IStoreState) {
   return {
     authenticated: state.authenticated,
-    keycloak: state.keycloak
-  }
+    keycloak: state.keycloak,
+  };
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onLogin: (keycloak: KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated))
+    onLogin: (keycloak: KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated)),
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(GlobalEditor);;
+export default connect(mapStateToProps, mapDispatchToProps)(GlobalEditor);

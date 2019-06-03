@@ -1,47 +1,47 @@
-import * as React from "react";
-import { Link } from "react-router-dom";
-import strings from "../../localization/strings";
 import { KeycloakInstance } from "keycloak-js";
-import {
-  Container,
-  Image,
-  Menu,
-  Dropdown,
-  Button,
-  Input,
-  InputOnChangeData
-} from "semantic-ui-react"
-import { IStoreState } from "src/types";
-import { Dispatch } from "redux";
+import * as React from "react";
 import { connect } from "react-redux";
+import { Link } from "react-router-dom";
+import { Dispatch } from "redux";
+import {
+  Button,
+  Container,
+  Dropdown,
+  Image,
+  Input,
+  InputOnChangeData,
+  Menu,
+} from "semantic-ui-react";
+import { IStoreState } from "src/types";
 import * as actions from "../../actions/";
+import strings from "../../localization/strings";
 
 export interface Props {
-  siteName: string,
-  siteLogo?: string,
-  authenticated: boolean,
-  autolayout: boolean,
-  keycloak?: KeycloakInstance,
-  onLogout?: () => void,
-  onAutoLayoutToggle?: (a: boolean) => void,
-  onSearch: (searchText: string) => void
+  siteName: string;
+  siteLogo?: string;
+  authenticated: boolean;
+  autolayout: boolean;
+  keycloak?: KeycloakInstance;
+  onLogout?: () => void;
+  onAutoLayoutToggle?: (a: boolean) => void;
+  onSearch: (searchText: string) => void;
 }
 
 class MenuContainer extends React.Component<Props, object> {
 
-  onAccountItemClick = () =>  {
+  public onAccountItemClick = () =>  {
     if (this.props.keycloak) {
       window.location.href = this.props.keycloak.createAccountUrl();
     }
   }
 
-  onLogoutItemClick = () => {
+  public onLogoutItemClick = () => {
     if (this.props.keycloak) {
       window.location.href = this.props.keycloak.createLogoutUrl();
     }
   }
 
-  render() {
+  public render() {
     return (
       <Menu fixed="top" inverted>
         <Container>
@@ -79,7 +79,7 @@ export function mapStateToProps(state: IStoreState) {
   return {
     authenticated: state.authenticated,
     keycloak: state.keycloak,
-    autolayout: state.autolayout
+    autolayout: state.autolayout,
   };
 }
 

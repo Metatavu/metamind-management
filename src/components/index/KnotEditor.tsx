@@ -1,57 +1,57 @@
-import * as React from "react";
-import * as Keycloak from 'keycloak-js';
-import * as actions from "../../actions";
-import { IStoreState } from "src/types";
-import { Dispatch } from "redux";
-import { connect } from "react-redux";
+import * as Keycloak from "keycloak-js";
 import { KeycloakInstance } from "keycloak-js";
+import * as React from "react";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
+import { IStoreState } from "src/types";
+import * as actions from "../../actions";
 
-import Api, { Knot, TokenizerType, KnotType } from "metamind-client";
-import { Segment, Input, Form, InputOnChangeData, Loader, TextArea, TextAreaProps, Dropdown, DropdownProps } from "semantic-ui-react";
+import Api, { Knot, KnotType, TokenizerType } from "metamind-client";
+import { Dropdown, DropdownProps, Form, Input, InputOnChangeData, Loader, Segment, TextArea, TextAreaProps } from "semantic-ui-react";
 
 /**
  * Component props
  */
-interface Props {
-  storyId: string,
-  knotId: string,
-  authenticated: boolean,
-  keycloak?: Keycloak.KeycloakInstance
-  onKnotUpdated: (knot: Knot) => void
+interface IProps {
+  storyId: string;
+  knotId: string;
+  authenticated: boolean;
+  keycloak?: Keycloak.KeycloakInstance;
+  onKnotUpdated: (knot: Knot) => void;
 }
 
 /**
  * Component state
  */
-interface State {
-  loading: boolean,
-  knot?: Knot,
-  knotName?: string,
-  knotContent?: string,
-  knotHint?: string
+interface IState {
+  loading: boolean;
+  knot?: Knot;
+  knotName?: string;
+  knotContent?: string;
+  knotHint?: string;
 }
 
 /**
  * Knot editor
  */
-class KnotEditor extends React.Component<Props, State> {
+class KnotEditor extends React.Component<IProps, IState> {
 
   /**
    * Constructor
    *
    * @param props props
    */
-  constructor(props: Props) {
+  constructor(props: IProps) {
     super(props);
     this.state = {
-      loading: false
+      loading: false,
     };
   }
 
   /**
    * Component did mount life-cycle event
    */
-  public componentDidMount = async() => {
+  public componentDidMount = async () => {
     this.loadKnot();
   }
 
@@ -60,7 +60,7 @@ class KnotEditor extends React.Component<Props, State> {
    *
    * @param prevProps previous props
    */
-  public componentDidUpdate = async (prevProps: Props) => {
+  public componentDidUpdate = async (prevProps: IProps) => {
     if (prevProps.knotId !== this.props.knotId) {
       this.loadKnot();
     }
@@ -83,11 +83,11 @@ class KnotEditor extends React.Component<Props, State> {
     const knotTypeOptions = [{
       key: KnotType.TEXT,
       text: "Text", // TODO: Localize
-      value: KnotType.TEXT
+      value: KnotType.TEXT,
     }, {
       key: KnotType.IMAGE,
       text: "Image",  // TODO: Localize
-      value: KnotType.IMAGE
+      value: KnotType.IMAGE,
     }];
 
     return (
@@ -95,23 +95,38 @@ class KnotEditor extends React.Component<Props, State> {
         <Form inverted>
           <Form.Field>
             <label>Knot name</label>
-            <Input value={ this.state.knotName } style={ { width: "100%" } } onChange={ this.onKnotNameChange } />
+            <Input
+            value={ this.state.knotName }
+            style={ { width: "100%" } }
+            onChange={ this.onKnotNameChange } />
           </Form.Field>
           <Form.Field>
             <label>Knot type</label>
-            <Dropdown onChange={ this.onKnotTypeChange } value={ this.state.knot ? this.state.knot.type : KnotType.TEXT } options={ knotTypeOptions } />
+            <Dropdown
+            onChange={ this.onKnotTypeChange }
+            value={ this.state.knot ? this.state.knot.type : KnotType.TEXT }
+            options={ knotTypeOptions } />
           </Form.Field>
           <Form.Field>
             <label>Knot contents</label>
-            <TextArea rows={ 15 } style={ { width: "100%" } } onChange={ this.onKnotContentChange } value={ this.state.knotContent } />
+            <TextArea
+            rows={ 15 }
+            style={ { width: "100%" } }
+            onChange={ this.onKnotContentChange }
+            value={ this.state.knotContent } />
           </Form.Field>
           <Form.Field>
             <label>Knot hint</label>
-            <Input value={ this.state.knotHint } style={ { width: "100%" } } onChange={ this.onKnotHintChange } />
+            <Input
+            value={ this.state.knotHint }
+            style={ { width: "100%" } }
+            onChange={ this.onKnotHintChange } />
           </Form.Field>
           <Form.Field>
             <label>Tokenizer</label>
-            <Dropdown onChange={ this.onTokenizerChange } value={ this.state.knot ? this.state.knot.tokenizer : TokenizerType.WHITESPACE } options={ tokenizerTypeOptions } />
+            <Dropdown
+            onChange={ this.onTokenizerChange }
+            value={ this.state.knot ? this.state.knot.tokenizer : TokenizerType.WHITESPACE } options={ tokenizerTypeOptions } />
           </Form.Field>
           {
             <Loader inline active={ this.state.loading }/>
@@ -130,10 +145,11 @@ class KnotEditor extends React.Component<Props, State> {
     const knot = await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").findKnot(this.props.storyId, this.props.knotId);
 
     this.setState({
-      loading: false,
-      knot: knot,
+      knot,
+      knotContent: knot.content,
       knotName: knot.name,
-      knotContent: knot.content
+      loading: false,
+
     });
   }
 
@@ -153,15 +169,17 @@ class KnotEditor extends React.Component<Props, State> {
     knot.name = data.value as string;
 
     this.setState({
+      knotName: knot.name,
       loading: true,
-      knotName: knot.name
+
     });
 
     const updatedKnot = await this.updateKnot(knot, storyId, knotId);
 
     this.setState({
+      knot: updatedKnot,
       loading: false,
-      knot: updatedKnot
+
     });
   }
 
@@ -181,15 +199,17 @@ class KnotEditor extends React.Component<Props, State> {
     knot.hint = data.value as string;
 
     this.setState({
+      knotHint: knot.hint,
       loading: true,
-      knotHint: knot.hint
+
     });
 
     const updatedKnot = await this.updateKnot(knot, storyId, knotId);
 
     this.setState({
+      knot: updatedKnot,
       loading: false,
-      knot: updatedKnot
+
     });
   }
 
@@ -209,15 +229,17 @@ class KnotEditor extends React.Component<Props, State> {
     knot.content = data.value as string;
 
     this.setState({
+      knotContent: knot.content,
       loading: true,
-      knotContent: knot.content
+
     });
 
     const updatedKnot = await this.updateKnot(knot, storyId, knotId);
 
     this.setState({
+      knot: updatedKnot,
       loading: false,
-      knot: updatedKnot
+
     });
   }
 
@@ -237,14 +259,15 @@ class KnotEditor extends React.Component<Props, State> {
     knot.tokenizer = data.value as TokenizerType;
 
     this.setState({
-      loading: true
+      loading: true,
     });
 
     const updatedKnot = await this.updateKnot(knot, storyId, knotId);
 
     this.setState({
+      knot: updatedKnot,
       loading: false,
-      knot: updatedKnot
+
     });
   }
 
@@ -264,14 +287,15 @@ class KnotEditor extends React.Component<Props, State> {
     knot.type = data.value as KnotType;
 
     this.setState({
-      loading: true
+      loading: true,
     });
 
     const updatedKnot = await this.updateKnot(knot, storyId, knotId);
 
     this.setState({
+      knot: updatedKnot,
       loading: false,
-      knot: updatedKnot
+
     });
   }
 
@@ -286,15 +310,16 @@ class KnotEditor extends React.Component<Props, State> {
 export function mapStateToProps(state: IStoreState) {
   return {
     authenticated: state.authenticated,
-    keycloak: state.keycloak
-  }
+    keycloak: state.keycloak,
+  };
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
+    onKnotUpdated: (knot: Knot) => dispatch(actions.knotUpdated(knot)),
     onLogin: (keycloak: KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated)),
-    onKnotUpdated: (knot: Knot) => dispatch(actions.knotUpdated(knot))
+
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(KnotEditor);;
+export default connect(mapStateToProps, mapDispatchToProps)(KnotEditor);
