@@ -14,13 +14,13 @@ import { KeycloakInstance } from "keycloak-js";
 import { connect } from "react-redux";
 
 export interface Props {
-  authenticated: boolean,
-  keycloak?: Keycloak.KeycloakInstance,
-  onLogin?: (keycloak: Keycloak.KeycloakInstance, authenticated: boolean) => void
+  authenticated: boolean;
+  keycloak?: Keycloak.KeycloakInstance;
+  onLogin?: (keycloak: Keycloak.KeycloakInstance, authenticated: boolean) => void;
 }
 
 interface State {
-  loadingRealms: boolean
+  loadingRealms: boolean;
 }
 
 class Login extends React.Component<Props, State> {
@@ -28,7 +28,7 @@ class Login extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      loadingRealms: false
+      loadingRealms: false,
     };
   }
 
@@ -40,18 +40,18 @@ class Login extends React.Component<Props, State> {
 
   doLogin() {
     const kcConf = {
-      "realm": process.env.REACT_APP_REALM,
-      "url": process.env.REACT_APP_AUTH_SERVER_URL,
-      "clientId": process.env.REACT_APP_AUTH_RESOURCE
+      clientId: process.env.REACT_APP_AUTH_RESOURCE,
+      realm: process.env.REACT_APP_REALM,
+      url: process.env.REACT_APP_AUTH_SERVER_URL,
+
     };
     const keycloak = Keycloak(kcConf);
     keycloak.init({onLoad: "login-required"}).success((authenticated) => {
-      console.log(authenticated);
-      this.props.onLogin && this.props.onLogin(keycloak, authenticated);
+     return this.props.onLogin &&  this.props.onLogin(keycloak, authenticated);
     });
   }
 
-  render() {
+  public render() {
     return (
       <BasicLayout>
         { this.props.authenticated ? (
@@ -73,13 +73,13 @@ class Login extends React.Component<Props, State> {
 export function mapStateToProps(state: IStoreState) {
   return {
     authenticated: state.authenticated,
-    keycloak: state.keycloak
-  }
+    keycloak: state.keycloak,
+  };
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onLogin: (keycloak: KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated))
+    onLogin: (keycloak: KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated)),
   };
 }
 
