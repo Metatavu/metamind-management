@@ -301,7 +301,7 @@ class IntentEditor extends React.Component<IProps, IState> {
     }
 
     this.setState({
-      intent: { ... intent, quickResponseOrder: parseInt(data.value as string) },
+      intent: { ... intent, quickResponseOrder: parseInt(data.value as string, 10) },
     });
   }
 

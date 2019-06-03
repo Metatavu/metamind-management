@@ -230,8 +230,9 @@ class TrainingMaterialEditor extends React.Component<IProps, IState> {
         selectedTrainingMaterialId: trainingMaterial.id,
         trainingMaterials: [ trainingMaterial ].concat( this.state.trainingMaterials ),
       });
-
-      this.props.onTrainingMaterialSave && this.props.onTrainingMaterialSave(trainingMaterial.id);
+      if ( this.props.onTrainingMaterialSave ) {
+        this.props.onTrainingMaterialSave(trainingMaterial.id);
+      }
       this.props.onTrainingMaterialChange(trainingMaterial.id);
     } else if (this.state.selectedTrainingMaterialId) {
       await trainingMaterialsService.updateTrainingMaterial({
@@ -243,8 +244,9 @@ class TrainingMaterialEditor extends React.Component<IProps, IState> {
       this.setState({
         loading: false,
       });
-
-      this.props.onTrainingMaterialSave && this.props.onTrainingMaterialSave(this.state.selectedTrainingMaterialId);
+      if ( this.props.onTrainingMaterialSave ) {
+        this.props.onTrainingMaterialSave(this.state.selectedTrainingMaterialId);
+      }
     }
 
   }

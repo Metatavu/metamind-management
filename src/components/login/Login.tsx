@@ -64,7 +64,10 @@ class Login extends React.Component<IProps, IState> {
     };
     const keycloak = Keycloak(kcConf);
     keycloak.init({onLoad: "login-required"}).success((authenticated) => {
-     this.props.onLogin &&  this.props.onLogin(keycloak, authenticated);
+      if ( this.props.onLogin ) {
+        this.props.onLogin(keycloak, authenticated);
+      }
+
     });
   }
 }
