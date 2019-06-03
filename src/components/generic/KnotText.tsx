@@ -1,10 +1,10 @@
 import * as React from "react";
-import  { GraphUtils, INode } from "react-digraph";
+import { GraphUtils, INode } from "react-digraph";
 
 /**
  * Component properties
  */
-interface Props {
+interface IProps {
   data: INode;
   isSelected: boolean;
 }
@@ -12,7 +12,7 @@ interface Props {
 /**
  * Component for rendering text on knot
  */
-class KnotText extends React.Component<Props> {
+class KnotText extends React.Component<IProps> {
 
   /**
    * Render

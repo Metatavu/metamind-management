@@ -2,136 +2,157 @@ import { KeycloakInstance } from "keycloak-js";
 import { Intent, Knot } from "metamind-client";
 import * as constants from "../constants";
 
-export interface UserLogin {
+export interface IUserLogin {
   type: constants.USER_LOGIN;
   keycloak?: KeycloakInstance;
   authenticated: boolean;
 }
 
-export interface UserLogout {
+export interface IUserLogout {
   type: constants.USER_LOGOUT;
 }
 
-export interface AutoLayoutToggle {
+export interface IAutoLayoutToggle {
   type: constants.AUTO_LAYOUT_TOGGLE;
   autolayout: boolean;
 }
 
-export interface Search {
+export interface ISearch {
   type: constants.SEARCH;
   searchText: string;
 }
 
-export interface KnotsFound {
+export interface IKnotsFound {
   type: constants.KNOTS_FOUND;
   knots: Knot[];
 }
 
-export interface KnotUpdated {
+export interface IKnotUpdated {
   type: constants.KNOT_UPDATED;
   knot: Knot;
 }
 
-export interface KnotDeleted {
+export interface IKnotDeleted {
   type: constants.KNOT_DELETED;
   knotId: string;
 }
 
-export interface IntentsFound {
+export interface IIntentsFound {
   type: constants.INTENTS_FOUND;
   intents: Intent[];
 }
 
-export interface IntentUpdated {
+export interface IIntentUpdated {
   type: constants.INTENT_UPDATED;
   intent: Intent;
 }
 
-export interface IntentDeleted {
+export interface IIntentDeleted {
   type: constants.INTENT_DELETED;
   intentId: string;
 }
-export interface SetKnotPositions {
+export interface ISetKnotPositions {
   type: constants.SET_KNOT_POSITIONS;
     knotPositions?: Array<{id: string, x: number, y: number}>;
 }
-export interface GetKnotPositions {
+export interface IGetKnotPositions {
   type: constants.GET_KNOT_POSITIONS;
   knotPositions?: Array<{id: string, x: number, y: number}>;
 }
 
-export type AppAction = GetKnotPositions | SetKnotPositions| UserLogin | UserLogout | AutoLayoutToggle | KnotsFound | KnotUpdated | KnotDeleted | IntentsFound | IntentUpdated | IntentDeleted | Search;
+export type AppAction =
+IGetKnotPositions |
+ISetKnotPositions |
+IUserLogin |
+IUserLogout |
+IAutoLayoutToggle |
+IKnotsFound |
+IKnotUpdated |
+IKnotDeleted |
+IIntentsFound |
+IIntentUpdated |
+IIntentDeleted |
+ISearch;
 
-export function userLogin(keycloak: KeycloakInstance, authenticated: boolean): UserLogin {
+export function userLogin(keycloak: KeycloakInstance, authenticated: boolean): IUserLogin {
   return {
-    type: constants.USER_LOGIN,
-    keycloak,
     authenticated,
+    keycloak,
+    type: constants.USER_LOGIN,
+
   };
 }
 
-export function autoLayoutToggle(autolayout: boolean): AutoLayoutToggle {
+export function autoLayoutToggle(autolayout: boolean): IAutoLayoutToggle {
   return {
-    type: constants.AUTO_LAYOUT_TOGGLE,
     autolayout,
+    type: constants.AUTO_LAYOUT_TOGGLE,
+
   };
 }
 
-export function search(searchText: string): Search {
+export function search(searchText: string): ISearch {
   return {
-    type: constants.SEARCH,
     searchText,
+    type: constants.SEARCH,
+
   };
 }
 
-export function userLogout(): UserLogout {
+export function userLogout(): IUserLogout {
   return {
     type: constants.USER_LOGOUT,
   };
 }
 
-export function intentsFound(intents: Intent[]): IntentsFound {
+export function intentsFound(intents: Intent[]): IIntentsFound {
   return {
-    type: constants.INTENTS_FOUND,
     intents,
+    type: constants.INTENTS_FOUND,
+
   };
 }
 
-export function intentUpdated(intent: Intent): IntentUpdated {
+export function intentUpdated(intent: Intent): IIntentUpdated {
   return {
-    type: constants.INTENT_UPDATED,
     intent,
+    type: constants.INTENT_UPDATED,
+
   };
 }
 
-export function intentDeleted(intentId: string): IntentDeleted {
+export function intentDeleted(intentId: string): IIntentDeleted {
   return {
-    type: constants.INTENT_DELETED,
     intentId,
+    type: constants.INTENT_DELETED,
+
   };
 }
 
-export function knotsFound(knots: Knot[]): KnotsFound {
+export function knotsFound(knots: Knot[]): IKnotsFound {
   return {
-    type: constants.KNOTS_FOUND,
     knots,
+    type: constants.KNOTS_FOUND,
+
   };
 }
 
-export function knotUpdated(knot: Knot): KnotUpdated {
+export function knotUpdated(knot: Knot): IKnotUpdated {
   return {
-    type: constants.KNOT_UPDATED,
     knot,
+    type: constants.KNOT_UPDATED,
+
   };
 }
 
-export function knotDeleted(knotId: string): KnotDeleted {
+export function knotDeleted(knotId: string): IKnotDeleted {
   return {
-    type: constants.KNOT_DELETED,
     knotId,
+    type: constants.KNOT_DELETED,
+
   };
 }
-export const getKnotLocalPositions = (): GetKnotPositions => {
+export const getKnotLocalPositions = (): IGetKnotPositions => {
 
     const serializedState = localStorage.getItem("knot-positions");
 
@@ -142,7 +163,7 @@ export const getKnotLocalPositions = (): GetKnotPositions => {
     return {type: constants.GET_KNOT_POSITIONS, knotPositions: JSON.parse(serializedState)};
 
 };
-export const writeKnotLocalPositions = (positions: Array<{id: string, x: number, y: number}>): SetKnotPositions => {
+export const writeKnotLocalPositions = (positions: Array<{id: string, x: number, y: number}>): ISetKnotPositions => {
 
     const serializedState = JSON.stringify(positions);
 

@@ -13,7 +13,7 @@ import VariableEditor from "./VariableEditor";
 /**
  * Component props
  */
-interface Props {
+interface IProps {
   storyId: string;
   authenticated: boolean;
   keycloak?: Keycloak.KeycloakInstance;
@@ -22,20 +22,21 @@ interface Props {
 /**
  * Component state
  */
-interface State {
+interface IState {
+  loading: boolean;
 }
 
 /**
  * Global editor
  */
-class GlobalEditor extends React.Component<Props, State> {
+class GlobalEditor extends React.Component<IProps, IState> {
 
   /**
    * Constructor
    *
    * @param props props
    */
-  constructor(props: Props) {
+  constructor(props: IProps) {
     super(props);
     this.state = {
       loading: false,

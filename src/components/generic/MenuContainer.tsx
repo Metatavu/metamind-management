@@ -16,7 +16,7 @@ import { IStoreState } from "src/types";
 import * as actions from "../../actions/";
 import strings from "../../localization/strings";
 
-export interface Props {
+export interface IProps {
   siteName: string;
   siteLogo?: string;
   authenticated: boolean;
@@ -27,7 +27,7 @@ export interface Props {
   onSearch: (searchText: string) => void;
 }
 
-class MenuContainer extends React.Component<Props, object> {
+class MenuContainer extends React.Component<IProps, object> {
 
   public onAccountItemClick = () =>  {
     if (this.props.keycloak) {
@@ -53,12 +53,16 @@ class MenuContainer extends React.Component<Props, object> {
           </Menu.Item>
           <Menu.Menu position="right">
             <Menu.Item>
-              <Button toggle active={this.props.autolayout} onClick={() => this.props.onAutoLayoutToggle && this.props.onAutoLayoutToggle(!this.props.autolayout)}>
+              <Button toggle
+              active={this.props.autolayout}
+              onClick={() => this.props.onAutoLayoutToggle && this.props.onAutoLayoutToggle(!this.props.autolayout)}>
                 {strings.layoutAutomatically}
               </Button>
             </Menu.Item>
             <Menu.Item>
-              <Input placeholder={ strings.search } onChange={ (event: React.ChangeEvent<HTMLInputElement>, data: InputOnChangeData) => { this.props.onSearch(data.value); }  }/>
+              <Input
+              placeholder={ strings.search }
+              onChange={ (event: React.ChangeEvent<HTMLInputElement>, data: InputOnChangeData) => { this.props.onSearch(data.value); }  }/>
             </Menu.Item>
             { this.props.authenticated &&
             <Dropdown item simple text={strings.menuBarUserItemText}>
@@ -78,15 +82,16 @@ class MenuContainer extends React.Component<Props, object> {
 export function mapStateToProps(state: IStoreState) {
   return {
     authenticated: state.authenticated,
-    keycloak: state.keycloak,
     autolayout: state.autolayout,
+    keycloak: state.keycloak,
+
   };
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onLogout: () => dispatch(actions.userLogout()),
     onAutoLayoutToggle: (a: boolean) => dispatch(actions.autoLayoutToggle(a)),
+    onLogout: () => dispatch(actions.userLogout()),
     onSearch: (searchText: string) => dispatch(actions.search(searchText)),
   };
 }
