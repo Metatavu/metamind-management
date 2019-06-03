@@ -1,8 +1,8 @@
 import { AppAction } from '../actions';
-import { StoreState } from '../types/index';
+import { IStoreState } from '../types/index';
 import { SET_KNOT_POSITIONS,GET_KNOT_POSITIONS,USER_LOGIN, USER_LOGOUT, AUTO_LAYOUT_TOGGLE, KNOTS_FOUND, KNOT_DELETED, KNOT_UPDATED, INTENTS_FOUND, INTENT_DELETED, INTENT_UPDATED, SEARCH } from '../constants/index';
 
-export function processAction(state: StoreState, action: AppAction): StoreState {
+export function processAction(state: IStoreState, action: AppAction): IStoreState {
   switch (action.type) {
     case USER_LOGIN:
       return { ...state, keycloak: action.keycloak, authenticated: action.authenticated};

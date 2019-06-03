@@ -11,7 +11,7 @@ import {
   Input,
   InputOnChangeData
 } from "semantic-ui-react"
-import { StoreState } from "src/types";
+import { IStoreState } from "src/types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import * as actions from "../../actions/";
@@ -75,7 +75,7 @@ class MenuContainer extends React.Component<Props, object> {
   }
 }
 
-export function mapStateToProps(state: StoreState) {
+export function mapStateToProps(state: IStoreState) {
   return {
     authenticated: state.authenticated,
     keycloak: state.keycloak,

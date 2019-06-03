@@ -4,7 +4,7 @@ import * as Keycloak from 'keycloak-js';
 import * as actions from "../../actions/";
 import BasicLayout from "../generic/BasicLayout";
 import { Redirect } from "react-router";
-import { StoreState } from "src/types";
+import { IStoreState } from "src/types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { KeycloakInstance } from "keycloak-js";
@@ -116,7 +116,7 @@ class WelcomePage extends React.Component<Props, State> {
   }
 }
 
-export function mapStateToProps(state: StoreState) {
+export function mapStateToProps(state: IStoreState) {
   return {
     authenticated: state.authenticated,
     keycloak: state.keycloak

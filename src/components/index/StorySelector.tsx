@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import * as actions from "../../actions";
-import { StoreState } from "src/types";
+import { IStoreState } from "src/types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { KeycloakInstance } from "keycloak-js";
@@ -37,7 +37,7 @@ class StorySelector extends React.Component<Props, State> {
 
   /**
    * Constructor
-   * 
+   *
    * @param props props
    */
   constructor(props: Props) {
@@ -52,7 +52,7 @@ class StorySelector extends React.Component<Props, State> {
    * Component did mount life-cycle method
    */
   public componentDidMount = async() => {
-    this.loadStories();    
+    this.loadStories();
   }
 
   /**
@@ -124,19 +124,19 @@ class StorySelector extends React.Component<Props, State> {
     this.setState({
       loading: false,
       stories: stories,
-      selectedStoryId: stories.length ? stories[0].id : undefined 
+      selectedStoryId: stories.length ? stories[0].id : undefined
     });
   }
-  
+
   /**
    * Event handler for story select dropdown change
-   * 
+   *
    * @param event event
    * @param data data
    */
   private onStorySelect = async (event: React.SyntheticEvent<HTMLElement, Event>, data: DropdownProps) => {
     const storyId = data.value as string || undefined;
-    
+
     this.setState({
       selectedStoryId: storyId
     });
@@ -144,7 +144,7 @@ class StorySelector extends React.Component<Props, State> {
 
   /**
    * Event handler for story select click
-   * 
+   *
    * @param event event
    * @param data data
    */
@@ -162,7 +162,7 @@ class StorySelector extends React.Component<Props, State> {
   }
 }
 
-export function mapStateToProps(state: StoreState) {
+export function mapStateToProps(state: IStoreState) {
   return {
     authenticated: state.authenticated,
     keycloak: state.keycloak

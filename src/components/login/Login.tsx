@@ -8,7 +8,7 @@ import * as actions from "../../actions";
 import BasicLayout from "../generic/BasicLayout";
 import { Redirect } from "react-router";
 import strings from "../../localization/strings";
-import { StoreState } from "src/types";
+import { IStoreState } from "src/types";
 import { Dispatch } from "redux";
 import { KeycloakInstance } from "keycloak-js";
 import { connect } from "react-redux";
@@ -70,7 +70,7 @@ class Login extends React.Component<Props, State> {
   }
 }
 
-export function mapStateToProps(state: StoreState) {
+export function mapStateToProps(state: IStoreState) {
   return {
     authenticated: state.authenticated,
     keycloak: state.keycloak

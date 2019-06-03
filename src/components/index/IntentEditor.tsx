@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import * as actions from "../../actions";
-import { StoreState } from "src/types";
+import { IStoreState } from "src/types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { KeycloakInstance } from "keycloak-js";
@@ -36,7 +36,7 @@ class IntentEditor extends React.Component<Props, State> {
 
   /**
    * Constructor
-   * 
+   *
    * @param props props
    */
   constructor(props: Props) {
@@ -50,19 +50,19 @@ class IntentEditor extends React.Component<Props, State> {
    * Component did mount life-cycle event
    */
   public componentDidMount = async() => {
-    this.loadIntent();    
+    this.loadIntent();
   }
 
   /**
    * Component did update life-cycle event
-   * 
+   *
    * @param prevProps previous props
    */
   public componentDidUpdate = async (prevProps: Props) => {
     if (prevProps.intentId !== this.props.intentId) {
       this.loadIntent();
     }
-  } 
+  }
 
   /**
    * Component render method
@@ -114,7 +114,7 @@ class IntentEditor extends React.Component<Props, State> {
           }
           <Form.Field>
             <Button onClick={ this.onSaveIntentClick } disabled={ !this.state.intent.name }>Save intent</Button>
-          </Form.Field>     
+          </Form.Field>
           {
             <Loader inline active={ this.state.loading }/>
           }
@@ -144,11 +144,11 @@ class IntentEditor extends React.Component<Props, State> {
         <Form.Field>
           <label>Variable OpenNLP NER training material</label>
           <TrainingMaterialEditor trainingMaterialType={ TrainingMaterialType.VARIABLEOPENNLPNER } storyId={ this.props.storyId } trainingMaterialId={ this.state.intent.trainingMaterials.variableOpenNlpNerId } onTrainingMaterialChange={ this.onTrainingMaterialChangeVariableOpenNlpNer }/>
-        </Form.Field>  
+        </Form.Field>
         <Form.Field>
           <label>Variable OpenNLP Regex training material</label>
           <TrainingMaterialEditor trainingMaterialType={ TrainingMaterialType.VARIABLEOPENNLPREGEX } storyId={ this.props.storyId } trainingMaterialId={ this.state.intent.trainingMaterials.variableOpenNlpRegex } onTrainingMaterialChange={ this.onTrainingMaterialChangeVariableOpenNlpRegex }/>
-        </Form.Field>  
+        </Form.Field>
       </div>
     );
   }
@@ -160,7 +160,7 @@ class IntentEditor extends React.Component<Props, State> {
     this.setState({loading: true});
 
     const intent = await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").findIntent(this.props.storyId, this.props.intentId);
-    
+
     this.setState({
       loading: false,
       intent: intent
@@ -169,7 +169,7 @@ class IntentEditor extends React.Component<Props, State> {
 
   /**
    * Event handler for intent doccat training material change
-   * 
+   *
    * @param event event
    * @param data data
    */
@@ -180,13 +180,13 @@ class IntentEditor extends React.Component<Props, State> {
     }
 
     this.setState({
-      intent: { ... intent, trainingMaterials: { ... intent.trainingMaterials, intentOpenNlpDoccatId: trainingMaterialId } } 
+      intent: { ... intent, trainingMaterials: { ... intent.trainingMaterials, intentOpenNlpDoccatId: trainingMaterialId } }
     });
   }
 
   /**
    * Event handler for intent regex material change
-   * 
+   *
    * @param event event
    * @param data data
    */
@@ -197,13 +197,13 @@ class IntentEditor extends React.Component<Props, State> {
     }
 
     this.setState({
-      intent: { ... intent, trainingMaterials: { ... intent.trainingMaterials, intentRegexId: trainingMaterialId } } 
+      intent: { ... intent, trainingMaterials: { ... intent.trainingMaterials, intentRegexId: trainingMaterialId } }
     });
   }
 
   /**
    * Event handler for intent doccat training material change
-   * 
+   *
    * @param event event
    * @param data data
    */
@@ -214,7 +214,7 @@ class IntentEditor extends React.Component<Props, State> {
     }
 
     this.setState({
-      intent: { ... intent, trainingMaterials: { ... intent.trainingMaterials, variableOpenNlpNerId: trainingMaterialId } } 
+      intent: { ... intent, trainingMaterials: { ... intent.trainingMaterials, variableOpenNlpNerId: trainingMaterialId } }
     });
   }
 
@@ -225,13 +225,13 @@ class IntentEditor extends React.Component<Props, State> {
     }
 
     this.setState({
-      intent: { ... intent, trainingMaterials: { ... intent.trainingMaterials, variableOpenNlpRegex: trainingMaterialId } } 
+      intent: { ... intent, trainingMaterials: { ... intent.trainingMaterials, variableOpenNlpRegex: trainingMaterialId } }
     });
   }
-  
+
   /**
    * Event handler for intent name change
-   * 
+   *
    * @param event event
    * @param data data
    */
@@ -248,7 +248,7 @@ class IntentEditor extends React.Component<Props, State> {
 
   /**
    * Event handler for intent quck response change
-   * 
+   *
    * @param event event
    * @param data data
    */
@@ -257,7 +257,7 @@ class IntentEditor extends React.Component<Props, State> {
     if (!intent) {
       return;
     }
-  
+
     this.setState({
       intent: { ... intent, quickResponse: data.value as string }
     });
@@ -268,7 +268,7 @@ class IntentEditor extends React.Component<Props, State> {
     if (!intent) {
       return;
     }
-  
+
     this.setState({
       intent: { ... intent, quickResponseOrder: parseInt(data.value as string) }
     });
@@ -277,17 +277,17 @@ class IntentEditor extends React.Component<Props, State> {
 
   /**
    * Event handler for intent type change
-   * 
+   *
    * @param event event
    * @param data data
    */
   private onIntentTypeChange = async (event: React.SyntheticEvent<HTMLElement, Event>, data: DropdownProps) => {
     const { intent } = this.state;
-    
+
     if (!intent || !data.value) {
       return;
     }
-  
+
     this.setState({
       intent: { ... intent, type: data.value as IntentType }
     });
@@ -297,18 +297,18 @@ class IntentEditor extends React.Component<Props, State> {
    * Saves an intent
    */
   private onSaveIntentClick = async () => {
-    const { intent } = this.state;    
+    const { intent } = this.state;
 
     if (!intent) {
       return;
     }
 
     const { storyId, intentId } = this.props;
-    
+
     this.setState({
       loading: true
     });
-    
+
     const updatedIntent = await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").updateIntent(intent, storyId, intentId);
 
     this.setState({
@@ -321,7 +321,7 @@ class IntentEditor extends React.Component<Props, State> {
 
 }
 
-export function mapStateToProps(state: StoreState) {
+export function mapStateToProps(state: IStoreState) {
   return {
     authenticated: state.authenticated,
     keycloak: state.keycloak

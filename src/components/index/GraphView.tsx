@@ -161,8 +161,8 @@ class GraphView extends React.Component<Props,State>{
 
 
     const nodetypes = GraphConfig.NodeTypes;
-    const textShape = nodetypes.text.shape;
-    const globalShape = nodetypes.global.shape;
+    const textShape = nodetypes.Text.shape;
+    const globalShape = nodetypes.Global.shape;
     let shape = textShape(25*this.state.zoom,25*this.state.zoom,color);
     if(node.id==="GLOBAL"){
       shape=globalShape(25*this.state.zoom,25*this.state.zoom,color);

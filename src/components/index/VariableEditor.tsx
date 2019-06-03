@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import * as actions from "../../actions";
-import { StoreState } from "src/types";
+import { IStoreState } from "src/types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { KeycloakInstance } from "keycloak-js";
@@ -39,7 +39,7 @@ class VariableEditor extends React.Component<Props, State> {
 
   /**
    * Constructor
-   * 
+   *
    * @param props props
    */
   constructor(props: Props) {
@@ -54,19 +54,19 @@ class VariableEditor extends React.Component<Props, State> {
    * Component did mount life-cycle event
    */
   public componentDidMount = async() => {
-    this.loadVariables(); 
+    this.loadVariables();
   }
 
   /**
    * Component did update life-cycle event
-   * 
+   *
    * @param prevProps previous props
    */
   public componentDidUpdate = async (prevProps: Props, prevState: State) => {
     if (this.state.selectedVariableId !== prevState.selectedVariableId) {
-      this.loadVariables(); 
+      this.loadVariables();
     }
-  } 
+  }
 
   /**
    * Component render method
@@ -123,7 +123,7 @@ class VariableEditor extends React.Component<Props, State> {
     const variablesService = Api.getVariablesService(this.props.keycloak ? this.props.keycloak.token! : "");
     const variables = await variablesService.listVariables(this.props.storyId);
     const selectedVariableId = !this.state.selectedVariableId ? variables.length ? variables[0].id : NEW_VARIABLE_ID : this.state.selectedVariableId;
-    const variable = !selectedVariableId || selectedVariableId === NEW_VARIABLE_ID ? null : await variablesService.findVariable(this.props.storyId, selectedVariableId); 
+    const variable = !selectedVariableId || selectedVariableId === NEW_VARIABLE_ID ? null : await variablesService.findVariable(this.props.storyId, selectedVariableId);
 
     this.setState({
       variables: variables,
@@ -169,14 +169,14 @@ class VariableEditor extends React.Component<Props, State> {
         </Form.Field>
         <Form.Field>
           <Button onClick={ this.onSaveVariableClick } disabled={ !this.state.variableName }>Save variable</Button>
-        </Form.Field>     
+        </Form.Field>
       </div>
     );
   }
 
   /**
    * Event handler for intent type change
-   * 
+   *
    * @param event event
    * @param data data
    */
@@ -204,8 +204,8 @@ class VariableEditor extends React.Component<Props, State> {
       const variable = await variablesService.createVariable({
         name: variableName,
         type: variableType,
-        validationScript: variableValidationScript 
-      }, this.props.storyId);  
+        validationScript: variableValidationScript
+      }, this.props.storyId);
 
       this.setState({
         variables: [ variable ].concat( this.state.variables ),
@@ -216,8 +216,8 @@ class VariableEditor extends React.Component<Props, State> {
       await variablesService.updateVariable({
         name: variableName,
         type: variableType,
-        validationScript: variableValidationScript 
-      }, this.props.storyId, this.state.selectedVariableId);  
+        validationScript: variableValidationScript
+      }, this.props.storyId, this.state.selectedVariableId);
 
       this.setState({
         loading: false
@@ -227,7 +227,7 @@ class VariableEditor extends React.Component<Props, State> {
   }
 }
 
-export function mapStateToProps(state: StoreState) {
+export function mapStateToProps(state: IStoreState) {
   return {
     authenticated: state.authenticated,
     keycloak: state.keycloak

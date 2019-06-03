@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import * as actions from "../../actions";
-import { StoreState } from "../../types";
+import { IStoreState } from "../../types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { KeycloakInstance } from "keycloak-js";
@@ -32,7 +32,7 @@ class GlobalEditor extends React.Component<Props, State> {
 
   /**
    * Constructor
-   * 
+   *
    * @param props props
    */
   constructor(props: Props) {
@@ -50,15 +50,15 @@ class GlobalEditor extends React.Component<Props, State> {
       { menuItem: 'Scripts', render: () => <Tab.Pane style={{ padding: 0, border: "none" }}><ScriptEditor storyId={ this.props.storyId }/></Tab.Pane> },
       { menuItem: 'Variables', render: () => <Tab.Pane style={{ padding: 0, border: "none" }}><VariableEditor storyId={ this.props.storyId }/></Tab.Pane> }
     ];
-    
+
     return (
-      <Tab style={{ marginTop: "30px" }} menu={{ inverted: true, borderless: true }} panes={ tabPanes }/> 
+      <Tab style={{ marginTop: "30px" }} menu={{ inverted: true, borderless: true }} panes={ tabPanes }/>
     );
   }
 
 }
 
-export function mapStateToProps(state: StoreState) {
+export function mapStateToProps(state: IStoreState) {
   return {
     authenticated: state.authenticated,
     keycloak: state.keycloak

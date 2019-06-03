@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import * as actions from "../../actions";
-import { StoreState } from "src/types";
+import { IStoreState } from "src/types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { KeycloakInstance } from "keycloak-js";
@@ -40,7 +40,7 @@ class ScriptEditor extends React.Component<Props, State> {
 
   /**
    * Constructor
-   * 
+   *
    * @param props props
    */
   constructor(props: Props) {
@@ -55,19 +55,19 @@ class ScriptEditor extends React.Component<Props, State> {
    * Component did mount life-cycle event
    */
   public componentDidMount = async() => {
-    this.loadScripts(); 
+    this.loadScripts();
   }
 
   /**
    * Component did update life-cycle event
-   * 
+   *
    * @param prevProps previous props
    */
   public componentDidUpdate = async (prevProps: Props, prevState: State) => {
     if (this.state.selectedScriptId !== prevState.selectedScriptId) {
-      this.loadScripts(); 
+      this.loadScripts();
     }
-  } 
+  }
 
   /**
    * Component render method
@@ -124,7 +124,7 @@ class ScriptEditor extends React.Component<Props, State> {
     const scriptsService = Api.getScriptsService(this.props.keycloak ? this.props.keycloak.token! : "");
     const scripts = await scriptsService.listScripts();
     const selectedScriptId = !this.state.selectedScriptId ? scripts.length ? scripts[0].id : NEW_SCRIPT_ID : this.state.selectedScriptId;
-    const script = !selectedScriptId || selectedScriptId === NEW_SCRIPT_ID ? null : await scriptsService.findScript(selectedScriptId); 
+    const script = !selectedScriptId || selectedScriptId === NEW_SCRIPT_ID ? null : await scriptsService.findScript(selectedScriptId);
 
     this.setState({
       scripts: scripts,
@@ -165,14 +165,14 @@ class ScriptEditor extends React.Component<Props, State> {
         </Form.Field>
         <Form.Field>
           <Button onClick={ this.onSaveScriptClick } disabled={ !this.state.scriptName || !this.state.scriptLanguage || !this.state.scriptContent }>Save script</Button>
-        </Form.Field>     
+        </Form.Field>
       </div>
     );
   }
 
   /**
    * Event handler for intent type change
-   * 
+   *
    * @param event event
    * @param data data
    */
@@ -202,7 +202,7 @@ class ScriptEditor extends React.Component<Props, State> {
         language: scriptLanguage,
         name: scriptName,
         version: scriptVersion
-      });  
+      });
 
       this.setState({
         scripts: [ script ].concat( this.state.scripts ),
@@ -215,7 +215,7 @@ class ScriptEditor extends React.Component<Props, State> {
         language: scriptLanguage,
         name: scriptName,
         version: scriptVersion
-      }, this.state.selectedScriptId);  
+      }, this.state.selectedScriptId);
 
       this.setState({
         loading: false
@@ -225,7 +225,7 @@ class ScriptEditor extends React.Component<Props, State> {
   }
 }
 
-export function mapStateToProps(state: StoreState) {
+export function mapStateToProps(state: IStoreState) {
   return {
     authenticated: state.authenticated,
     keycloak: state.keycloak

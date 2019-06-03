@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import * as actions from "../../actions";
-import { StoreState } from "src/types";
+import { IStoreState } from "src/types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { KeycloakInstance } from "keycloak-js";
@@ -38,7 +38,7 @@ class KnotEditor extends React.Component<Props, State> {
 
   /**
    * Constructor
-   * 
+   *
    * @param props props
    */
   constructor(props: Props) {
@@ -52,19 +52,19 @@ class KnotEditor extends React.Component<Props, State> {
    * Component did mount life-cycle event
    */
   public componentDidMount = async() => {
-    this.loadKnot();    
+    this.loadKnot();
   }
 
   /**
    * Component did update life-cycle event
-   * 
+   *
    * @param prevProps previous props
    */
   public componentDidUpdate = async (prevProps: Props) => {
     if (prevProps.knotId !== this.props.knotId) {
       this.loadKnot();
     }
-  } 
+  }
 
   /**
    * Component render method
@@ -104,11 +104,11 @@ class KnotEditor extends React.Component<Props, State> {
           <Form.Field>
             <label>Knot contents</label>
             <TextArea rows={ 15 } style={ { width: "100%" } } onChange={ this.onKnotContentChange } value={ this.state.knotContent } />
-          </Form.Field>       
+          </Form.Field>
           <Form.Field>
             <label>Knot hint</label>
             <Input value={ this.state.knotHint } style={ { width: "100%" } } onChange={ this.onKnotHintChange } />
-          </Form.Field>   
+          </Form.Field>
           <Form.Field>
             <label>Tokenizer</label>
             <Dropdown onChange={ this.onTokenizerChange } value={ this.state.knot ? this.state.knot.tokenizer : TokenizerType.WHITESPACE } options={ tokenizerTypeOptions } />
@@ -139,7 +139,7 @@ class KnotEditor extends React.Component<Props, State> {
 
   /**
    * Event handler for knot name change
-   * 
+   *
    * @param event event
    * @param data data
    */
@@ -151,12 +151,12 @@ class KnotEditor extends React.Component<Props, State> {
 
     const { storyId, knotId } = this.props;
     knot.name = data.value as string;
-    
+
     this.setState({
       loading: true,
       knotName: knot.name
     });
-    
+
     const updatedKnot = await this.updateKnot(knot, storyId, knotId);
 
     this.setState({
@@ -167,7 +167,7 @@ class KnotEditor extends React.Component<Props, State> {
 
   /**
    * Event handler for knot hint change
-   * 
+   *
    * @param event event
    * @param data data
    */
@@ -179,12 +179,12 @@ class KnotEditor extends React.Component<Props, State> {
 
     const { storyId, knotId } = this.props;
     knot.hint = data.value as string;
-    
+
     this.setState({
       loading: true,
       knotHint: knot.hint
     });
-    
+
     const updatedKnot = await this.updateKnot(knot, storyId, knotId);
 
     this.setState({
@@ -195,7 +195,7 @@ class KnotEditor extends React.Component<Props, State> {
 
   /**
    * Event handler for knot content change
-   * 
+   *
    * @param event event
    * @param data data
    */
@@ -207,12 +207,12 @@ class KnotEditor extends React.Component<Props, State> {
 
     const { storyId, knotId } = this.props;
     knot.content = data.value as string;
-    
+
     this.setState({
       loading: true,
       knotContent: knot.content
     });
-    
+
     const updatedKnot = await this.updateKnot(knot, storyId, knotId);
 
     this.setState({
@@ -223,7 +223,7 @@ class KnotEditor extends React.Component<Props, State> {
 
   /**
    * Event handler for knot tokenizer change
-   * 
+   *
    * @param event event
    * @param data data
    */
@@ -235,11 +235,11 @@ class KnotEditor extends React.Component<Props, State> {
 
     const { storyId, knotId } = this.props;
     knot.tokenizer = data.value as TokenizerType;
-    
+
     this.setState({
       loading: true
     });
-    
+
     const updatedKnot = await this.updateKnot(knot, storyId, knotId);
 
     this.setState({
@@ -250,7 +250,7 @@ class KnotEditor extends React.Component<Props, State> {
 
   /**
    * Event handler for knot type change
-   * 
+   *
    * @param event event
    * @param data data
    */
@@ -262,11 +262,11 @@ class KnotEditor extends React.Component<Props, State> {
 
     const { storyId, knotId } = this.props;
     knot.type = data.value as KnotType;
-    
+
     this.setState({
       loading: true
     });
-    
+
     const updatedKnot = await this.updateKnot(knot, storyId, knotId);
 
     this.setState({
@@ -283,7 +283,7 @@ class KnotEditor extends React.Component<Props, State> {
 
 }
 
-export function mapStateToProps(state: StoreState) {
+export function mapStateToProps(state: IStoreState) {
   return {
     authenticated: state.authenticated,
     keycloak: state.keycloak

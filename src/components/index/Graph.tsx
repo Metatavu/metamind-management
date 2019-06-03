@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { StoreState } from "src/types";
+import { IStoreState } from "src/types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import * as actions from "../../actions/";
@@ -417,7 +417,7 @@ private onDeleteEdge = async (viewEdge: IEdge) => {
 }
 
 
-export function mapStateToProps(state: StoreState) {
+export function mapStateToProps(state: IStoreState) {
   return {
     autolayout: state.autolayout,
     searchText: state.searchText,

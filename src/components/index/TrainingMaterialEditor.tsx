@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import * as actions from "../../actions";
-import { StoreState } from "src/types";
+import { IStoreState } from "src/types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { KeycloakInstance } from "keycloak-js";
@@ -43,7 +43,7 @@ class TrainingMaterialEditor extends React.Component<Props, State> {
 
   /**
    * Constructor
-   * 
+   *
    * @param props props
    */
   constructor(props: Props) {
@@ -59,12 +59,12 @@ class TrainingMaterialEditor extends React.Component<Props, State> {
    * Component did mount life-cycle event
    */
   public componentDidMount = async() => {
-    this.loadTrainingMaterials(); 
+    this.loadTrainingMaterials();
   }
 
   /**
    * Component did update life-cycle event
-   * 
+   *
    * @param prevProps previous props
    */
   public componentDidUpdate = async (prevProps: Props, prevState: State) => {
@@ -75,9 +75,9 @@ class TrainingMaterialEditor extends React.Component<Props, State> {
     }
 
     if (this.state.selectedTrainingMaterialId !== prevState.selectedTrainingMaterialId) {
-      this.loadTrainingMaterials(); 
+      this.loadTrainingMaterials();
     }
-  } 
+  }
 
   /**
    * Component render method
@@ -119,7 +119,7 @@ class TrainingMaterialEditor extends React.Component<Props, State> {
       },
       {
         key: NONE_VARIABLE_ID,
-        text: "None", // 
+        text: "None", //
         value: NONE_VARIABLE_ID
       }
     ]);
@@ -139,7 +139,7 @@ class TrainingMaterialEditor extends React.Component<Props, State> {
     const trainingMaterialsService = Api.getTrainingMaterialsService(this.props.keycloak ? this.props.keycloak.token! : "");
     const trainingMaterials = await trainingMaterialsService.listTrainingMaterials(this.props.storyId, this.props.trainingMaterialType);
     const selectedTrainingMaterialId = !this.state.selectedTrainingMaterialId ? NONE_VARIABLE_ID : this.state.selectedTrainingMaterialId;
-    const trainingMaterial = !selectedTrainingMaterialId || selectedTrainingMaterialId === NEW_VARIABLE_ID || selectedTrainingMaterialId === NONE_VARIABLE_ID ? null : await trainingMaterialsService.findTrainingMaterial(selectedTrainingMaterialId); 
+    const trainingMaterial = !selectedTrainingMaterialId || selectedTrainingMaterialId === NEW_VARIABLE_ID || selectedTrainingMaterialId === NONE_VARIABLE_ID ? null : await trainingMaterialsService.findTrainingMaterial(selectedTrainingMaterialId);
 
     this.setState({
       trainingMaterials: trainingMaterials,
@@ -170,14 +170,14 @@ class TrainingMaterialEditor extends React.Component<Props, State> {
         </Form.Field>
         <Form.Field>
           <Button onClick={ this.onSaveTrainingMaterialClick } disabled={ !this.state.trainingMaterialName || !this.state.trainingMaterialText }>Save training material</Button>
-        </Form.Field>     
+        </Form.Field>
       </div>
     );
   }
 
   /**
    * Event handler for intent type change
-   * 
+   *
    * @param event event
    * @param data data
    */
@@ -211,7 +211,7 @@ class TrainingMaterialEditor extends React.Component<Props, State> {
         name: trainingMaterialName,
         type: this.props.trainingMaterialType,
         text: trainingMaterialText
-      });  
+      });
 
       this.setState({
         trainingMaterials: [ trainingMaterial ].concat( this.state.trainingMaterials ),
@@ -226,7 +226,7 @@ class TrainingMaterialEditor extends React.Component<Props, State> {
         name: trainingMaterialName,
         type: this.props.trainingMaterialType,
         text: trainingMaterialText
-      }, this.state.selectedTrainingMaterialId);  
+      }, this.state.selectedTrainingMaterialId);
 
       this.setState({
         loading: false
@@ -238,7 +238,7 @@ class TrainingMaterialEditor extends React.Component<Props, State> {
   }
 }
 
-export function mapStateToProps(state: StoreState) {
+export function mapStateToProps(state: IStoreState) {
   return {
     authenticated: state.authenticated,
     keycloak: state.keycloak

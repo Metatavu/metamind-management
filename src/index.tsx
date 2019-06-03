@@ -6,12 +6,12 @@ import registerServiceWorker from './registerServiceWorker';
 
 import { createStore } from 'redux';
 import { processAction } from './reducers/index';
-import { StoreState } from './types/index';
+import { IStoreState } from './types/index';
 import { AppAction } from './actions';
 import { Provider } from 'react-redux';
 import Api from "metamind-client";
 
-const store = createStore<StoreState, AppAction, any, any>(processAction, {
+const store = createStore<IStoreState, AppAction, any, any>(processAction, {
   authenticated: false,
   autolayout: true,
   knots: [],
