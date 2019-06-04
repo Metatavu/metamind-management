@@ -51,10 +51,12 @@ export interface IIntentDeleted {
   type: constants.INTENT_DELETED;
   intentId: string;
 }
+
 export interface ISetKnotPositions {
   type: constants.SET_KNOT_POSITIONS;
     knotPositions?: Array<{id: string, x: number, y: number}>;
 }
+
 export interface IGetKnotPositions {
   type: constants.GET_KNOT_POSITIONS;
   knotPositions?: Array<{id: string, x: number, y: number}>;
