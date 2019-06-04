@@ -53,7 +53,6 @@ const globalNode: INode = {
 
 };
 class Graph extends React.Component<IProps, IState> {
-  private graphViewRef: any;
   /**
    * Updates component state when knots or intents are changed
    */
@@ -141,51 +140,47 @@ class Graph extends React.Component<IProps, IState> {
 
   }
 
-
   constructor(props: IProps) {
-    super(props);
+      super(props);
 
-    this.state = {
-      copiedNode: null,
-      filterIds: [],
-      graph: {
-        edges: [],
-        nodes: [],
-      },
-      selected: null,
+      this.state = {
+        copiedNode: null,
+        filterIds: [],
+        graph: {
+          edges: [],
+          nodes: [],
+        },
+        selected: null,
 
-    };
+      };
 
-    this.graphViewRef = React.createRef();
   }
 
   public componentDidMount = async () => {
-    const knotsService = Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "");
-    const intentsService = Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "");
+      const knotsService = Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "");
+      const intentsService = Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "");
 
-    const [ knots, intents ] = await Promise.all([
-      knotsService.listKnots(this.props.storyId),
-      intentsService.listIntents(this.props.storyId),
-    ]);
+      const [ knots, intents ] = await Promise.all([
+        knotsService.listKnots(this.props.storyId),
+        intentsService.listIntents(this.props.storyId),
+      ]);
 
-    this.props.onKnotsFound(knots);
-    this.props.onIntentsFound(intents);
-    this.props.getKnotLocalPositions();
-  }
+      this.props.onKnotsFound(knots);
+      this.props.onIntentsFound(intents);
+      this.props.getKnotLocalPositions();
+    }
 
   public componentDidUpdate(prevProps: IProps, prevState: IState) {
-   if (this.props.searchText !== prevProps.searchText) {
-     this.setState({
-       filterIds: this.searchKnots(),
-     });
-   }
- }
-
+     if (this.props.searchText !== prevProps.searchText) {
+       this.setState({
+         filterIds: this.searchKnots(),
+       });
+     }
+  }
   /*
    * Render
    */
   public render() {
-
 
     return (
       <div id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
@@ -208,6 +203,7 @@ class Graph extends React.Component<IProps, IState> {
       </div>
     );
   }
+
  /*
  * Handles node search
  */
@@ -250,7 +246,7 @@ class Graph extends React.Component<IProps, IState> {
    });
 
    return filterNodes.concat(filterEdges);
- }
+  }
   private onUpdateMultiple = async (viewNodes: INode[]) => {
 
     await this.props.writeKnotLocalPositions(viewNodes);
