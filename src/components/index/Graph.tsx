@@ -203,67 +203,68 @@ class Graph extends React.Component<IProps, IState> {
     );
   }
 
- /*
- * Handles node search
- */
- private searchKnots = (): string[] => {
-   if (!this.props.searchText) {
-     return [];
-   }
-
-   const searchText = this.props.searchText.toLowerCase();
-
-   const filterNodes =  this.props.knots.filter((knot) => {
-     const name = knot.name.toLowerCase();
-     if (name && name.includes(searchText)) {
-       return true;
+  /**
+    * Handles node search
+    */
+  private searchKnots = (): string[] => {
+     if (!this.props.searchText) {
+       return [];
      }
 
-     const content = knot.content.toLowerCase();
-     if (content && content.includes(searchText)) {
-       return true;
-     }
+     const searchText = this.props.searchText.toLowerCase();
 
-     return false;
-   })
-   .map((knot) => {
-     return knot.id!;
-   });
-   const filterEdges =  this.props.intents.filter((intent) => {
-     if (intent.name) {
-       const name = intent.name.toLowerCase();
+     const filterNodes =  this.props.knots.filter((knot) => {
+       const name = knot.name.toLowerCase();
        if (name && name.includes(searchText)) {
          return true;
        }
 
-     }
+       const content = knot.content.toLowerCase();
+       if (content && content.includes(searchText)) {
+         return true;
+       }
 
-     return false;
-   })
-   .map((intent) => {
-     return intent.id!;
-   });
+       return false;
+     })
+     .map((knot) => {
+       return knot.id!;
+     });
+     const filterEdges =  this.props.intents.filter((intent) => {
+       if (intent.name) {
+         const name = intent.name.toLowerCase();
+         if (name && name.includes(searchText)) {
+           return true;
+         }
 
-   return filterNodes.concat(filterEdges);
+       }
+
+       return false;
+     })
+     .map((intent) => {
+       return intent.id!;
+     });
+
+     return filterNodes.concat(filterEdges);
   }
+
   private onUpdateMultiple = async (viewNodes: INode[]) => {
 
     await this.props.writeKnotLocalPositions(viewNodes);
   }
- /**
-  * Handles node selection
-  */
- private onNodeClick = (viewNode: INode) => {
-   this.setState({ selected: viewNode });
-   this.props.onSelectNode(viewNode);
+  /**
+   * Handles node selection
+   */
+  private onNodeClick = (viewNode: INode) => {
+    this.setState({ selected: viewNode });
+    this.props.onSelectNode(viewNode);
   }
- /**
-  * Writes node position to local storage
-  *
-  * @param viewNode - Node that has been dragged
-  */
+  /**
+   * Writes node position to local storage
+   *
+   * @param viewNode - Node that has been dragged
+   */
 
- private onNodeDragEnd = (viewNode: INode) => {
+  private onNodeDragEnd = (viewNode: INode) => {
 
   if (this.props.knotPositions) {
     this.props.writeKnotLocalPositions(this.props.knotPositions.map((pos) => {
@@ -275,11 +276,11 @@ class Graph extends React.Component<IProps, IState> {
   }
  }
 
- /**
-  * Updates the graph with a new node
-  * @param viewNode - Node that has been created
-  */
- private onCreateNode = async (viewNode: INode) => {
+  /**
+   * Updates the graph with a new node
+   * @param viewNode - Node that has been created
+   */
+  private onCreateNode = async (viewNode: INode) => {
    const graph = this.state.graph;
    const tempNodeId = `pending-${new Date().getTime()}`;
    const node = {
@@ -321,111 +322,111 @@ class Graph extends React.Component<IProps, IState> {
    this.props.writeKnotLocalPositions(knotLocalPositions);
 
  }
- /**
-  * Event handler for node deletion
-  *
-  * @param viewNode node
-  * @param nodeId node id
-  * @param nodes nodes after deletion
-  */
- private onDeleteNode = async (viewNode: INode) => {
- const graph = this.state.graph;
+  /**
+   * Event handler for node deletion
+   *
+   * @param viewNode node
+   * @param nodeId node id
+   * @param nodes nodes after deletion
+   */
+  private onDeleteNode = async (viewNode: INode) => {
+   const graph = this.state.graph;
 
- await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").deleteKnot(this.props.storyId, viewNode.id);
+   await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").deleteKnot(this.props.storyId, viewNode.id);
 
- const edges = [];
- let i = 0;
- await graph.edges.forEach(async () => {
-   const edge = graph.edges[i];
-   if (edge.source.id !== viewNode.id && edge.target.id !== viewNode.id) {
-     edges.push(edge);
-   } else {
-     await this.deleteIntent(edge.id);
-   }
-   i++;
- });
+   const edges = [];
+   let i = 0;
+   await graph.edges.forEach(async () => {
+     const edge = graph.edges[i];
+     if (edge.source.id !== viewNode.id && edge.target.id !== viewNode.id) {
+       edges.push(edge);
+     } else {
+       await this.deleteIntent(edge.id);
+     }
+     i++;
+   });
 
- this.props.onKnotDeleted(viewNode.id);
- this.setState({ selected: null });
- this.props.onSelectNode(null);
- }
-/**
- * Creates a new edge between two nodes
- *
- * @param sourceViewNode - Source of the new edge.
- * @param targetViewNode - Target of the new edge.
- */
- private onCreateEdge = async (sourceViewNode: INode, targetViewNode: INode) => {
-  const graph = this.state.graph;
-  const intent = await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").createIntent({
+   this.props.onKnotDeleted(viewNode.id);
+   this.setState({ selected: null });
+   this.props.onSelectNode(null);
+  }
+  /**
+   * Creates a new edge between two nodes
+   *
+   * @param sourceViewNode - Source of the new edge.
+   * @param targetViewNode - Target of the new edge.
+   */
+  private onCreateEdge = async (sourceViewNode: INode, targetViewNode: INode) => {
+    const graph = this.state.graph;
+    const intent = await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").createIntent({
 
-      global: sourceViewNode.id === GLOBAL_NODE_ID,
-      name: "New intent",
-      quickResponseOrder: 0,
-      sourceKnotId: sourceViewNode.id === GLOBAL_NODE_ID ? undefined : sourceViewNode.id ,
-      targetKnotId: targetViewNode.id,
-      trainingMaterials: {},
-      type: "NORMAL",
-    }, this.props.storyId);
+        global: sourceViewNode.id === GLOBAL_NODE_ID,
+        name: "New intent",
+        quickResponseOrder: 0,
+        sourceKnotId: sourceViewNode.id === GLOBAL_NODE_ID ? undefined : sourceViewNode.id ,
+        targetKnotId: targetViewNode.id,
+        trainingMaterials: {},
+        type: "NORMAL",
+      }, this.props.storyId);
 
-  const viewEdge = Graph.translateIntent(intent, sourceViewNode, targetViewNode);
+    const viewEdge = Graph.translateIntent(intent, sourceViewNode, targetViewNode);
 
-  graph.edges = [...graph.edges, viewEdge];
-  this.setState({
-      graph,
-      selected: viewEdge,
+    graph.edges = [...graph.edges, viewEdge];
+    this.setState({
+        graph,
+        selected: viewEdge,
+      });
+
+    this.props.onIntentsFound([intent]);
+
+  }
+  /**
+   * Event handler for edge deletion
+   *
+   * @param viewEdge edge
+   * @param edges edges after deletion
+   */
+  private onDeleteEdge = async (viewEdge: IEdge) => {
+    await this.deleteIntent(viewEdge.id);
+    this.setState({
+      selected: null,
     });
+  }
 
-  this.props.onIntentsFound([intent]);
-
- }
- /**
-  * Event handler for edge deletion
-  *
-  * @param viewEdge edge
-  * @param edges edges after deletion
-  */
- private onDeleteEdge = async (viewEdge: IEdge) => {
-  await this.deleteIntent(viewEdge.id);
-  this.setState({
-    selected: null,
-  });
- }
-
- /**
-  * Handles edge selection
-  * @param viewEdge - Selected edge.
-  */
+  /**
+   * Handles edge selection
+   * @param viewEdge - Selected edge.
+   */
  private onEdgeClick = (viewEdge: IEdge) => {
     this.setState({ selected: viewEdge });
     this.props.onSelectEdge(viewEdge);
- }
- /**
-  * Deletes an intent
-  *
-  * @param id id of intent to delete
-  */
- private deleteIntent = async (id: string) => {
-   await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").deleteIntent(this.props.storyId, id);
-   this.props.onIntentDeleted(id);
- }
+  }
+  /**
+   * Deletes an intent
+   *
+   * @param id id of intent to delete
+   */
+  private deleteIntent = async (id: string) => {
+    await Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "").deleteIntent(this.props.storyId, id);
+    this.props.onIntentDeleted(id);
+  }
 
 }
 
-export function mapStateToProps(state: IStoreState) {
-  return {
-    autolayout: state.autolayout,
-    intents: state.intents,
-    keycloak: state.keycloak,
-    knotPositions: state.knotPositions,
-    knots: state.knots,
-    searchText: state.searchText,
-  };
-}
-interface IKnotPosition {
-  x: number; y: number; id: string;
-}
-export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+ export function mapStateToProps(state: IStoreState) {
+    return {
+      autolayout: state.autolayout,
+      intents: state.intents,
+      keycloak: state.keycloak,
+      knotPositions: state.knotPositions,
+      knots: state.knots,
+      searchText: state.searchText,
+    };
+ }
+ interface IKnotPosition {
+   x: number; y: number; id: string;
+ }
+ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     getKnotLocalPositions: () => dispatch(actions.getKnotLocalPositions()),
     onIntentDeleted: (intentId: string) => dispatch(actions.intentDeleted(intentId)),
@@ -436,6 +437,6 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
     onKnotsFound: (knots: Knot[]) => dispatch(actions.knotsFound(knots)),
     writeKnotLocalPositions: (knotPositions: IKnotPosition[]) => dispatch(actions.writeKnotLocalPositions(knotPositions)),
   };
-}
+ }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Graph);
+ export default connect(mapStateToProps, mapDispatchToProps)(Graph);
