@@ -96,38 +96,38 @@ class IntentEditor extends React.Component<IProps, IState> {
           <Form.Field>
             <label>Intent name</label>
             <Input
-            value={ this.state.intent.name }
-            style={ { width: "100%" } }
-            onChange={ this.onIntentNameChange } />
+              value={ this.state.intent.name }
+              style={ { width: "100%" } }
+              onChange={ this.onIntentNameChange } />
           </Form.Field>
           <Form.Field>
             <label>Quick response</label>
             <Input
-            value={ this.state.intent.quickResponse }
-            style={ { width: "100%" } }
-            onChange={ this.onIntentQuickResponseChange } />
+              value={ this.state.intent.quickResponse }
+              style={ { width: "100%" } }
+              onChange={ this.onIntentQuickResponseChange } />
           </Form.Field>
           <Form.Field>
             <label>Quick response order</label>
             <Input
-            value={ this.state.intent.quickResponseOrder }
-            type="number" style={ { width: "100%" } }
-            onChange={ this.onIntentQuickResponseOrderChange } />
+              value={ this.state.intent.quickResponseOrder }
+              type="number" style={ { width: "100%" } }
+              onChange={ this.onIntentQuickResponseOrderChange } />
           </Form.Field>
           <Form.Field>
             <label>Intent type</label>
             <Dropdown
-            onChange={ this.onIntentTypeChange }
-            value={ this.state.intent ? this.state.intent.type : IntentType.NORMAL }
-            options={ intentTypeOptions } />
+              onChange={ this.onIntentTypeChange }
+              value={ this.state.intent ? this.state.intent.type : IntentType.NORMAL }
+              options={ intentTypeOptions } />
           </Form.Field>
           {
             this.renderEditorContents()
           }
           <Form.Field>
             <Button
-            onClick={ this.onSaveIntentClick }
-            disabled={ !this.state.intent.name }>Save intent</Button>
+              onClick={ this.onSaveIntentClick }
+              disabled={ !this.state.intent.name }>Save intent</Button>
           </Form.Field>
           {
             <Loader inline active={ this.state.loading }/>
@@ -150,34 +150,34 @@ class IntentEditor extends React.Component<IProps, IState> {
         <Form.Field>
           <label>Intent OpenNLP Doccat training material</label>
           <TrainingMaterialEditor
-          trainingMaterialType={ TrainingMaterialType.INTENTOPENNLPDOCCAT }
-          storyId={ this.props.storyId }
-          trainingMaterialId={ this.state.intent.trainingMaterials.intentOpenNlpDoccatId }
-          onTrainingMaterialChange={ this.onTrainingMaterialChangeIntentDoccat }/>
+            trainingMaterialType={ TrainingMaterialType.INTENTOPENNLPDOCCAT }
+            storyId={ this.props.storyId }
+            trainingMaterialId={ this.state.intent.trainingMaterials.intentOpenNlpDoccatId }
+            onTrainingMaterialChange={ this.onTrainingMaterialChangeIntentDoccat }/>
         </Form.Field>
         <Form.Field>
           <label>Intent Regex training material</label>
           <TrainingMaterialEditor
-          trainingMaterialType={ TrainingMaterialType.INTENTREGEX }
-          storyId={ this.props.storyId }
-          trainingMaterialId={ this.state.intent.trainingMaterials.intentRegexId }
-          onTrainingMaterialChange={ this.onTrainingMaterialChangeIntentRegex }/>
+            trainingMaterialType={ TrainingMaterialType.INTENTREGEX }
+            storyId={ this.props.storyId }
+            trainingMaterialId={ this.state.intent.trainingMaterials.intentRegexId }
+            onTrainingMaterialChange={ this.onTrainingMaterialChangeIntentRegex }/>
         </Form.Field>
         <Form.Field>
           <label>Variable OpenNLP NER training material</label>
           <TrainingMaterialEditor
-          trainingMaterialType={ TrainingMaterialType.VARIABLEOPENNLPNER }
-          storyId={ this.props.storyId }
-          trainingMaterialId={ this.state.intent.trainingMaterials.variableOpenNlpNerId }
-          onTrainingMaterialChange={ this.onTrainingMaterialChangeVariableOpenNlpNer }/>
+            trainingMaterialType={ TrainingMaterialType.VARIABLEOPENNLPNER }
+            storyId={ this.props.storyId }
+            trainingMaterialId={ this.state.intent.trainingMaterials.variableOpenNlpNerId }
+            onTrainingMaterialChange={ this.onTrainingMaterialChangeVariableOpenNlpNer }/>
         </Form.Field>
         <Form.Field>
           <label>Variable OpenNLP Regex training material</label>
           <TrainingMaterialEditor
-          trainingMaterialType={ TrainingMaterialType.VARIABLEOPENNLPREGEX }
-          storyId={ this.props.storyId }
-          trainingMaterialId={ this.state.intent.trainingMaterials.variableOpenNlpRegex }
-          onTrainingMaterialChange={ this.onTrainingMaterialChangeVariableOpenNlpRegex }/>
+            trainingMaterialType={ TrainingMaterialType.VARIABLEOPENNLPREGEX }
+            storyId={ this.props.storyId }
+            trainingMaterialId={ this.state.intent.trainingMaterials.variableOpenNlpRegex }
+            onTrainingMaterialChange={ this.onTrainingMaterialChangeVariableOpenNlpRegex }/>
         </Form.Field>
       </div>
     );

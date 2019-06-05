@@ -184,21 +184,21 @@ class Graph extends React.Component<IProps, IState> {
     return (
       <div id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
       <GraphView
-      searchText={this.props.searchText}
-      autolayout={this.props.autolayout}
-      height={window.innerHeight}
-      width={window.innerWidth}
-      onEdgeClick={this.onEdgeClick}
-      onDeleteEdge={this.onDeleteEdge}
-      onCreateEdge={this.onCreateEdge}
-      onDeleteNode={this.onDeleteNode}
-      onCreateNode={this.onCreateNode}
-      onNodeDragEnd={this.onNodeDragEnd}
-      onNodeClick={this.onNodeClick}
-      filterIds={this.state.filterIds}
-      nodes={this.state.graph.nodes}
-      edges={this.state.graph.edges}
-      onUpdateMultiple={this.onUpdateMultiple}/>
+        searchText={this.props.searchText}
+        autolayout={this.props.autolayout}
+        height={window.innerHeight}
+        width={window.innerWidth}
+        onEdgeClick={this.onEdgeClick}
+        onDeleteEdge={this.onDeleteEdge}
+        onCreateEdge={this.onCreateEdge}
+        onDeleteNode={this.onDeleteNode}
+        onCreateNode={this.onCreateNode}
+        onNodeDragEnd={this.onNodeDragEnd}
+        onNodeClick={this.onNodeClick}
+        filterIds={this.state.filterIds}
+        nodes={this.state.graph.nodes}
+        edges={this.state.graph.edges}
+        onUpdateMultiple={this.onUpdateMultiple}/>
       </div>
     );
   }
