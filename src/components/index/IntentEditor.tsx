@@ -343,7 +343,6 @@ class IntentEditor extends React.Component<IProps, IState> {
     this.setState({
       intent: updatedIntent,
       loading: false,
-
     });
 
     this.props.onIntentUpdated(intent);
