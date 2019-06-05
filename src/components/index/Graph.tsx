@@ -204,8 +204,8 @@ class Graph extends React.Component<IProps, IState> {
   }
 
   /**
-    * Handles node search
-    */
+   * Handles node search
+   */
   private searchKnots = (): string[] => {
      if (!this.props.searchText) {
        return [];
@@ -413,7 +413,7 @@ class Graph extends React.Component<IProps, IState> {
 
 }
 
- export function mapStateToProps(state: IStoreState) {
+export function mapStateToProps(state: IStoreState) {
     return {
       autolayout: state.autolayout,
       intents: state.intents,
@@ -423,10 +423,10 @@ class Graph extends React.Component<IProps, IState> {
       searchText: state.searchText,
     };
  }
- interface IKnotPosition {
+interface IKnotPosition {
    x: number; y: number; id: string;
  }
- export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     getKnotLocalPositions: () => dispatch(actions.getKnotLocalPositions()),
     onIntentDeleted: (intentId: string) => dispatch(actions.intentDeleted(intentId)),
@@ -439,4 +439,4 @@ class Graph extends React.Component<IProps, IState> {
   };
  }
 
- export default connect(mapStateToProps, mapDispatchToProps)(Graph);
+export default connect(mapStateToProps, mapDispatchToProps)(Graph);
