@@ -259,6 +259,8 @@ class Graph extends React.Component<IProps, IState> {
   }
  /**
   * Writes node position to local storage
+  *
+  * @param viewNode - Node that has been dragged
   */
 
  private onNodeDragEnd = (viewNode: INode) => {
@@ -275,6 +277,7 @@ class Graph extends React.Component<IProps, IState> {
 
  /**
   * Updates the graph with a new node
+  * @param viewNode - Node that has been created
   */
  private onCreateNode = async (viewNode: INode) => {
    const graph = this.state.graph;
@@ -348,6 +351,9 @@ class Graph extends React.Component<IProps, IState> {
  }
 /**
  * Creates a new edge between two nodes
+ *
+ * @param sourceViewNode - Source of the new edge.
+ * @param targetViewNode - Target of the new edge.
  */
  private onCreateEdge = async (sourceViewNode: INode, targetViewNode: INode) => {
   const graph = this.state.graph;
@@ -388,6 +394,7 @@ class Graph extends React.Component<IProps, IState> {
 
  /**
   * Handles edge selection
+  * @param viewEdge - Selected edge.
   */
  private onEdgeClick = (viewEdge: IEdge) => {
     this.setState({ selected: viewEdge });
