@@ -1,56 +1,57 @@
+import * as Keycloak from "keycloak-js";
 import * as React from "react";
-import * as Keycloak from 'keycloak-js';
 
+import { KeycloakInstance } from "keycloak-js";
+import { connect } from "react-redux";
+import { Redirect } from "react-router";
+import { Dispatch } from "redux";
+import { IStoreState } from "src/types";
 import * as actions from "../../actions/";
 import BasicLayout from "../generic/BasicLayout";
-import { Redirect } from "react-router";
-import { StoreState } from "src/types";
-import { Dispatch } from "redux";
-import { connect } from "react-redux";
-import { KeycloakInstance } from "keycloak-js";
 
+import { Segment, Sidebar } from "semantic-ui-react";
 import "../../styles/common.scss";
-import Graph from "./Graph";
-import { Sidebar, Segment } from "semantic-ui-react";
-import { INode, IEdge } from "react-digraph";
-import IntentEditor from "./IntentEditor";
-import StorySelector from "./StorySelector";
-import KnotEditor from "./KnotEditor";
 import { GLOBAL_TYPE } from "../../utils/graph-config";
 import GlobalEditor from "./GlobalEditor";
+import Graph from "./Graph";
+import { IEdge, INode } from "./GraphView";
+import IntentEditor from "./IntentEditor";
+import KnotEditor from "./KnotEditor";
+import StorySelector from "./StorySelector";
 
-interface Props {
-  authenticated: boolean,
-  keycloak?: Keycloak.KeycloakInstance
+interface IProps {
+  authenticated: boolean;
+  keycloak?: Keycloak.KeycloakInstance;
 }
 
-interface State {
-  sidebarVisible: boolean,
-  selectedNode: INode | null,
-  selectedEdge: IEdge | null,
-  storyId?: string
+interface IState {
+  sidebarVisible: boolean;
+  selectedNode: INode | null;
+  selectedEdge: IEdge | null;
+  storyId?: string;
 }
 
-class WelcomePage extends React.Component<Props, State> {
+class WelcomePage extends React.Component<IProps, IState> {
 
-  constructor(props: Props) {
+  constructor(props: IProps) {
     super(props);
     this.state = {
-      sidebarVisible: false,
+      selectedEdge: null,
       selectedNode: null,
-      selectedEdge: null
+      sidebarVisible: false,
     };
   }
 
   public render() {
+
     return (
       <BasicLayout>
         { this.props.authenticated ? (
         <Sidebar.Pushable style={{border: "none"}} as={Segment}>
           <Sidebar
             as={Segment}
-            animation='overlay'
-            icon='labeled'
+            animation="overlay"
+            icon="labeled"
             inverted
             direction="right"
             vertical
@@ -73,9 +74,9 @@ class WelcomePage extends React.Component<Props, State> {
 
   private renderContent() {
     if (!this.state.storyId) {
-      return <div style={{ minHeight: "400px" }}><StorySelector onStorySelected={ (storyId) => { this.setState({ storyId: storyId}) } } /></div>
+      return <div style={{ minHeight: "400px" }}><StorySelector onStorySelected={ (storyId) => { this.setState({ storyId}); } } /></div>;
     } else {
-      return <Graph storyId={ this.state.storyId } onSelectNode={this.onSelectNode} onSelectEdge={this.onSelectEdge} />
+      return <Graph storyId={ this.state.storyId } onSelectNode={this.onSelectNode} onSelectEdge={this.onSelectEdge} />;
     }
   }
 
@@ -84,15 +85,15 @@ class WelcomePage extends React.Component<Props, State> {
    */
   private renderSidebarContent = (): JSX.Element | null => {
     if (this.state.selectedEdge && this.state.storyId) {
-      return <IntentEditor storyId={ this.state.storyId } intentId={this.state.selectedEdge.id} />
+      return <IntentEditor storyId={ this.state.storyId } intentId={this.state.selectedEdge.id} />;
     }
 
     if (this.state.selectedNode && this.state.storyId && this.state.selectedNode.type === GLOBAL_TYPE) {
-      return <GlobalEditor storyId={ this.state.storyId } />
+      return <GlobalEditor storyId={ this.state.storyId } />;
     }
 
     if (this.state.selectedNode && this.state.storyId && this.state.selectedNode.type !== GLOBAL_TYPE) {
-      return <KnotEditor storyId={ this.state.storyId } knotId={this.state.selectedNode.id} />
+      return <KnotEditor storyId={ this.state.storyId } knotId={this.state.selectedNode.id} />;
     }
 
     return null;
@@ -100,32 +101,34 @@ class WelcomePage extends React.Component<Props, State> {
 
   private onSelectNode = (item: INode | null) => {
     this.setState({
-      sidebarVisible: !!item,
       selectedEdge: null,
-      selectedNode: item
+      selectedNode: item,
+      sidebarVisible: !!item,
+
     });
   }
 
   private onSelectEdge = (item: IEdge | null) => {
     this.setState({
-      sidebarVisible: !!item,
       selectedEdge: item,
-      selectedNode: null
+      selectedNode: null,
+      sidebarVisible: !!item,
+
     });
   }
 }
 
-export function mapStateToProps(state: StoreState) {
+export function mapStateToProps(state: IStoreState) {
   return {
     authenticated: state.authenticated,
-    keycloak: state.keycloak
-  }
+    keycloak: state.keycloak,
+  };
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onLogin: (keycloak: KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated))
+    onLogin: (keycloak: KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated)),
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(WelcomePage);;
+export default connect(mapStateToProps, mapDispatchToProps)(WelcomePage);

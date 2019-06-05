@@ -1,18 +1,18 @@
-import * as React from 'react';
-import  { GraphUtils, INode } from "react-digraph"
+import * as React from "react";
+import { GraphUtils, INode } from "react-digraph";
 
 /**
  * Component properties
  */
-interface Props {
-  data: INode,
-  isSelected: boolean
+interface IProps {
+  data: INode;
+  isSelected: boolean;
 }
 
 /**
  * Component for rendering text on knot
  */
-class KnotText extends React.Component<Props> {
+class KnotText extends React.Component<IProps> {
 
   /**
    * Render
@@ -20,12 +20,12 @@ class KnotText extends React.Component<Props> {
   public render() {
     const { data } = this.props;
     const title = data.title;
-    const className = GraphUtils.classNames('node-text', { selected: false });
+    const className = GraphUtils.classNames("node-text", { selected: false });
 
     return (
       <text className={className} textAnchor="middle">
         {!!title && (
-          <tspan style={{stroke:"white", fontWeight: "bold", fontSize: "1.5rem"}} opacity="0.5">{title}</tspan>
+          <tspan style={{stroke: "white", fontWeight: "bold", fontSize: "1.5rem"}} opacity="0.5">{title}</tspan>
         )}
       </text>
     );

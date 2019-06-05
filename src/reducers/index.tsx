@@ -1,43 +1,47 @@
-import { AppAction } from '../actions';
-import { StoreState } from '../types/index';
-import { USER_LOGIN, USER_LOGOUT, AUTO_LAYOUT_TOGGLE, KNOTS_FOUND, KNOT_DELETED, KNOT_UPDATED, INTENTS_FOUND, INTENT_DELETED, INTENT_UPDATED, SEARCH } from '../constants/index';
+import { AppAction } from "../actions";
+import * as constants from "../constants/index";
+import { IStoreState } from "../types/index";
 
-export function processAction(state: StoreState, action: AppAction): StoreState {
+export function processAction(state: IStoreState, action: AppAction): IStoreState {
   switch (action.type) {
-    case USER_LOGIN:
+    case constants.USER_LOGIN:
       return { ...state, keycloak: action.keycloak, authenticated: action.authenticated};
-    case USER_LOGOUT:
+    case constants.USER_LOGOUT:
       return { ...state, keycloak: undefined, authenticated: false };
-    case AUTO_LAYOUT_TOGGLE:
+    case constants.AUTO_LAYOUT_TOGGLE:
       return { ...state, autolayout: action.autolayout};
-    case SEARCH:
+    case constants.SEARCH:
     return { ...state, searchText: action.searchText};
-    case KNOTS_FOUND:
+    case constants.KNOTS_FOUND:
       return { ...state, knots: (state.knots || []).concat(action.knots)};
-    case KNOT_DELETED:
-      return { ...state,  knots: (state.knots || []).filter((knot) => {return knot.id !== action.knotId})};
-    case KNOT_UPDATED:
+    case constants.KNOT_DELETED:
+      return { ...state,  knots: (state.knots || []).filter((knot) =>  knot.id !== action.knotId)};
+    case constants.KNOT_UPDATED:
       const knots = state.knots || [];
       return { ...state, knots: knots.map((knot) => {
-        if (action.knot.id && action.knot.id == knot.id) {
+        if (action.knot.id && action.knot.id === knot.id) {
           return { ...knot, ...action.knot };
         } else {
           return knot;
         }
       })};
-    case INTENTS_FOUND:
+    case constants.INTENTS_FOUND:
       return { ...state, intents: (state.intents || []).concat(action.intents)};
-    case INTENT_DELETED:
-      return { ...state,  intents: (state.intents || []).filter((intent) => {return intent.id !== action.intentId})};
-    case INTENT_UPDATED:
+    case constants.INTENT_DELETED:
+      return { ...state,  intents: (state.intents || []).filter((intent) => intent.id !== action.intentId)};
+    case constants.INTENT_UPDATED:
       const intents = state.intents || [];
       return { ...state, intents: intents.map((intent) => {
-        if (action.intent.id && action.intent.id == intent.id) {
+        if (action.intent.id && action.intent.id === intent.id) {
           return { ...intent, ...action.intent };
         } else {
           return intent;
         }
       })};
+    case constants.GET_KNOT_POSITIONS:
+      return {...state, knotPositions: action.knotPositions};
+    case constants.SET_KNOT_POSITIONS:
+        return {...state, knotPositions: action.knotPositions};
   }
   return state;
 }

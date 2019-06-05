@@ -1,24 +1,24 @@
-import LocalizedStrings, { 
-  LocalizedStringsMethods
-} from 'localized-strings';
+import LocalizedStrings, {
+  LocalizedStringsMethods,
+} from "localized-strings";
 
 export interface IStrings extends LocalizedStringsMethods {
-  menuBarUserItemText: string
-  menuBarManageAccountText: string
-  menuBarLogoutText: string
-  welcomeLoginButtonText: string
-  siteHeader: string
-  news: string
-  deliveries: string
-  contracts: string
-  welcome: string
-  redirectingTokeycloak: string
-  layoutAutomatically: string,
-  search: string
+  menuBarUserItemText: string;
+  menuBarManageAccountText: string;
+  menuBarLogoutText: string;
+  welcomeLoginButtonText: string;
+  siteHeader: string;
+  news: string;
+  deliveries: string;
+  contracts: string;
+  welcome: string;
+  redirectingTokeycloak: string;
+  layoutAutomatically: string;
+  search: string;
 }
 
 const strings: IStrings = new LocalizedStrings({
-  en: require("./en.json")
+  en: require("./en.json"),
 });
 
 export default strings;

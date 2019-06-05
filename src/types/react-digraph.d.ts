@@ -16,21 +16,21 @@
 
 declare module "react-digraph" {
 
-  export type INode = {
+  export interface INode {
     title: string;
     x?: number | null;
     y?: number | null;
     type?: string;
     subtype?: string | null;
     [key: string]: any;
-  };
+  }
 
-  export type IPoint = {
+  export interface IPoint {
     x: number;
     y: number;
-  };
+  }
 
-  export type INodeProps = {
+  export interface INodeProps {
     data: INode;
     id: string;
     nodeTypes: any; // TODO: make a nodeTypes interface
@@ -48,34 +48,34 @@ declare module "react-digraph" {
       data: any,
       id: string,
       selected: boolean,
-      hovered: boolean
+      hovered: boolean,
     ) => any;
     renderNodeText?: (
       data: any,
       id: string | number,
-      isSelected: boolean
+      isSelected: boolean,
     ) => any;
     isSelected: boolean;
     layoutEngine?: any;
     viewWrapperElem: HTMLDivElement;
-  };
+  }
 
   export const Node: React.ComponentClass<INodeProps>;
 
-  export type IEdge = {
+  export interface IEdge {
     source: string;
     target: string;
     type?: string;
     handleText?: string;
     [key: string]: any;
-  };
+  }
 
-  export type ITargetPosition = {
+  export interface ITargetPosition {
     x: number;
     y: number;
-  };
+  }
 
-  export type IEdgeProps = {
+  export interface IEdgeProps {
     data: IEdge;
     edgeTypes: any; // TODO: create an edgeTypes interface
     edgeHandleSize?: number;
@@ -85,11 +85,11 @@ declare module "react-digraph" {
     isSelected: boolean;
     nodeKey: string;
     viewWrapperElem: HTMLDivElement;
-  };
+  }
 
   export const Edge: React.Component<IEdgeProps>;
 
-  export type IGraphViewProps = {
+  export interface IGraphViewProps {
     backgroundFillId?: string;
     edges: any[];
     edgeArrowSize?: number;
@@ -133,26 +133,26 @@ declare module "react-digraph" {
       data: any,
       id: string,
       selected: boolean,
-      hovered: boolean
+      hovered: boolean,
     ) => any;
     afterRenderEdge?: (
       id: string,
       element: any,
       edge: IEdge,
       edgeContainer: any,
-      isEdgeSelected: boolean
+      isEdgeSelected: boolean,
     ) => void;
     renderNodeText?: (
       data: any,
       id: string | number,
-      isSelected: boolean
+      isSelected: boolean,
     ) => any;
-  };
+  }
 
-  export type IGraphInput = {
+  export interface IGraphInput {
     nodes: INode[];
     edges: IEdge[];
-  };
+  }
 
   export class BwdlTransformer extends Transformer {}
 
@@ -162,29 +162,29 @@ declare module "react-digraph" {
      * @param input
      * @returns IGraphInput
      */
-    static transform(input: any): IGraphInput;
+    public static transform(input: any): IGraphInput;
 
     /**
      * Converts a graphInput to the specified transformer type.
      * @param graphInput
      * @returns any
      */
-    static revert(graphInput: IGraphInput): any;
+    public static revert(graphInput: IGraphInput): any;
   }
 
   export type LayoutEngineType = "None" | "SnapToGrid" | "VerticalTree";
 
   export const GraphView: React.ComponentClass<IGraphViewProps>;
-  export type INodeMapNode = {
+  export interface INodeMapNode {
     node: INode;
     originalArrIndex: number;
     incomingEdges: IEdge[];
     outgoingEdges: IEdge[];
     parents: INode[];
     children: INode[];
-  };
+  }
 
-  type ObjectMap<T> = { [key: string]: T };
+  interface ObjectMap<T> { [key: string]: T }
 
   export type NodesMap = ObjectMap<INodeMapNode>;
 
@@ -198,25 +198,25 @@ declare module "react-digraph" {
   export type Element = any;
 
   export class GraphUtils {
-    static getNodesMap(arr: INode[], key: string): NodesMap;
+    public static getNodesMap(arr: INode[], key: string): NodesMap;
 
-    static getEdgesMap(arr: IEdge[]): EdgesMap;
+    public static getEdgesMap(arr: IEdge[]): EdgesMap;
 
-    static linkNodesAndEdges(nodesMap: NodesMap, edges: IEdge[]): void;
+    public static linkNodesAndEdges(nodesMap: NodesMap, edges: IEdge[]): void;
 
-    static removeElementFromDom(id: string): boolean;
+    public static removeElementFromDom(id: string): boolean;
 
-    static findParent(element: Element, selector: string): Element | null;
+    public static findParent(element: Element, selector: string): Element | null;
 
-    static classNames(...args: any[]): string;
+    public static classNames(...args: any[]): string;
 
-    static yieldingLoop(
+    public static yieldingLoop(
       count: number,
       chunksize: number,
       callback: (i: number) => void,
-      finished?: () => void
+      finished?: () => void,
     ): void;
 
-    static hasNodeShallowChanged(prevNode: INode, newNode: INode): boolean;
+    public static hasNodeShallowChanged(prevNode: INode, newNode: INode): boolean;
   }
 }

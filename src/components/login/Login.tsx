@@ -1,57 +1,44 @@
+import * as Keycloak from "keycloak-js";
+import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
-import * as Keycloak from 'keycloak-js';
+import { connect } from "react-redux";
+import { Redirect } from "react-router";
+import { Dispatch } from "redux";
 import {
   Grid,
-  Header
+  Header,
 } from "semantic-ui-react";
+import { IStoreState } from "src/types";
 import * as actions from "../../actions";
-import BasicLayout from "../generic/BasicLayout";
-import { Redirect } from "react-router";
 import strings from "../../localization/strings";
-import { StoreState } from "src/types";
-import { Dispatch } from "redux";
-import { KeycloakInstance } from "keycloak-js";
-import { connect } from "react-redux";
+import BasicLayout from "../generic/BasicLayout";
 
-export interface Props {
-  authenticated: boolean,
-  keycloak?: Keycloak.KeycloakInstance,
-  onLogin?: (keycloak: Keycloak.KeycloakInstance, authenticated: boolean) => void
+export interface IProps {
+  authenticated: boolean;
+  keycloak?: Keycloak.KeycloakInstance;
+  onLogin?: (keycloak: Keycloak.KeycloakInstance, authenticated: boolean) => void;
 }
 
-interface State {
-  loadingRealms: boolean
+interface IState {
+  loadingRealms: boolean;
 }
 
-class Login extends React.Component<Props, State> {
+class Login extends React.Component<IProps, IState> {
 
-  constructor(props: Props) {
+  constructor(props: IProps) {
     super(props);
     this.state = {
-      loadingRealms: false
+      loadingRealms: false,
     };
   }
 
-  componentDidMount() {
+  public componentDidMount() {
     if (!this.props.authenticated) {
       this.doLogin();
     }
   }
 
-  doLogin() {
-    const kcConf = {
-      "realm": process.env.REACT_APP_REALM,
-      "url": process.env.REACT_APP_AUTH_SERVER_URL,
-      "clientId": process.env.REACT_APP_AUTH_RESOURCE
-    };
-    const keycloak = Keycloak(kcConf);
-    keycloak.init({onLoad: "login-required"}).success((authenticated) => {
-      console.log(authenticated);
-      this.props.onLogin && this.props.onLogin(keycloak, authenticated);
-    });
-  }
-
-  render() {
+  public render() {
     return (
       <BasicLayout>
         { this.props.authenticated ? (
@@ -68,18 +55,33 @@ class Login extends React.Component<Props, State> {
       </BasicLayout>
     );
   }
+  private doLogin() {
+    const kcConf = {
+      clientId: process.env.REACT_APP_AUTH_RESOURCE,
+      realm: process.env.REACT_APP_REALM,
+      url: process.env.REACT_APP_AUTH_SERVER_URL,
+
+    };
+    const keycloak = Keycloak(kcConf);
+    keycloak.init({onLoad: "login-required"}).success((authenticated) => {
+      if ( this.props.onLogin ) {
+        this.props.onLogin(keycloak, authenticated);
+      }
+
+    });
+  }
 }
 
-export function mapStateToProps(state: StoreState) {
+export function mapStateToProps(state: IStoreState) {
   return {
     authenticated: state.authenticated,
-    keycloak: state.keycloak
-  }
+    keycloak: state.keycloak,
+  };
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onLogin: (keycloak: KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated))
+    onLogin: (keycloak: KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated)),
   };
 }
 

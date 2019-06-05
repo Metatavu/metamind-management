@@ -1,58 +1,57 @@
-import * as React from "react";
-import * as Keycloak from 'keycloak-js';
-import * as actions from "../../actions";
-import { StoreState } from "src/types";
-import { Dispatch } from "redux";
-import { connect } from "react-redux";
+import * as Keycloak from "keycloak-js";
 import { KeycloakInstance } from "keycloak-js";
-
 import Api, { Story } from "metamind-client";
-import { Segment, Dropdown, DropdownProps, Button, Grid, Loader, ButtonProps, Input, InputProps } from "semantic-ui-react";
+import * as React from "react";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
+import { Button,  ButtonProps, Dropdown, DropdownProps, Grid, Input, InputProps,  Loader,  Segment } from "semantic-ui-react";
+import { IStoreState } from "src/types";
+import * as actions from "../../actions";
 
 const NEW_STORY_ID = "NEW";
 
 /**
  * Component props
  */
-interface Props {
-  authenticated: boolean,
-  keycloak?: Keycloak.KeycloakInstance,
-  onStorySelected: (storyId: string) => void
+interface IProps {
+  authenticated: boolean;
+  keycloak?: Keycloak.KeycloakInstance;
+  onStorySelected: (storyId: string) => void;
 }
 
 /**
  * Component state
  */
-interface State {
-  loading: boolean,
-  stories: Story[],
-  newStoryName?: string,
-  selectedStoryId?: string
+interface IState {
+  loading: boolean;
+  stories: Story[];
+  newStoryName?: string;
+  selectedStoryId?: string;
 }
 
 /**
  * Story selector component
  */
-class StorySelector extends React.Component<Props, State> {
+class StorySelector extends React.Component<IProps, IState> {
 
   /**
    * Constructor
-   * 
+   *
    * @param props props
    */
-  constructor(props: Props) {
+  constructor(props: IProps) {
     super(props);
     this.state = {
       loading: false,
-      stories: []
+      stories: [],
     };
   }
 
   /**
    * Component did mount life-cycle method
    */
-  public componentDidMount = async() => {
-    this.loadStories();    
+  public componentDidMount = async () => {
+    this.loadStories();
   }
 
   /**
@@ -60,21 +59,21 @@ class StorySelector extends React.Component<Props, State> {
    */
   public render() {
     if (this.state.loading) {
-      return <Loader/>
+      return <Loader/>;
     }
 
     const options = this.state.stories.map((story) => {
       return {
         key: story.id,
         text: story.name,
-        value: story.id
-      }
+        value: story.id,
+      };
     }).concat([
       {
         key: NEW_STORY_ID,
-        text: "New", //TODO: localize,
-        value: NEW_STORY_ID
-      }
+        text: "New", // TODO: localize,
+        value: NEW_STORY_ID,
+      },
     ]);
 
     return (
@@ -108,7 +107,7 @@ class StorySelector extends React.Component<Props, State> {
     return (
       <Grid.Row>
         <Input onChange={ (event: any, data: InputProps ) => { this.setState({
-          newStoryName: data.value as string || undefined
+          newStoryName: data.value as string || undefined,
         }); } }></Input>
       </Grid.Row>
     );
@@ -123,28 +122,28 @@ class StorySelector extends React.Component<Props, State> {
 
     this.setState({
       loading: false,
-      stories: stories,
-      selectedStoryId: stories.length ? stories[0].id : undefined 
+      selectedStoryId: stories.length ? stories[0].id : undefined,
+      stories,
     });
   }
-  
+
   /**
    * Event handler for story select dropdown change
-   * 
+   *
    * @param event event
    * @param data data
    */
   private onStorySelect = async (event: React.SyntheticEvent<HTMLElement, Event>, data: DropdownProps) => {
     const storyId = data.value as string || undefined;
-    
+
     this.setState({
-      selectedStoryId: storyId
+      selectedStoryId: storyId,
     });
   }
 
   /**
    * Event handler for story select click
-   * 
+   *
    * @param event event
    * @param data data
    */
@@ -152,7 +151,7 @@ class StorySelector extends React.Component<Props, State> {
     if (this.state.newStoryName && this.state.selectedStoryId === NEW_STORY_ID) {
       const story = await Api.getStoriesService(this.props.keycloak ? this.props.keycloak.token! : "").createStory({
         locale: "fi",
-        name: this.state.newStoryName
+        name: this.state.newStoryName,
       });
 
       this.props.onStorySelected(story.id!);
@@ -162,16 +161,16 @@ class StorySelector extends React.Component<Props, State> {
   }
 }
 
-export function mapStateToProps(state: StoreState) {
+export function mapStateToProps(state: IStoreState) {
   return {
     authenticated: state.authenticated,
-    keycloak: state.keycloak
-  }
+    keycloak: state.keycloak,
+  };
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onLogin: (keycloak: KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated))
+    onLogin: (keycloak: KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated)),
   };
 }
 
