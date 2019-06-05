@@ -194,7 +194,6 @@ class IntentEditor extends React.Component<IProps, IState> {
     this.setState({
       intent,
       loading: false,
-
     });
   }
 
