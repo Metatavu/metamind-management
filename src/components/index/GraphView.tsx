@@ -1,6 +1,7 @@
 import * as dagre from "dagre";
 import * as React from "react";
 import GraphConfig from "../../utils/graph-config";
+
 export interface INode {
   id: string;
   title: string;
