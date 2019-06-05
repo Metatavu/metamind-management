@@ -9,11 +9,13 @@ export interface INode {
   type?: string;
   subtype?: string;
 }
+
 export interface IEdge {
   id: string;
   source: INode;
   target: INode;
 }
+
 interface IProps {
   width: number;
   height: number;
