@@ -53,6 +53,7 @@ const globalNode: INode = {
 
 };
 class Graph extends React.Component<IProps, IState> {
+  private graphViewRef: any;
   /**
    * Updates component state when knots or intents are changed
    */
@@ -153,6 +154,7 @@ class Graph extends React.Component<IProps, IState> {
         selected: null,
 
       };
+      this.graphViewRef = React.createRef();
 
   }
 
@@ -185,6 +187,7 @@ class Graph extends React.Component<IProps, IState> {
     return (
       <div id="graph" style={{width: "100vw", height: "100vh"}} className={ !!this.props.searchText ? "search-active" : "" }>
       <GraphView
+      ref={this.graphViewRef}
       searchText={this.props.searchText}
       autolayout={this.props.autolayout}
       height={window.innerHeight}
