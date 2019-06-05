@@ -50,8 +50,8 @@ interface IState {
 
 class GraphView extends React.Component<IProps, IState> {
   /**
-    * Gets called when props change
-    */
+   * Gets called when props change
+   */
   public static getDerivedStateFromProps = (props: IProps, state: IState) => {
     const newNodes = props.nodes.map((node) => {
 
@@ -91,15 +91,15 @@ class GraphView extends React.Component<IProps, IState> {
 
   public componentDidMount() {
    /**
-     * Handles key events
-     */
+    * Handles key events
+    */
     this.keyHandler();
   }
 
   public render() {
   /**
-    * Resets the layout when the "layout automatically"-button gets pressed
-    */
+   * Resets the layout when the "layout automatically"-button gets pressed
+   */
 
     if (this.state.autolayout !== this.props.autolayout) {
       this.setLayout();
@@ -120,8 +120,8 @@ class GraphView extends React.Component<IProps, IState> {
     );
   }
   /**
-    * Gets all graphical elements of the graph
-    */
+   * Gets all graphical elements of the graph
+   */
   public getGraph = (): any[] => {
     const edgeLines = this.state.edges.map((edge) => this.getEdgeLines(edge));
     const edgeCircles = this.state.edges.map((edge) => this.getEdgeCircles(edge));
@@ -130,10 +130,10 @@ class GraphView extends React.Component<IProps, IState> {
     return edgeLines.concat(edgeCircles).concat(nodeIcons).concat(edgeArrows);
   }
   /**
-    * Gets lines that represent edges between nodes
-    *
-    * @param edge - Edge to render.
-    */
+   * Gets lines that represent edges between nodes
+   *
+   * @param edge - Edge to render.
+   */
   public getEdgeLines = (edge: IEdge) => {
     const color = this.giveColor(edge, this.state.selectedEdge);
     const x1 = this.getElementPosition(edge.source.x);
@@ -144,9 +144,9 @@ class GraphView extends React.Component<IProps, IState> {
     return <line  onClick={() => this.edgeClickHandler(edge)} x1={x1} x2={x2} y1={y1} y2={y2} style={{stroke: color}} stroke-width={2}></line>;
   }
   /**
-    * Gets arrows that indicate the direction of the connection between nodes
-    * @param edge - Edge to render
-    */
+   * Gets arrows that indicate the direction of the connection between nodes
+   * @param edge - Edge to render
+   */
   public getEdgeArrows = (edge: IEdge) => {
 
     const x = this.getElementPosition((((edge.source.x * 0.3) + (edge.target.x * 1.7))) / 2);
@@ -165,9 +165,9 @@ class GraphView extends React.Component<IProps, IState> {
 
   }
   /**
-    * Gets clickable cirles on top of the edges
-    * @param edge - Edge to render
-    */
+   * Gets clickable cirles on top of the edges
+   * @param edge - Edge to render
+   */
   public getEdgeCircles = (edge: IEdge) => {
     const color = this.giveColor(edge, this.state.selectedEdge);
     const x = this.getElementPosition(((edge.source.x * 0.5) + (edge.target.x * 1.5)) / 2);
@@ -177,9 +177,9 @@ class GraphView extends React.Component<IProps, IState> {
     return <circle onClick={() => this.edgeClickHandler(edge)} transform={circleTransform}  fill={color} r={5 * this.state.zoom} ></circle>;
   }
   /**
-    * Gets lthe node icons
-    * @param node - Node to render
-    */
+   * Gets lthe node icons
+   * @param node - Node to render
+   */
   public getNodeIcons = (node: INode) => {
     const color = this.giveColor(node, this.state.selectedNode);
     const transform = () => {
@@ -208,8 +208,8 @@ class GraphView extends React.Component<IProps, IState> {
     transform={transform()} >{shape}</g>;
   }
   /**
-    * Resets the layout
-    */
+   * Resets the layout
+   */
   public setLayout = () => {
     this.setState({autolayout: this.props.autolayout});
     const newNodes: any = [];
@@ -232,9 +232,9 @@ class GraphView extends React.Component<IProps, IState> {
     this.props.onUpdateMultiple(newNodes);
   }
   /**
-    * Handles dragging nodes
-    * @param event - Dragging event
-    */
+   * Handles dragging nodes
+   * @param event - Dragging event
+   */
   public handleDrag = (event: any) => {
     const svg = event.currentTarget;
 
@@ -245,9 +245,9 @@ class GraphView extends React.Component<IProps, IState> {
     }
   }
   /**
-    * Handles deleting connected edges
-    * @param node - Delete all edges connected to this node
-    */
+   * Handles deleting connected edges
+   * @param node - Delete all edges connected to this node
+   */
   public deleteConnectedEdges = async (node: INode) => {
     const promises = this.state.edges.map(async (edge) => {
       if (edge.source.id === node.id || edge.target.id === node.id) {
@@ -258,8 +258,8 @@ class GraphView extends React.Component<IProps, IState> {
 
   }
   /**
-    * Handles selecting edges
-    * @param edge - Edge that has been clicked
+   * Handles selecting edges
+   * @param edge - Edge that has been clicked
    */
   public edgeClickHandler = (edge: IEdge) => {
       this.props.onEdgeClick(edge);
@@ -268,10 +268,10 @@ class GraphView extends React.Component<IProps, IState> {
 
     }
   /**
-    * Gives color to a node or an edge
-    * @param d - Edge or node that needs to be given a color
-    * @param selected - Edge or node that is currently selected
-    */
+   * Gives color to a node or an edge
+   * @param d - Edge or node that needs to be given a color
+   * @param selected - Edge or node that is currently selected
+   */
   public giveColor = (d: IEdge|INode, selected: IEdge|INode|undefined) => {
       if (selected) {
 
@@ -285,10 +285,10 @@ class GraphView extends React.Component<IProps, IState> {
       return "blue";
     }
   /**
-    * Handles selecting nodes
-    * @param event - Click event
-    * @param node - Node that has been clicked
-    */
+   * Handles selecting nodes
+   * @param event - Click event
+   * @param node - Node that has been clicked
+   */
   public nodeClickHandler = (event: any, node: INode) => {
       if (!event.shiftKey) {
         this.props.onNodeClick(node);
@@ -298,9 +298,9 @@ class GraphView extends React.Component<IProps, IState> {
       }
   }
   /**
-    * Handles mousedown-event on the node
-    * @param node - Node on which mouse is being held down
-    */
+   * Handles mousedown-event on the node
+   * @param node - Node on which mouse is being held down
+   */
   public nodeMouseDownHandler = (node: INode) => {
 
       if (!this.state.beingDragged) {
@@ -308,9 +308,9 @@ class GraphView extends React.Component<IProps, IState> {
       }
   }
   /**
-    * Handles creating new edges
-    * @param node - Node which has been clicked with right mouse button
-    */
+   * Handles creating new edges
+   * @param node - Node which has been clicked with right mouse button
+   */
   public nodeRightClickHandler = (node: INode) => {
 
       if (this.state.selectedNode) {
@@ -337,8 +337,8 @@ class GraphView extends React.Component<IProps, IState> {
       }
   }
   /**
-    * Handles key events
-    */
+   * Handles key events
+   */
   public keyHandler = () => {
       window.addEventListener("keydown", (event: any) => {
         if (event.keyCode === 38) {
@@ -400,11 +400,11 @@ class GraphView extends React.Component<IProps, IState> {
       });
   }
   /**
-    * Gets the mouse position in relation to the svg
-    * @param svg - Svg on which all graphical elements (icons, lines, circles, arrows) exist
-    * @param eventX - Mouse clientX-position
-    * @param eventY - Mouse clientY-position
-    */
+   * Gets the mouse position in relation to the svg
+   * @param svg - Svg on which all graphical elements (icons, lines, circles, arrows) exist
+   * @param eventX - Mouse clientX-position
+   * @param eventY - Mouse clientY-position
+   */
   public getMousePosition = (svg: any, eventX: number, eventY: number): any => {
     const rect = svg.getBoundingClientRect();
     const x = eventX - rect.left - svg.clientLeft - window.pageXOffset - this.state.translateX;
@@ -414,10 +414,10 @@ class GraphView extends React.Component<IProps, IState> {
     return {x: x + (distanceFromCenterX / this.state.zoom - distanceFromCenterX), y: y + (distanceFromCenterY / this.state.zoom - distanceFromCenterY)};
   }
   /**
-    * Gets element position with zoom and translate values taken into account
-    * @param inputX element x-position
-    * @param inputY element y-position
-    */
+   * Gets element position with zoom and translate values taken into account
+   * @param inputX element x-position
+   * @param inputY element y-position
+   */
 
   public getElementPosition = (inputX?: number, inputY?: number): any => {
     let finalX: number|undefined;
@@ -443,9 +443,9 @@ class GraphView extends React.Component<IProps, IState> {
     }
   }
   /**
-    * Handles zooming
-    * @param event - Mousewheel event
-    */
+   * Handles zooming
+   * @param event - Mousewheel event
+   */
   public zoomHandler = (event: any) => {
     const deltaY = event.deltaY;
     let {zoom} = this.state;
@@ -460,8 +460,8 @@ class GraphView extends React.Component<IProps, IState> {
 
   }
   /**
-    * Handles mouseup-events on svg
-    */
+   * Handles mouseup-events on svg
+   */
   public svgMouseUpHandler = () => {
     if (this.state.beingDragged) {
       let x = this.state.beingDragged.x;
@@ -486,9 +486,9 @@ class GraphView extends React.Component<IProps, IState> {
     }
   }
   /**
-    * Handles the creation of new nodes
-    * @param event - Click event
-    */
+   * Handles the creation of new nodes
+   * @param event - Click event
+   */
   public svgClickHandler = (event: any) => {
 
     if (event.shiftKey) {
