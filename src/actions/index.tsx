@@ -165,6 +165,7 @@ export const getKnotLocalPositions = (): IGetKnotPositions => {
     return {type: constants.GET_KNOT_POSITIONS, knotPositions: JSON.parse(serializedState)};
 
 };
+
 export const writeKnotLocalPositions = (positions: Array<{id: string, x: number, y: number}>): ISetKnotPositions => {
 
     const serializedState = JSON.stringify(positions);
