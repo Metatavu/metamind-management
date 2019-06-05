@@ -111,7 +111,6 @@ class GraphView extends React.Component<IProps, IState> {
       onClick={this.svgClickHandler}
       onWheel={this.zoomHandler}
       height={this.props.height}>
-
       {this.getGraph()}
       </svg>
       </div>
