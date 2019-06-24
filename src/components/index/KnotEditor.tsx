@@ -261,13 +261,13 @@ class KnotEditor extends React.Component<IProps, IState> {
       return;
     }
 
-    // const { storyId, knotId } = this.props;
+    const { storyId, knotId } = this.props;
 
     this.setState({
       loading: true,
     });
 
-    const updatedKnot = knot;
+    const updatedKnot = await this.updateKnotImage(event.currentTarget.files[0], storyId, knotId);
 
     this.setState({
       knot: updatedKnot,
@@ -333,6 +333,12 @@ class KnotEditor extends React.Component<IProps, IState> {
 
   private updateKnot = async (knot: Knot, storyId: string, knotId: string): Promise<Knot> => {
     const updatedKnot = await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").updateKnot(knot, storyId, knotId);
+    this.props.onKnotUpdated(updatedKnot);
+    return updatedKnot;
+  }
+
+  private updateKnotImage = async (imageFile: any, storyId: string, knotId: string): Promise<Knot> => {
+    const updatedKnot = await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").updateKnotImage(imageFile, storyId, knotId);
     this.props.onKnotUpdated(updatedKnot);
     return updatedKnot;
   }
