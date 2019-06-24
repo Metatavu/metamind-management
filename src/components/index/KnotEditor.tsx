@@ -109,11 +109,16 @@ class KnotEditor extends React.Component<IProps, IState> {
           </Form.Field>
           <Form.Field>
             <label>Knot contents</label>
-            <TextArea
-            rows={ 15 }
-            style={ { width: "100%" } }
-            onChange={ this.onKnotContentChange }
-            value={ this.state.knotContent } />
+            {
+              this.state.knot && this.state.knot.type === KnotType.IMAGE ?
+              <input type="file"/> :
+              <TextArea
+              rows={ 15 }
+              style={ { width: "100%" } }
+              onChange={ this.onKnotContentChange }
+              value={ this.state.knotContent } />
+            }
+
           </Form.Field>
           <Form.Field>
             <label>Knot hint</label>
