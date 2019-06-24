@@ -111,11 +111,14 @@ class KnotEditor extends React.Component<IProps, IState> {
             <label>Knot contents</label>
             {
               this.state.knot && this.state.knot.type === KnotType.IMAGE ?
-              <input type="file"/> :
+              <input
+              type="file"
+              onChange= { this.onImageKnotContentChange }
+              /> :
               <TextArea
               rows={ 15 }
               style={ { width: "100%" } }
-              onChange={ this.onKnotContentChange }
+              onChange={ this.onTextKnotContentChange }
               value={ this.state.knotContent } />
             }
 
@@ -219,12 +222,12 @@ class KnotEditor extends React.Component<IProps, IState> {
   }
 
   /**
-   * Event handler for knot content change
+   * Event handler for text knot content change
    *
    * @param event event
    * @param data data
    */
-  private onKnotContentChange = async (event: any, data: TextAreaProps) => {
+  private onTextKnotContentChange = async (event: any, data: TextAreaProps) => {
     const { knot } = this.state;
     if (!knot || !data.value) {
       return;
@@ -245,6 +248,30 @@ class KnotEditor extends React.Component<IProps, IState> {
       knot: updatedKnot,
       loading: false,
 
+    });
+  }
+
+  /**
+   * Event handler for image knot content change
+   * @param event event
+   */
+  private onImageKnotContentChange = async (event: any) => {
+    const { knot } = this.state;
+    if (!knot || !event.currentTarget.files[0]) {
+      return;
+    }
+
+    // const { storyId, knotId } = this.props;
+
+    this.setState({
+      loading: true,
+    });
+
+    const updatedKnot = knot;
+
+    this.setState({
+      knot: updatedKnot,
+      loading: false,
     });
   }
 
