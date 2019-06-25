@@ -331,7 +331,11 @@ class Graph extends React.Component<IProps, IState> {
    */
   private onDeleteNode = async (viewNode: INode) => {
    const graph = this.state.graph;
-
+   if ( this.props.knots ) {
+     const knot = this.props.knots.find((k) => k.id === viewNode.id);
+     const knotContent = knot ? knot.content : "";
+     await fetch(`${process.env.REACT_APP_API_BASE_PATH}/${knotContent}`, {method: "delete"});
+   }
    await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").deleteKnot(this.props.storyId, viewNode.id);
 
    const edges = [];

@@ -350,7 +350,7 @@ class KnotEditor extends React.Component<IProps, IState> {
     this.setState({
       loading: true,
     });
-
+    fetch(`${process.env.REACT_APP_API_BASE_PATH}/${knot.content}`, {method: "delete"});
     const updatedKnot = await this.updateKnot(knot, storyId, knotId);
 
     this.setState({
