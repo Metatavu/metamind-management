@@ -112,7 +112,7 @@ class KnotEditor extends React.Component<IProps, IState> {
             {
               this.state.knot && this.state.knot.type === KnotType.IMAGE ?
               <img
-              src={`${process.env.REACT_APP_API_BASE_PATH}/${this.state.knotContent}`}
+              src={`${process.env.REACT_APP_API_BASE_PATH}/images/${this.state.knotContent}`}
               style={ { width: "100%" } }
               />
               :
@@ -289,7 +289,7 @@ class KnotEditor extends React.Component<IProps, IState> {
     };
 
     await fetch(`${process.env.REACT_APP_API_BASE_PATH}/images`, options).then( (response) => response.json() ).then( (data) => {
-      knot.content = data.fileUrl;
+      knot.content = data.filename;
       this.setState({
         knot,
         knotContent: knot.content,
@@ -350,7 +350,7 @@ class KnotEditor extends React.Component<IProps, IState> {
     this.setState({
       loading: true,
     });
-    fetch(`${process.env.REACT_APP_API_BASE_PATH}/${knot.content}`, {method: "delete"});
+    fetch(`${process.env.REACT_APP_API_BASE_PATH}/images/${knot.content}`, {method: "delete"});
     const updatedKnot = await this.updateKnot(knot, storyId, knotId);
 
     this.setState({
