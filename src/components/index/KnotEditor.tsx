@@ -111,10 +111,11 @@ class KnotEditor extends React.Component<IProps, IState> {
             <label>Knot contents</label>
             {
               this.state.knot && this.state.knot.type === KnotType.IMAGE ?
-              <input
-              type="file"
-              onChange= { this.onImageKnotContentChange }
-              /> :
+              <img
+              src={`${process.env.REACT_APP_API_BASE_PATH}/${this.state.knotContent}`}
+              style={ { width: "100%" } }
+              />
+              :
               <TextArea
               rows={ 15 }
               style={ { width: "100%" } }
@@ -123,6 +124,18 @@ class KnotEditor extends React.Component<IProps, IState> {
             }
 
           </Form.Field>
+          {
+            this.state.knot && this.state.knot.type === KnotType.IMAGE ?
+            <Form.Field>
+            <label>Change image</label>
+            <input
+            type="file"
+            onChange= { this.onImageKnotContentChange }
+            />
+            </Form.Field> :
+            <div></div>
+          }
+
           <Form.Field>
             <label>Knot hint</label>
             <Input
@@ -261,17 +274,33 @@ class KnotEditor extends React.Component<IProps, IState> {
       return;
     }
 
-    const { storyId, knotId } = this.props;
+    const { knotId, storyId } = this.props;
 
     this.setState({
       loading: true,
     });
 
-    const updatedKnot = await this.updateKnotImage(event.currentTarget.files[0], storyId, knotId);
+    const formData = new FormData();
+    formData.append("file", event.currentTarget.files[0]);
+    formData.append("knotId", knotId);
+    const options = {
+      body: formData,
+      method: "put",
+    };
 
-    this.setState({
-      knot: updatedKnot,
-      loading: false,
+    await fetch(`${process.env.REACT_APP_API_BASE_PATH}/images`, options).then( (response) => response.json() ).then( (data) => {
+      knot.content = data.fileUrl;
+      this.setState({
+        knot,
+        knotContent: knot.content,
+        loading: true,
+      });
+      return this.updateKnot(knot, storyId, knotId);
+    }).then( (updatedKnot) => {
+      this.setState({
+        knot: updatedKnot,
+        loading: false,
+      });
     });
   }
 
@@ -333,12 +362,6 @@ class KnotEditor extends React.Component<IProps, IState> {
 
   private updateKnot = async (knot: Knot, storyId: string, knotId: string): Promise<Knot> => {
     const updatedKnot = await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").updateKnot(knot, storyId, knotId);
-    this.props.onKnotUpdated(updatedKnot);
-    return updatedKnot;
-  }
-
-  private updateKnotImage = async (imageFile: any, storyId: string, knotId: string): Promise<Knot> => {
-    const updatedKnot = await Api.getKnotsService(this.props.keycloak ? this.props.keycloak.token! : "").updateKnotImage(imageFile, storyId, knotId);
     this.props.onKnotUpdated(updatedKnot);
     return updatedKnot;
   }
