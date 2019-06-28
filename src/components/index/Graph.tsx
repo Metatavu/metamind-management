@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { KeycloakInstance } from "keycloak-js";
-import Api, { Intent, Knot, KnotType } from "metamind-client";
+import Api, { Intent, Knot } from "metamind-client";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { IStoreState } from "src/types";
@@ -335,7 +335,7 @@ class Graph extends React.Component<IProps, IState> {
      const knot = this.props.knots.find((k) => k.id === viewNode.id);
      const knotContent = knot ? knot.content : "";
      const knotType = knot ? knot.type : "";
-     if ( knotType === KnotType.IMAGE ) {
+     if ( knotType === "IMAGE" ) {
        await fetch(`${process.env.REACT_APP_API_BASE_PATH}/images/${knotContent}`, {method: "delete"});
      }
    }
