@@ -346,17 +346,18 @@ class KnotEditor extends React.Component<IProps, IState> {
 
     const { storyId, knotId } = this.props;
     knot.type = data.value as KnotType;
-
+    if ( knot.type === KnotType.TEXT  ) {
+        fetch(`${process.env.REACT_APP_API_BASE_PATH}/images/${knot.content}`, {method: "delete"});
+    }
     this.setState({
       loading: true,
     });
-    fetch(`${process.env.REACT_APP_API_BASE_PATH}/images/${knot.content}`, {method: "delete"});
+
     const updatedKnot = await this.updateKnot(knot, storyId, knotId);
 
     this.setState({
       knot: updatedKnot,
       loading: false,
-
     });
   }
 
