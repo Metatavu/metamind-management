@@ -6,7 +6,7 @@ import { Dispatch } from "redux";
 import { IStoreState } from "src/types";
 import * as actions from "../../actions";
 
-import Api, { Intent, IntentType, TrainingMaterialType } from "metamind-client";
+import Api, { Intent, IntentType, TrainingMaterialType, TrainingMaterialVisibility } from "metamind-client";
 import { Button, Dropdown, DropdownProps, Form, Input, InputOnChangeData, Loader, Segment } from "semantic-ui-react";
 import TrainingMaterialEditor from "./TrainingMaterialEditor";
 
@@ -17,6 +17,7 @@ interface IProps {
   storyId: string;
   intentId: string;
   authenticated: boolean;
+  trainingMaterialVisibility: TrainingMaterialVisibility;
   keycloak?: Keycloak.KeycloakInstance;
   onIntentUpdated: (intent: Intent) => void;
 }

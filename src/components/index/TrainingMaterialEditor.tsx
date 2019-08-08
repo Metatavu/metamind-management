@@ -1,13 +1,13 @@
 import * as Keycloak from "keycloak-js";
 import { KeycloakInstance } from "keycloak-js";
-import Api, { TrainingMaterial, TrainingMaterialType } from "metamind-client";
+import Api, { TrainingMaterial, TrainingMaterialType, TrainingMaterialVisibility } from "metamind-client";
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { IStoreState } from "src/types";
 import * as actions from "../../actions";
 
-import {Button, Dropdown, DropdownProps, Form, Input, InputOnChangeData, Segment, TextArea, TextAreaProps} from "semantic-ui-react";
+import {Button, Checkbox, CheckboxProps, Dropdown, DropdownProps, Form, FormField, Input, InputOnChangeData, Segment, TextArea, TextAreaProps} from "semantic-ui-react";
 
 /**
  * Component props
@@ -31,6 +31,8 @@ interface IState {
   selectedTrainingMaterialId?: string;
   trainingMaterialName?: string;
   trainingMaterialText?: string;
+  trainingMaterialVisibility: TrainingMaterialVisibility;
+  visibilityStatus?: string;
 }
 
 const NEW_VARIABLE_ID = "NEW";
@@ -51,8 +53,8 @@ class TrainingMaterialEditor extends React.Component<IProps, IState> {
     this.state = {
       loading: false,
       selectedTrainingMaterialId: this.props.trainingMaterialId,
+      trainingMaterialVisibility: TrainingMaterialVisibility.LOCAL,
       trainingMaterials: [],
-
     };
   }
 
@@ -150,6 +152,7 @@ class TrainingMaterialEditor extends React.Component<IProps, IState> {
       selectedTrainingMaterialId,
       trainingMaterialName: trainingMaterial ? trainingMaterial.name : "",
       trainingMaterialText: trainingMaterial ? trainingMaterial.text : "",
+      trainingMaterialVisibility: trainingMaterial ? trainingMaterial.visibility || TrainingMaterialVisibility.LOCAL : TrainingMaterialVisibility.LOCAL,
       trainingMaterials,
     });
   }
@@ -161,6 +164,16 @@ class TrainingMaterialEditor extends React.Component<IProps, IState> {
     if (!this.state.selectedTrainingMaterialId || this.state.selectedTrainingMaterialId === NONE_VARIABLE_ID) {
       return null;
     }
+
+    // const intentVisibilityOptions = [{
+    //   key: TrainingMaterialVisibility.STORY,
+    //   text: "Story", // TODO: localize
+    //   value: TrainingMaterialVisibility.STORY,
+    // }, {
+    //   key: TrainingMaterialVisibility.LOCAL,
+    //   text: "Local", // TODO: localize
+    //   value: TrainingMaterialVisibility.LOCAL,
+    // }];
 
     return (
       <div>
@@ -178,6 +191,12 @@ class TrainingMaterialEditor extends React.Component<IProps, IState> {
           style={ { width: "100%" } }
           onChange={(event: any, data: TextAreaProps ) => this.setState({trainingMaterialText: data.value as string})} />
         </Form.Field>
+        <FormField>
+          <label>Visible: { this.state.trainingMaterialVisibility }</label>
+          <Checkbox label="Make visible" checked={this.state.trainingMaterialVisibility === TrainingMaterialVisibility.STORY} onChange={this.onVisibilityChange}>
+              {/* <Input type="checkbox" checked={this.state.trainingMaterialVisibility == TrainingMaterialVisibility.STORY} onChange={this.onVisibilityChange} /> */}
+          </Checkbox>
+        </FormField>
         <Form.Field>
           <Button
           onClick={ this.onSaveTrainingMaterialClick }
@@ -207,7 +226,7 @@ class TrainingMaterialEditor extends React.Component<IProps, IState> {
    * Updates trainingMaterial
    */
   private onSaveTrainingMaterialClick = async () => {
-    const { selectedTrainingMaterialId, trainingMaterialName, trainingMaterialText } = this.state;
+    const { selectedTrainingMaterialId, trainingMaterialName, trainingMaterialText, trainingMaterialVisibility } = this.state;
 
     if (!trainingMaterialName || !trainingMaterialText) {
       return;
@@ -223,6 +242,7 @@ class TrainingMaterialEditor extends React.Component<IProps, IState> {
         storyId: this.props.storyId,
         text: trainingMaterialText,
         type: this.props.trainingMaterialType,
+        visibility: trainingMaterialVisibility,
       });
 
       this.setState({
@@ -239,6 +259,7 @@ class TrainingMaterialEditor extends React.Component<IProps, IState> {
         name: trainingMaterialName,
         text: trainingMaterialText,
         type: this.props.trainingMaterialType,
+        visibility: trainingMaterialVisibility,
       }, this.state.selectedTrainingMaterialId);
 
       this.setState({
@@ -249,6 +270,14 @@ class TrainingMaterialEditor extends React.Component<IProps, IState> {
       }
     }
 
+  }
+
+  private onVisibilityChange = (event: React.FormEvent<HTMLInputElement>, data: CheckboxProps) => {
+    if (data.checked) {
+      this.setState({trainingMaterialVisibility: TrainingMaterialVisibility.STORY});
+    } else {
+      this.setState({trainingMaterialVisibility: TrainingMaterialVisibility.LOCAL});
+    }
   }
 }
 

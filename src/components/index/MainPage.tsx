@@ -18,6 +18,7 @@ import { IEdge, INode } from "./GraphView";
 import IntentEditor from "./IntentEditor";
 import KnotEditor from "./KnotEditor";
 import StorySelector from "./StorySelector";
+import { TrainingMaterialVisibility } from "metamind-client";
 
 interface IProps {
   authenticated: boolean;
@@ -29,6 +30,7 @@ interface IState {
   selectedNode: INode | null;
   selectedEdge: IEdge | null;
   storyId?: string;
+  trainingMaterialVisibility: TrainingMaterialVisibility;
 }
 
 class WelcomePage extends React.Component<IProps, IState> {
@@ -39,6 +41,7 @@ class WelcomePage extends React.Component<IProps, IState> {
       selectedEdge: null,
       selectedNode: null,
       sidebarVisible: false,
+      trainingMaterialVisibility: TrainingMaterialVisibility.LOCAL,
     };
   }
 
@@ -85,7 +88,7 @@ class WelcomePage extends React.Component<IProps, IState> {
    */
   private renderSidebarContent = (): JSX.Element | null => {
     if (this.state.selectedEdge && this.state.storyId) {
-      return <IntentEditor storyId={ this.state.storyId } intentId={this.state.selectedEdge.id} />;
+      return <IntentEditor storyId={ this.state.storyId } intentId={ this.state.selectedEdge.id } trainingMaterialVisibility={ this.state.trainingMaterialVisibility }/>;
     }
 
     if (this.state.selectedNode && this.state.storyId && this.state.selectedNode.type === GLOBAL_TYPE) {
