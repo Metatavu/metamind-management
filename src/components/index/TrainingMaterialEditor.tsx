@@ -172,17 +172,6 @@ class TrainingMaterialEditor extends React.Component<IProps, IState> {
     if (!this.state.selectedTrainingMaterialId || this.state.selectedTrainingMaterialId === NONE_VARIABLE_ID) {
       return null;
     }
-
-    // const intentVisibilityOptions = [{
-    //   key: TrainingMaterialVisibility.STORY,
-    //   text: "Story", // TODO: localize
-    //   value: TrainingMaterialVisibility.STORY,
-    // }, {
-    //   key: TrainingMaterialVisibility.LOCAL,
-    //   text: "Local", // TODO: localize
-    //   value: TrainingMaterialVisibility.LOCAL,
-    // }];
-
     return (
       <div>
         <Form.Field>
