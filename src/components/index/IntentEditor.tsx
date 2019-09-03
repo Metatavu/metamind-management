@@ -152,6 +152,7 @@ class IntentEditor extends React.Component<IProps, IState> {
           <label>Intent OpenNLP Doccat training material</label>
           <TrainingMaterialEditor
             trainingMaterialType={ TrainingMaterialType.INTENTOPENNLPDOCCAT }
+            intentId={ this.props.intentId }
             storyId={ this.props.storyId }
             trainingMaterialId={ this.state.intent.trainingMaterials.intentOpenNlpDoccatId }
             onTrainingMaterialChange={ this.onTrainingMaterialChangeIntentDoccat }/>
@@ -160,6 +161,7 @@ class IntentEditor extends React.Component<IProps, IState> {
           <label>Intent Regex training material</label>
           <TrainingMaterialEditor
             trainingMaterialType={ TrainingMaterialType.INTENTREGEX }
+            intentId={ this.props.intentId }
             storyId={ this.props.storyId }
             trainingMaterialId={ this.state.intent.trainingMaterials.intentRegexId }
             onTrainingMaterialChange={ this.onTrainingMaterialChangeIntentRegex }/>
@@ -168,6 +170,7 @@ class IntentEditor extends React.Component<IProps, IState> {
           <label>Variable OpenNLP NER training material</label>
           <TrainingMaterialEditor
             trainingMaterialType={ TrainingMaterialType.VARIABLEOPENNLPNER }
+            intentId={ this.props.intentId }
             storyId={ this.props.storyId }
             trainingMaterialId={ this.state.intent.trainingMaterials.variableOpenNlpNerId }
             onTrainingMaterialChange={ this.onTrainingMaterialChangeVariableOpenNlpNer }/>
@@ -176,6 +179,7 @@ class IntentEditor extends React.Component<IProps, IState> {
           <label>Variable OpenNLP Regex training material</label>
           <TrainingMaterialEditor
             trainingMaterialType={ TrainingMaterialType.VARIABLEOPENNLPREGEX }
+            intentId={ this.props.intentId }
             storyId={ this.props.storyId }
             trainingMaterialId={ this.state.intent.trainingMaterials.variableOpenNlpRegex }
             onTrainingMaterialChange={ this.onTrainingMaterialChangeVariableOpenNlpRegex }/>

@@ -1,19 +1,21 @@
 import * as Keycloak from "keycloak-js";
 import { KeycloakInstance } from "keycloak-js";
-import Api, { TrainingMaterial, TrainingMaterialType, TrainingMaterialVisibility } from "metamind-client";
+import Api, { Intent, TrainingMaterial, TrainingMaterialType, TrainingMaterialVisibility } from "metamind-client";
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { IStoreState } from "src/types";
 import * as actions from "../../actions";
 
-import {Button, Checkbox, CheckboxProps, Dropdown, DropdownProps, Form, FormField, Input, InputOnChangeData, Segment, TextArea, TextAreaProps} from "semantic-ui-react";
+import {Button, Checkbox, CheckboxProps, Dropdown, DropdownProps, Form,
+  FormField, Input, InputOnChangeData, Segment, TextArea, TextAreaProps} from "semantic-ui-react";
 
 /**
  * Component props
  */
 interface IProps {
   storyId: string;
+  intentId: string;
   authenticated: boolean;
   keycloak?: Keycloak.KeycloakInstance;
   trainingMaterialId?: string;
@@ -27,6 +29,8 @@ interface IProps {
  */
 interface IState {
   loading: boolean;
+  intents: Intent[];
+  intent?: Intent;
   trainingMaterials: TrainingMaterial[];
   selectedTrainingMaterialId?: string;
   trainingMaterialName?: string;
@@ -51,6 +55,7 @@ class TrainingMaterialEditor extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
+      intents: [],
       loading: false,
       selectedTrainingMaterialId: this.props.trainingMaterialId,
       trainingMaterialVisibility: TrainingMaterialVisibility.LOCAL,
@@ -108,7 +113,7 @@ class TrainingMaterialEditor extends React.Component<IProps, IState> {
       return null;
     }
 
-    const options = this.state.trainingMaterials.map((trainingMaterial) => {
+    const options = this.state.trainingMaterials.filter(this.isTrainingMaterialVisible).map((trainingMaterial) => {
       return {
         key: trainingMaterial.id,
         text: trainingMaterial.name,
@@ -141,6 +146,8 @@ class TrainingMaterialEditor extends React.Component<IProps, IState> {
   private loadTrainingMaterials = async () => {
     const trainingMaterialsService = Api.getTrainingMaterialsService(this.props.keycloak ? this.props.keycloak.token! : "");
     const trainingMaterials = await trainingMaterialsService.listTrainingMaterials(this.props.storyId, this.props.trainingMaterialType);
+    const intentsService = Api.getIntentsService(this.props.keycloak ? this.props.keycloak.token! : "");
+    const intents = await intentsService.listIntents(this.props.storyId);
     const selectedTrainingMaterialId = !this.state.selectedTrainingMaterialId ? NONE_VARIABLE_ID : this.state.selectedTrainingMaterialId;
     const trainingMaterial = !selectedTrainingMaterialId ||
     selectedTrainingMaterialId === NEW_VARIABLE_ID ||
@@ -148,6 +155,7 @@ class TrainingMaterialEditor extends React.Component<IProps, IState> {
     null : await trainingMaterialsService.findTrainingMaterial(selectedTrainingMaterialId);
 
     this.setState({
+      intents,
       loading: false,
       selectedTrainingMaterialId,
       trainingMaterialName: trainingMaterial ? trainingMaterial.name : "",
@@ -193,9 +201,9 @@ class TrainingMaterialEditor extends React.Component<IProps, IState> {
         </Form.Field>
         <FormField>
           <label>Visible: { this.state.trainingMaterialVisibility }</label>
-          <Checkbox label="Make visible" checked={this.state.trainingMaterialVisibility === TrainingMaterialVisibility.STORY} onChange={this.onVisibilityChange}>
-              {/* <Input type="checkbox" checked={this.state.trainingMaterialVisibility == TrainingMaterialVisibility.STORY} onChange={this.onVisibilityChange} /> */}
-          </Checkbox>
+          <Checkbox label="Make visible"
+          checked={this.state.trainingMaterialVisibility === TrainingMaterialVisibility.STORY}
+          onChange={this.onVisibilityChange} />
         </FormField>
         <Form.Field>
           <Button
@@ -272,6 +280,21 @@ class TrainingMaterialEditor extends React.Component<IProps, IState> {
 
   }
 
+  /**
+   * Passes filter when training material is allowed to be seen in intent
+   */
+  private isTrainingMaterialVisible = (trainingMaterial: TrainingMaterial) => {
+    const parentIntent = this.state.intents.filter((intent) => intent.id === this.props.intentId);
+    const parentIntentTrainingMaterialid = parentIntent[0].trainingMaterials.intentOpenNlpDoccatId;
+    if (trainingMaterial.visibility === TrainingMaterialVisibility.LOCAL && trainingMaterial.id !== parentIntentTrainingMaterialid) {
+        return false;
+    }
+    return true;
+  }
+
+  /**
+   * Changes training material visibility
+   */
   private onVisibilityChange = (event: React.FormEvent<HTMLInputElement>, data: CheckboxProps) => {
     if (data.checked) {
       this.setState({trainingMaterialVisibility: TrainingMaterialVisibility.STORY});
