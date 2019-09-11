@@ -2,6 +2,7 @@ import * as Keycloak from "keycloak-js";
 import * as React from "react";
 
 import { KeycloakInstance } from "keycloak-js";
+import { TrainingMaterialVisibility } from "metamind-client";
 import { connect } from "react-redux";
 import { Redirect } from "react-router";
 import { Dispatch } from "redux";
@@ -29,6 +30,7 @@ interface IState {
   selectedNode: INode | null;
   selectedEdge: IEdge | null;
   storyId?: string;
+  trainingMaterialVisibility: TrainingMaterialVisibility;
 }
 
 class WelcomePage extends React.Component<IProps, IState> {
@@ -39,6 +41,7 @@ class WelcomePage extends React.Component<IProps, IState> {
       selectedEdge: null,
       selectedNode: null,
       sidebarVisible: false,
+      trainingMaterialVisibility: TrainingMaterialVisibility.LOCAL,
     };
   }
 
@@ -85,7 +88,10 @@ class WelcomePage extends React.Component<IProps, IState> {
    */
   private renderSidebarContent = (): JSX.Element | null => {
     if (this.state.selectedEdge && this.state.storyId) {
-      return <IntentEditor storyId={ this.state.storyId } intentId={this.state.selectedEdge.id} />;
+      return <IntentEditor
+      storyId={ this.state.storyId }
+      intentId={ this.state.selectedEdge.id }
+      trainingMaterialVisibility={ this.state.trainingMaterialVisibility }/>;
     }
 
     if (this.state.selectedNode && this.state.storyId && this.state.selectedNode.type === GLOBAL_TYPE) {

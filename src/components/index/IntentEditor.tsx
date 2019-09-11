@@ -6,7 +6,7 @@ import { Dispatch } from "redux";
 import { IStoreState } from "src/types";
 import * as actions from "../../actions";
 
-import Api, { Intent, IntentType, TrainingMaterialType } from "metamind-client";
+import Api, { Intent, IntentType, TrainingMaterialType, TrainingMaterialVisibility } from "metamind-client";
 import { Button, Dropdown, DropdownProps, Form, Input, InputOnChangeData, Loader, Segment } from "semantic-ui-react";
 import TrainingMaterialEditor from "./TrainingMaterialEditor";
 
@@ -17,6 +17,7 @@ interface IProps {
   storyId: string;
   intentId: string;
   authenticated: boolean;
+  trainingMaterialVisibility: TrainingMaterialVisibility;
   keycloak?: Keycloak.KeycloakInstance;
   onIntentUpdated: (intent: Intent) => void;
 }
@@ -151,6 +152,7 @@ class IntentEditor extends React.Component<IProps, IState> {
           <label>Intent OpenNLP Doccat training material</label>
           <TrainingMaterialEditor
             trainingMaterialType={ TrainingMaterialType.INTENTOPENNLPDOCCAT }
+            intentId={ this.props.intentId }
             storyId={ this.props.storyId }
             trainingMaterialId={ this.state.intent.trainingMaterials.intentOpenNlpDoccatId }
             onTrainingMaterialChange={ this.onTrainingMaterialChangeIntentDoccat }/>
@@ -159,6 +161,7 @@ class IntentEditor extends React.Component<IProps, IState> {
           <label>Intent Regex training material</label>
           <TrainingMaterialEditor
             trainingMaterialType={ TrainingMaterialType.INTENTREGEX }
+            intentId={ this.props.intentId }
             storyId={ this.props.storyId }
             trainingMaterialId={ this.state.intent.trainingMaterials.intentRegexId }
             onTrainingMaterialChange={ this.onTrainingMaterialChangeIntentRegex }/>
@@ -167,6 +170,7 @@ class IntentEditor extends React.Component<IProps, IState> {
           <label>Variable OpenNLP NER training material</label>
           <TrainingMaterialEditor
             trainingMaterialType={ TrainingMaterialType.VARIABLEOPENNLPNER }
+            intentId={ this.props.intentId }
             storyId={ this.props.storyId }
             trainingMaterialId={ this.state.intent.trainingMaterials.variableOpenNlpNerId }
             onTrainingMaterialChange={ this.onTrainingMaterialChangeVariableOpenNlpNer }/>
@@ -175,6 +179,7 @@ class IntentEditor extends React.Component<IProps, IState> {
           <label>Variable OpenNLP Regex training material</label>
           <TrainingMaterialEditor
             trainingMaterialType={ TrainingMaterialType.VARIABLEOPENNLPREGEX }
+            intentId={ this.props.intentId }
             storyId={ this.props.storyId }
             trainingMaterialId={ this.state.intent.trainingMaterials.variableOpenNlpRegex }
             onTrainingMaterialChange={ this.onTrainingMaterialChangeVariableOpenNlpRegex }/>
