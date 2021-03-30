@@ -1,1 +1,1 @@
-# metamind-management-v2
+# metamind-management
