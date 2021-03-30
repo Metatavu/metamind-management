@@ -1,28 +1,16 @@
-import Api from "metamind-client";
-import * as React from "react";
-import * as ReactDOM from "react-dom";
-import { Provider } from "react-redux";
-import { createStore } from "redux";
-import { AppAction } from "./actions";
-import App from "./components/App";
-import { processAction } from "./reducers/index";
-import registerServiceWorker from "./registerServiceWorker";
-import { IStoreState } from "./types/index";
-
-const store = createStore<IStoreState, AppAction, any, any>(processAction, {
-  authenticated: false,
-  autolayout: true,
-  intents: [],
-  knots: [],
-
-});
-
-Api.configure(process.env.REACT_APP_API_BASE_PATH || "");
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './components/app';
+import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
-  <Provider store={store}>
+  <React.StrictMode>
     <App />
-  </Provider>,
-  document.getElementById("root") as HTMLElement,
+  </React.StrictMode>,
+  document.getElementById('root')
 );
-registerServiceWorker();
+
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://bit.ly/CRA-PWA
+serviceWorker.unregister();

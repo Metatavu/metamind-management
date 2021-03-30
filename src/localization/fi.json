@@ -1,0 +1,26 @@
+{
+  "appTitle": "Metamind hallinta",
+
+  "generic": {
+    "save": "Tallenna",
+    "cancel": "Peruuta"
+  },
+
+  "comingSoon": "Tulossa pian",
+  "appBarTitle": "Metamind v2",
+
+  "editorScreen": {
+    "leftBar" : {
+      "knotsLeftTab": "Solmut",
+      "intentsLeftTab": "Aikomukset",
+      "knotSearchHelper": "Solmujen haku"
+    },
+    "rightBar" : {
+      "storyRightTab": "Tarinat",
+      "detailsRightTab": "Tiedot",
+      "linkingRightTab": "Linkit",
+      "storyNameHelper": "Tarinan nimi",
+      "knotNameHelper": "Solmun nimi"
+    } 
+  }
+}
