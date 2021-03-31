@@ -40,8 +40,8 @@ class StoreInitializer extends React.Component<Props, State> {
   /**
    * Component did mount life cycle method
    */
-  public componentDidMount = () => {
-    this.fetchData();
+  public componentDidMount = async () => {
+    await this.fetchData();
   }
 
   /**
