@@ -49,9 +49,9 @@ class StoreInitializer extends React.Component<Props, State> {
    *
    * @param prevProps previous component props
    */
-  public componentDidUpdate = (prevProps: Props) => {
+  public componentDidUpdate = async (prevProps: Props) => {
     if (!prevProps.accessToken && this.props.accessToken) {
-      this.fetchData();
+      await this.fetchData();
     }
   }
 
