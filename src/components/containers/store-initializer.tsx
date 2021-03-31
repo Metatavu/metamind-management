@@ -59,11 +59,7 @@ class StoreInitializer extends React.Component<Props, State> {
    * Component render method
    */
   public render = () => {
-    const { children } = this.props;
-
-    return (
-        children
-    );
+    return this.props.children;
   }
 
   /**
