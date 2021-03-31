@@ -66,12 +66,14 @@ class StoreInitializer extends React.Component<Props, State> {
    * Fetch app data
    */
   private fetchData = async () => {
+    const { accessToken } = this.props;
+
     try {
-      const { accessToken } = this.props;
       if (!accessToken) {
         return;
       }
-
+      
+      // TODO: Add data fetch
     } catch (error) {
       this.setState({ error });
     }
