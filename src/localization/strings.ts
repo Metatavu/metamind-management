@@ -7,6 +7,9 @@ export interface IStrings extends LocalizedStringsMethods {
 
   appTitle: string;
 
+  /**
+  * Translations related to generic terms
+  */
   generic: {
     save: string;
     cancel: string;
@@ -15,6 +18,9 @@ export interface IStrings extends LocalizedStringsMethods {
   comingSoon: string;
   appBarTitle: string;
 
+  /**
+  * Translations related to editori screen
+  */
   editorScreen: {
 
     leftBar: {
