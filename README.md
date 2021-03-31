@@ -1,1 +1,1 @@
-# metamind-management Management
+# metamind-management

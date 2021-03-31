@@ -1,24 +1,47 @@
-import LocalizedStrings, {
-  LocalizedStringsMethods,
-} from "localized-strings";
+import LocalizedStrings, { LocalizedStringsMethods } from "localized-strings";
 
+/**
+ * Interface describing localized strings
+ */
 export interface IStrings extends LocalizedStringsMethods {
-  menuBarUserItemText: string;
-  menuBarManageAccountText: string;
-  menuBarLogoutText: string;
-  welcomeLoginButtonText: string;
-  siteHeader: string;
-  news: string;
-  deliveries: string;
-  contracts: string;
-  welcome: string;
-  redirectingTokeycloak: string;
-  layoutAutomatically: string;
-  search: string;
+
+  appTitle: string;
+
+  /**
+  * Translations related to generic terms
+  */
+  generic: {
+    save: string;
+    cancel: string;
+  };
+
+  comingSoon: string;
+  appBarTitle: string;
+
+  /**
+  * Translations related to editori screen
+  */
+  editorScreen: {
+
+    leftBar: {
+      knotsLeftTab: string;
+      intentsLeftTab: string;
+      knotSearchHelper: string;
+    };
+
+    rightBar: {
+      storyRightTab: string;
+      detailsRightTab: string;
+      linkingRightTab: string;
+      knotNameHelper: string;
+      storyNameHelper: string;
+    };
+  };
 }
 
 const strings: IStrings = new LocalizedStrings({
   en: require("./en.json"),
+  fi: require("./fi.json")
 });
 
 export default strings;

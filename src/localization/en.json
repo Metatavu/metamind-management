@@ -1,14 +1,26 @@
 {
-  "menuBarUserItemText": "Account",
-  "menuBarManageAccountText": "Settings",
-  "menuBarLogoutText": "Logout",
-  "welcomeLoginButtonText": "Login",
-  "siteHeader": "metamind-management management",
-  "news": "News",
-  "deliveries": "Deliveries",
-  "contracts": "Contracts",
-  "welcome": "Welcome",
-  "redirectingTokeycloak": "Redirecting to keycloak...",
-  "layoutAutomatically": "Layout automatically",
-  "search": "Search"
+  "appTitle": "Metamind management",
+
+  "generic": {
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+
+  "comingSoon": "Coming soon!",
+  "appBarTitle": "Metamind",
+
+  "editorScreen": {
+    "leftBar" : {
+      "knotsLeftTab": "Knots",
+      "intentsLeftTab": "Intents",
+      "knotSearchHelper": "Knot search"
+    },
+    "rightBar" : {
+      "storyRightTab": "Story",
+      "detailsRightTab": "Details",
+      "linkingRightTab": "Linking",
+      "storyNameHelper": "Story name",
+      "knotNameHelper": "Knot name"
+    } 
+  }
 }
