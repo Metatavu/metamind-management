@@ -1,5 +1,5 @@
 import * as React from "react";
-import { AppBar, Toolbar, Typography, withStyles, WithStyles, Box } from '@material-ui/core';
+import { AppBar, Toolbar, Typography, withStyles, WithStyles, Box } from "@material-ui/core";
 import { styles } from "./app-layout.styles";
 import Logo from "../../../resources/svg/logo";
 
