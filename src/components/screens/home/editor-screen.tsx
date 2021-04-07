@@ -10,7 +10,7 @@ import { styles } from "./editor-screen.styles";
 import { KeycloakInstance } from "keycloak-js";
 import AppLayout from "../../layouts/app-layout/app-layout";
 import { AccessToken } from "../../../types";
-import { Box, List, ListItem, ListItemIcon, Typography, WithStyles, withStyles, Drawer, Tab, Tabs, TextField } from "@material-ui/core";
+import { Box, List, ListItem, ListItemIcon, WithStyles, withStyles, Drawer, Tab, Tabs, TextField } from "@material-ui/core";
 import { Knot } from "../../../generated/client/models/Knot";
 import { KnotType } from "../../../generated/client/models/KnotType";
 import { TokenizerType } from "../../../generated/client/models/TokenizerType";
@@ -99,8 +99,6 @@ class EditorScreen extends React.Component<Props, State> {
    * Component render
    */
   public render = () => {
-    const { classes } = this.props;
-
     return (
       <AppLayout>
         { this.renderLeftToolbar() }
@@ -114,7 +112,6 @@ class EditorScreen extends React.Component<Props, State> {
    * Renders left toolbar
    */
   private renderLeftToolbar = () => {
-    const { classes } = this.props;
     const { leftToolbarIndex } = this.state;
 
     return (
@@ -151,10 +148,8 @@ class EditorScreen extends React.Component<Props, State> {
    * Todo: make correct margins from top and side panels
    */
   private renderContent = () => {
-    const { classes } = this.props;
-
     return (
-      <Box bgcolor="success.main" height="100%"/>
+      <Box height="100%"/>
     );
   }
 
@@ -162,7 +157,6 @@ class EditorScreen extends React.Component<Props, State> {
    * Renders right toolbar
    */
   private renderRightToolbar = () => {
-    const { classes } = this.props;
     const { rightToolbarIndex } = this.state;
 
     return (
@@ -188,7 +182,7 @@ class EditorScreen extends React.Component<Props, State> {
             label={ strings.editorScreen.rightBar.linkingRightTab }
           />
         </Tabs>
-        <Box>
+        <Box p={ 2 }>
           { rightToolbarIndex === 0 && this.renderStoryTab() }
           { rightToolbarIndex === 1 && this.renderDetailsTab() }
           { rightToolbarIndex === 2 && this.renderLinkingTab() }
@@ -230,8 +224,8 @@ class EditorScreen extends React.Component<Props, State> {
     return (
       <TextField
         label={ strings.editorScreen.rightBar.storyNameHelper }
-        defaultValue={ currentStory.name }>
-      </TextField>
+        defaultValue={ currentStory.name }
+      />
     );
   }
 

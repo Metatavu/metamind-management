@@ -1,7 +1,7 @@
 import * as React from "react";
-import { AppBar, Toolbar, Typography, withStyles, WithStyles } from "@material-ui/core";
+import { AppBar, Toolbar, Typography, withStyles, WithStyles, Box } from "@material-ui/core";
 import { styles } from "./app-layout.styles";
-import strings from "../../../localization/strings";
+import Logo from "../../../resources/svg/logo";
 
 /**
  * Interface describing component props
@@ -18,18 +18,15 @@ const AppLayout: React.FC<Props> = ({ classes, children }) => {
   return (
     <>
       <AppBar 
-        position="fixed" 
-        className={ classes.appBar }
+        position="fixed"
       >
         <Toolbar>
-          <Typography>
-            { strings.appBarTitle }
-          </Typography>
+          <Logo />
         </Toolbar>
       </AppBar>
-      <div className={ classes.root }>
+      <Box className={ classes.root }>
         { children }
-      </div>
+      </Box>
     </>
   );
 }
