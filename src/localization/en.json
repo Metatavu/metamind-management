@@ -7,8 +7,9 @@
 
   "header": {
     "title": "Metamind Management",
-    "editor": "Editori",
-    "preview": "Esikatselu"
+    "editor": "Editor",
+    "preview": "Preview",
+    "signOut": "Sign out"
   },
 
   "homeScreen": {

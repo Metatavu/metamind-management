@@ -8,7 +8,8 @@
   "header": {
     "title": "Metamind Hallinta",
     "editor": "Editori",
-    "preview": "Esikatselu"
+    "preview": "Esikatselu",
+    "signOut": "Kirjaudu ulos"
   },
 
   "homeScreen": {

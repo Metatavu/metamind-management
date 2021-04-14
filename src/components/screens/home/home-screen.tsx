@@ -10,7 +10,6 @@ import { AccessToken } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
 import { styles } from "./home-screen.styles";
 import { History } from "history";
-import classes from "*.module.css";
 
 /**
  * Interface describing component props

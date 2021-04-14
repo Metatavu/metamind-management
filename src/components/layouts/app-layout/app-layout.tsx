@@ -27,7 +27,7 @@ interface State {
 }
 
 /**
- * App layout component. Provides the basic page layout
+ * App layout component. Provides the basic page layout with a header
  */
 class AppLayout extends React.Component<Props, State> {
 
@@ -48,8 +48,7 @@ class AppLayout extends React.Component<Props, State> {
       children,
       onSaveClick,
       dataChanged,
-      storySelected,
-      pageTitle
+      storySelected
     } = this.props;
 
     return (
@@ -59,21 +58,7 @@ class AppLayout extends React.Component<Props, State> {
         >
           <Toolbar>
             { this.renderNavigation() }
-            <Box display="flex" position="absolute" left="0" right="0" justifyContent="center" zIndex="-1">
-              <Box display="flex" alignItems="center">
-                <Typography color="textSecondary" >
-                  { strings.header.title }
-                </Typography>
-                <Box ml={ 2 } mr={ 2 }>
-                  <Typography color="textSecondary">
-                    { "// "}
-                  </Typography>
-                </Box>
-                <Typography color="textSecondary">
-                  { pageTitle }
-                </Typography>
-              </Box>
-            </Box>
+            { this.renderPageTitle() }
             <Box>
               { storySelected &&
                 <Button
@@ -86,6 +71,12 @@ class AppLayout extends React.Component<Props, State> {
                   { strings.generic.save }
                 </Button>
               }
+              <Button
+                variant="text"
+                color="secondary"
+                > 
+                { strings.header.signOut }
+              </Button>
               <IconButton color="secondary">
                 <SettingsIcon />
               </IconButton>
@@ -100,7 +91,7 @@ class AppLayout extends React.Component<Props, State> {
   }
 
   /**
-   * Render navigation
+   * Renders navigation
    */
   private renderNavigation = () => {
     const { storySelected } = this.props;
@@ -132,6 +123,30 @@ class AppLayout extends React.Component<Props, State> {
             </Button>
           </Box>
         }
+      </Box>
+    );
+  }
+
+  /**
+   * Renders title
+   */
+  private renderPageTitle = () => {
+    const { pageTitle } = this.props;
+    return (
+      <Box display="flex" position="absolute" left="0" right="0" justifyContent="center" zIndex="-1">
+        <Box display="flex" alignItems="center">
+          <Typography color="textSecondary" >
+            { strings.header.title }
+          </Typography>
+          <Box ml={ 2 } mr={ 2 }>
+            <Typography color="textSecondary">
+              { "// "}
+            </Typography>
+          </Box>
+          <Typography color="textSecondary">
+            { pageTitle }
+          </Typography>
+        </Box>
       </Box>
     );
   }

@@ -21,6 +21,7 @@ export interface IStrings extends LocalizedStringsMethods {
     title: string;
     editor: string;
     preview: string;
+    signOut: string;
   };
 
   /**
