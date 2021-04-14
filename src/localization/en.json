@@ -1,15 +1,27 @@
 {
-  "appTitle": "Metamind management",
-
   "generic": {
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "edited": "Edited"
   },
 
-  "comingSoon": "Coming soon!",
-  "appBarTitle": "Metamind",
+  "header": {
+    "title": "Metamind Management",
+    "editor": "Editori",
+    "preview": "Esikatselu"
+  },
+
+  "homeScreen": {
+    "title": "Story selection",
+    "myStories": "My stories",
+    "selectStoryText": "Select a Story or create a new one.",
+    "createNewStory": "Create a new story",
+    "lastEditedStories": "Last edited"
+  },
 
   "editorScreen": {
+    "story": "Story",
+    "global": "Global",
     "leftBar" : {
       "knotsLeftTab": "Knots",
       "intentsLeftTab": "Intents",

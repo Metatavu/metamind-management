@@ -5,30 +5,46 @@ import LocalizedStrings, { LocalizedStringsMethods } from "localized-strings";
  */
 export interface IStrings extends LocalizedStringsMethods {
 
-  appTitle: string;
-
   /**
   * Translations related to generic terms
   */
   generic: {
     save: string;
     cancel: string;
+    edited: string;
   };
 
-  comingSoon: string;
-  appBarTitle: string;
+  /**
+  * Translations related to header terms
+  */
+  header: {
+    title: string;
+    editor: string;
+    preview: string;
+  };
 
   /**
-  * Translations related to editori screen
+  * Translations related to home screen
+  */
+  homeScreen: {
+    title: string;
+    myStories: string;
+    selectStoryText: string;
+    createNewStory: string;
+    lastEditedStories: string;
+  };
+
+  /**
+  * Translations related to editor screen
   */
   editorScreen: {
-
+    story: string,
+    global: string,
     leftBar: {
       knotsLeftTab: string;
       intentsLeftTab: string;
       knotSearchHelper: string;
     };
-
     rightBar: {
       storyRightTab: string;
       detailsRightTab: string;
@@ -37,6 +53,9 @@ export interface IStrings extends LocalizedStringsMethods {
       storyNameHelper: string;
     };
   };
+
+  storyView: {};
+  globalView: {};
 }
 
 const strings: IStrings = new LocalizedStrings({
