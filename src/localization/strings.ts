@@ -55,7 +55,14 @@ export interface IStrings extends LocalizedStringsMethods {
     };
   };
 
+  /**
+  * Translations related to story view
+  */
   storyView: {};
+  
+  /**
+  * Translations related to global view
+  */
   globalView: {};
 }
 
