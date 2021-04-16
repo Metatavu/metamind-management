@@ -66,7 +66,7 @@ class AppLayout extends React.Component<Props, State> {
                   disabled={ !dataChanged }
                   variant="text"
                   color="secondary"
-                  startIcon={ <SaveIcon /> }
+                  startIcon={ <SaveIcon/> }
                   > 
                   { strings.generic.save }
                 </Button>
