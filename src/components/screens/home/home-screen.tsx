@@ -135,11 +135,10 @@ class HomeScreen extends React.Component<Props, State> {
   }
   
   /**
-   * Create new story method
+   * Event handler for create new story click
    */
   private onCreateNewStoryClick = () => {
-    const { history } = this.props;
-    history.push("/editor/:id")
+    // TODO: Not yet implemented
   }
 
 }
