@@ -1,15 +1,28 @@
 {
-  "appTitle": "Metamind hallinta",
-
   "generic": {
     "save": "Tallenna",
-    "cancel": "Peruuta"
+    "cancel": "Peruuta",
+    "edited": "Muokattu"
   },
 
-  "comingSoon": "Tulossa pian",
-  "appBarTitle": "Metamind",
+  "header": {
+    "title": "Metamind Hallinta",
+    "editor": "Editori",
+    "preview": "Esikatselu",
+    "signOut": "Kirjaudu ulos"
+  },
+
+  "homeScreen": {
+    "title": "Tarinan valinta",
+    "myStories": "Omat tarinat",
+    "selectStoryText": "Valitse tarina tai luo uusi.",
+    "createNewStory": "Luo uusi tarina",
+    "lastEditedStories": "Viimeksi muokatut tarinat"
+  },
 
   "editorScreen": {
+    "story": "Tarina",
+    "global": "Globaalit",
     "leftBar" : {
       "knotsLeftTab": "Solmut",
       "intentsLeftTab": "Aikomukset",

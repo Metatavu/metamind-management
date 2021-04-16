@@ -10,20 +10,23 @@ import { styles } from "./editor-screen.styles";
 import { KeycloakInstance } from "keycloak-js";
 import AppLayout from "../../layouts/app-layout/app-layout";
 import { AccessToken } from "../../../types";
-import { Box, List, ListItem, ListItemIcon, WithStyles, withStyles, Drawer, Tab, Tabs, TextField } from "@material-ui/core";
+import { Box, List, ListItem, ListItemIcon, WithStyles, withStyles, Drawer, Tab, Tabs, TextField, Typography } from "@material-ui/core";
 import { Knot } from "../../../generated/client/models/Knot";
 import { KnotType } from "../../../generated/client/models/KnotType";
 import { TokenizerType } from "../../../generated/client/models/TokenizerType";
 import { Story } from "../../../generated/client/models/Story";
 import strings from "../../../localization/strings";
 import TagFacesIcon from "@material-ui/icons/TagFaces";
+import { History } from "history";
 
 /**
  * Interface describing component props
  */
 interface Props extends WithStyles<typeof styles> {
+  history: History;
   keycloak: KeycloakInstance;
   accessToken: AccessToken;
+  storyId: string;
 }
 
 /**
@@ -37,6 +40,7 @@ interface State {
   rightToolbarIndex: number;
   currentKnot: Knot;
   currentStory: Story;
+  editorTabIndex: number;
 }
 
 /**
@@ -90,6 +94,7 @@ class EditorScreen extends React.Component<Props, State> {
       globalKnots: [ globalKnot0, globalKnot1 ],
       leftToolbarIndex: 0,
       rightToolbarIndex: 0,
+      editorTabIndex: 0,
       currentStory: story0,
       currentKnot: globalKnot0
     };
@@ -100,9 +105,13 @@ class EditorScreen extends React.Component<Props, State> {
    */
   public render = () => {
     return (
-      <AppLayout>
+      <AppLayout
+        pageTitle="Story name here"
+        dataChanged={ true }
+        storySelected={ true }
+      >
         { this.renderLeftToolbar() }
-        { this.renderContent() }
+        { this.renderEditorContent() }
         { this.renderRightToolbar() }
       </AppLayout>
     );
@@ -113,7 +122,6 @@ class EditorScreen extends React.Component<Props, State> {
    */
   private renderLeftToolbar = () => {
     const { leftToolbarIndex } = this.state;
-
     return (
       <Drawer
         variant="permanent"
@@ -144,12 +152,76 @@ class EditorScreen extends React.Component<Props, State> {
   }
 
   /**
-   * Renders main content area
-   * Todo: make correct margins from top and side panels
+   * Renders main editor area
    */
-  private renderContent = () => {
+  private renderEditorContent = () => {
+    const { classes } = this.props;
+    const { editorTabIndex } = this.state;
+
     return (
-      <Box height="100%"/>
+      <Box
+        marginLeft="320px"
+        marginRight="320px"
+        height="100%"
+      >
+        <Toolbar/>
+        <Toolbar>
+          <Tabs
+            onChange={ this.setEditorTabIndex }
+            value={ editorTabIndex }
+            className={ classes.tabs }
+          >
+            <Tab
+              value={ 0 }
+              className={ classes.tab }
+              label={ strings.editorScreen.story }
+            />
+            <Tab
+              value={ 1 }
+              className={ classes.tab }
+              label={ strings.editorScreen.global }
+            />
+          </Tabs>
+        </Toolbar>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          { editorTabIndex === 0 && this.renderStoryEditor() }
+          { editorTabIndex === 1 && this.renderGlobalEditor() }
+        </Box>
+      </Box>
+    );
+  }
+
+  /**
+   * Renders main editor area
+   * 
+   * TODO: replace content with editor
+   */
+  private renderStoryEditor = () => {
+    return (
+      <Box>
+        <Typography color="primary">
+          { strings.editorScreen.story }
+        </Typography>
+      </Box>
+    );
+  }
+
+  /**
+   * Renders main editor area
+   * 
+   * TODO: replace content with editor
+   */
+  private renderGlobalEditor = () => {
+    return (
+      <Box>
+        <Typography color="primary">
+          { strings.editorScreen.global }
+        </Typography>
+      </Box>
     );
   }
 
@@ -213,6 +285,16 @@ class EditorScreen extends React.Component<Props, State> {
     this.setState({
       rightToolbarIndex: newValue
     });
+  }
+
+  /**
+   * Sets editor tab index
+   *
+   * @param event event object
+   * @param newValue new tab index value
+   */
+  private setEditorTabIndex = (event: React.ChangeEvent<{ }>, newValue: number) => {
+    this.setState({ editorTabIndex: newValue });
   }
 
   /**
