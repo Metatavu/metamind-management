@@ -182,7 +182,11 @@ class EditorScreen extends React.Component<Props, State> {
             />
           </Tabs>
         </Toolbar>
-        <Box display="flex" alignItems="center" justifyContent="center">
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
           { editorTabIndex === 0 && this.renderStoryEditor() }
           { editorTabIndex === 1 && this.renderGlobalEditor() }
         </Box>
