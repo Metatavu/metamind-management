@@ -53,9 +53,7 @@ class AppLayout extends React.Component<Props, State> {
 
     return (
       <>
-        <AppBar 
-          position="fixed"
-        >
+        <AppBar position="fixed">
           <Toolbar>
             { this.renderNavigation() }
             { this.renderPageTitle() }
