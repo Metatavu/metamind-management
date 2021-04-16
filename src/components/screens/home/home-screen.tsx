@@ -88,6 +88,7 @@ class HomeScreen extends React.Component<Props, State> {
    */
   private renderSelectStoryCard = () => {
     const { classes } = this.props;
+
     return (
       <Box className={ classes.storySelectCard }>
         <Box textAlign="center" mb={ 4 }>
