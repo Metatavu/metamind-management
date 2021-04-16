@@ -78,7 +78,7 @@ class AppLayout extends React.Component<Props, State> {
                 { strings.header.signOut }
               </Button>
               <IconButton color="secondary">
-                <SettingsIcon />
+                <SettingsIcon/>
               </IconButton>
             </Box>
           </Toolbar>
