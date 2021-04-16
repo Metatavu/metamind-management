@@ -148,7 +148,7 @@ class AppLayout extends React.Component<Props, State> {
           </Typography>
           <Box ml={ 2 } mr={ 2 }>
             <Typography color="textSecondary">
-              { "// "}
+              { "// " }
             </Typography>
           </Box>
           <Typography color="textSecondary">
