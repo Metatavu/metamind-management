@@ -372,10 +372,7 @@ class EditorScreen extends React.Component<Props, State> {
       storiesApi.listStories()
     ]);  
     let mainStoryId: string = stories[0].id as string;
-    console.log("found story "+mainStoryId);
-
     const foundStory = await storiesApi.findStory({storyId: mainStoryId})
-    console.log(foundStory.id)
     if (foundStory) {
       let foundStoryId: string = foundStory.id as string;
       const [ knotList ] = await Promise.all<Knot[]>([
@@ -389,9 +386,6 @@ class EditorScreen extends React.Component<Props, State> {
           storyId: foundStoryId
         })
       ]);  
-
-      console.log(knotList)
-      console.log(intentList)
 
       this.setState({
         currentStory: foundStory,
@@ -470,7 +464,6 @@ class EditorScreen extends React.Component<Props, State> {
    * Creates test story and knots for it
    */
     private createTestData = async() => {
-      console.log("creating test data")
       const { accessToken } = this.props;
   
       if (!accessToken) {
@@ -514,14 +507,12 @@ class EditorScreen extends React.Component<Props, State> {
       }; 
   
       const createdStory = await storiesApi.createStory({story: story0})
-      console.log("created story "+createdStory.id)
 
       const knot1 = await knotsApi.createKnot({knot: basicKnot0, storyId: createdStory.id!})
       const knot2 = await knotsApi.createKnot({knot: basicKnot1, storyId: createdStory.id!})
       const knot3 = await knotsApi.createKnot({knot: globalKnot0, storyId: createdStory.id!})
       const knot4 = await knotsApi.createKnot({knot: globalKnot1, storyId: createdStory.id!})
-      console.log("created knots "+knot1.id+knot2.id+knot3.id+knot4.id+" for "+createdStory.id)
-    }
+  }
 }
 
 /**
