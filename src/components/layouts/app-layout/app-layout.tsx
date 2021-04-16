@@ -74,7 +74,7 @@ class AppLayout extends React.Component<Props, State> {
               <Button
                 variant="text"
                 color="secondary"
-                > 
+              >
                 { strings.header.signOut }
               </Button>
               <IconButton color="secondary">
