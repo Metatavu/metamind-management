@@ -158,8 +158,12 @@ class EditorScreen extends React.Component<Props, State> {
     const { editorTabIndex } = this.state;
 
     return (
-      <Box marginLeft="320px" marginRight="320px" height="100%">
-        <Toolbar />
+      <Box
+        marginLeft="320px"
+        marginRight="320px"
+        height="100%"
+      >
+        <Toolbar/>
         <Toolbar>
           <Tabs
             onChange={ this.setEditorTabIndex }
