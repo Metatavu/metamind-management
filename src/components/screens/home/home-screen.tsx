@@ -1,6 +1,5 @@
 import { Box, Button, Divider, Drawer, List, ListItem, ListItemText, Typography, WithStyles, withStyles } from "@material-ui/core";
 import Toolbar from "@material-ui/core/Toolbar";
-import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
