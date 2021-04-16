@@ -41,7 +41,9 @@ class AppLayout extends React.Component<Props, State> {
 
     this.state = {}
   }
-
+  /**
+   * Component render method
+   */
   public render = () => {
     const {
       classes,
