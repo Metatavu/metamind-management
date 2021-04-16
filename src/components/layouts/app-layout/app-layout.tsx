@@ -116,7 +116,7 @@ class AppLayout extends React.Component<Props, State> {
             </Button>
             <Button
               variant="text"
-              startIcon={ <PreviewIcon /> }
+              startIcon={ <PreviewIcon/> }
               color="secondary"
             > 
               { strings.header.preview }
