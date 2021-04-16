@@ -150,8 +150,7 @@ class HomeScreen extends React.Component<Props, State> {
  * @returns state from props
  */
 const mapStateToProps = (state: ReduxState) => ({
-  accessToken: state.auth.accessToken as AccessToken,
-  keycloak: state.auth.keycloak as KeycloakInstance,
+  accessToken: state.auth.accessToken as AccessToken
 });
 
 /**
