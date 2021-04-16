@@ -109,7 +109,7 @@ class AppLayout extends React.Component<Props, State> {
           <Box ml={ 2 }>
             <Button
               variant="text"
-              startIcon={ <EditorIcon /> }
+              startIcon={ <EditorIcon/> }
               color="secondary"
             >
               { strings.header.editor }
