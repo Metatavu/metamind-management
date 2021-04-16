@@ -78,7 +78,7 @@ class HomeScreen extends React.Component<Props, State> {
             </Typography>
           </Box>
         </Toolbar>
-        <Divider />
+        <Divider/>
       </Drawer>
     );
   }
