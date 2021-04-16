@@ -10,13 +10,19 @@ import { styles } from "./editor-screen.styles";
 import { KeycloakInstance } from "keycloak-js";
 import AppLayout from "../../layouts/app-layout/app-layout";
 import { AccessToken } from "../../../types";
-import { Box, List, ListItem, ListItemIcon, WithStyles, withStyles, Drawer, Tab, Tabs, TextField } from "@material-ui/core";
+import { Box, List, ListItem, ListItemIcon, WithStyles, withStyles, Drawer, Tab, Tabs, TextField, Typography } from "@material-ui/core";
 import { Knot } from "../../../generated/client/models/Knot";
 import { KnotType } from "../../../generated/client/models/KnotType";
 import { TokenizerType } from "../../../generated/client/models/TokenizerType";
 import { Story } from "../../../generated/client/models/Story";
 import strings from "../../../localization/strings";
 import TagFacesIcon from "@material-ui/icons/TagFaces";
+import Api from "../../../api/api";
+import { access } from "fs";
+import { Intent } from '../../../generated/client/models/Intent';
+import { IntentType } from '../../../generated/client/models/IntentType';
+import { IntentsApi, CreateIntentRequest } from '../../../generated/client/apis/IntentsApi';
+
 
 /**
  * Interface describing component props
@@ -31,12 +37,13 @@ interface Props extends WithStyles<typeof styles> {
  */
 interface State {
   error?: Error;
-  basicKnots?: Knot[];
-  globalKnots: Knot[];
   leftToolbarIndex: number;
   rightToolbarIndex: number;
-  currentKnot: Knot;
-  currentStory: Story;
+  storyKnots: Knot[];
+  storyIntents: Intent[];
+  currentKnot?: Knot;
+  currentStory?: Story;
+  storyId?: String;
 }
 
 /**
@@ -52,46 +59,11 @@ class EditorScreen extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    const basicKnot0: Knot = {
-      name: "basic0",
-      type: KnotType.TEXT,
-      tokenizer: TokenizerType.UNTOKENIZED,
-      content: "basic knot 1 text content"
-    };
-
-    const basicKnot1: Knot = {
-      name: "basic1",
-      type: KnotType.TEXT,
-      tokenizer: TokenizerType.UNTOKENIZED,
-      content: "basic knot 2 text content"
-    };
-
-    const globalKnot0: Knot = {
-      name: "global0",
-      type: KnotType.TEXT,
-      tokenizer: TokenizerType.UNTOKENIZED,
-      content: "global knot 1 text content"
-    };
-
-    const globalKnot1: Knot = {
-      name: "global1",
-      type: KnotType.TEXT,
-      tokenizer: TokenizerType.UNTOKENIZED,
-      content: "global knot 1 text content"
-    };
-
-    const story0: Story = {
-      name: "story 1",
-      locale: "en"
-    };
-
     this.state = {
-      basicKnots: [ basicKnot0, basicKnot1 ],
-      globalKnots: [ globalKnot0, globalKnot1 ],
       leftToolbarIndex: 0,
       rightToolbarIndex: 0,
-      currentStory: story0,
-      currentKnot: globalKnot0
+      storyKnots: [],
+      storyIntents: []
     };
   }
 
@@ -224,7 +196,7 @@ class EditorScreen extends React.Component<Props, State> {
     return (
       <TextField
         label={ strings.editorScreen.rightBar.storyNameHelper }
-        defaultValue={ currentStory.name }
+        defaultValue={ currentStory?.name }
       />
     );
   }
@@ -235,14 +207,14 @@ class EditorScreen extends React.Component<Props, State> {
   private renderDetailsTab = () => {
     const { currentKnot } = this.state;
 
-    return (
+    return (   
       <Box>
         <TextField
           label={ strings.editorScreen.rightBar.knotNameHelper }
-          defaultValue={ currentKnot.name }
+          defaultValue={ currentKnot?.name }
         />
         <Divider/>
-        { this.renderKnotDetails(currentKnot.name) }
+        { this.renderKnotDetails(currentKnot?.name) }
       </Box>
     )
   }
@@ -252,7 +224,7 @@ class EditorScreen extends React.Component<Props, State> {
    * 
    * @param currentKnot current knot
    */
-  private renderKnotDetails = (currentKnot: String) => {
+  private renderKnotDetails = (currentKnot?: String) => {
     return null;
   }
 
@@ -269,8 +241,9 @@ class EditorScreen extends React.Component<Props, State> {
    * Todo dropdown list
    */
   private renderKnotsTab = () => {
-    const { basicKnots, globalKnots } = this.state;
+    const { storyKnots } = this.state;
 
+    const globalKnot = storyKnots[0];
     return (
       <Box>
         <Box p={ 2 }>
@@ -280,43 +253,275 @@ class EditorScreen extends React.Component<Props, State> {
           />
         </Box>
         <Divider/>
-        { globalKnots &&
-          globalKnots.map(knot => (
-            <ListItem button>
-              <ListItemIcon>
-                <TagFacesIcon/>
-              </ListItemIcon>
-              <ListItemText>
-                { knot.name }
-              </ListItemText>
-            </ListItem>
-          ))
+        {
+          <Box>
+          <Typography>Global knots</Typography>
+          <ListItem button>
+            <ListItemIcon>
+              <TagFacesIcon/>
+            </ListItemIcon>
+            <ListItemText>
+              { globalKnot?.name }
+            </ListItemText>
+          </ListItem>        
+          </Box>  
         }
-        <Divider/>
-        <List>
-          { basicKnots &&
-            basicKnots.map(knot => (
-              <ListItem button>
-                <ListItemIcon>
-                  <TagFacesIcon/>
-                </ListItemIcon>
-                <ListItemText>
-                  { knot.name }
-                </ListItemText>
-              </ListItem>
-            ))
-          }
-        </List>
+        <Divider/>                   
+          <Box>
+            <Typography>Basic knots</Typography>
+            <List>
+              {storyKnots?.map(knot => (
+                <ListItem button>
+                  <ListItemIcon>
+                    <TagFacesIcon/>
+                  </ListItemIcon>
+                  <ListItemText>
+                    { knot.name }
+                  </ListItemText>
+                </ListItem>
+              ))
+              }
+            </List>
+          </Box>    
       </Box>
     );
   }
 
   /*
-  * Renders tab of intents (left toobar)
+  * Renders tab of intents (left toolbar)
   */
   private renderIntentsTab = () => {
-    return null;
+    const { storyIntents } = this.state;
+
+    const normalIntents = storyIntents.filter(intent => intent.type === IntentType.NORMAL)
+    const defaultIntents = storyIntents.filter(intent => intent.type === IntentType.DEFAULT)
+    const confusedIntents = storyIntents.filter(intent => intent.type === IntentType.CONFUSED)
+    const redirectIntents = storyIntents.filter(intent => intent.type === IntentType.REDIRECT)
+
+    return (
+      <Box>
+        <Box p={ 2 }>
+          <TextField 
+            fullWidth
+            label={ strings.editorScreen.leftBar.intentSearchHelper }
+          />
+        </Box>
+        <Divider/>                   
+          <Box>
+            <Typography>Normal intents</Typography>      
+            { this.renderIntentsGroup(normalIntents) }      
+          </Box>
+        <Divider/>
+          <Box>
+            <Typography>Default intents</Typography>       
+            { this.renderIntentsGroup(defaultIntents) }  
+          </Box>
+        <Divider/>
+          <Box>
+            <Typography>Confused intents</Typography>  
+            { this.renderIntentsGroup(confusedIntents) }  
+          </Box>
+        <Divider/>
+          <Box>
+            <Typography>Redirect intents</Typography>  
+            { this.renderIntentsGroup(redirectIntents) }                
+          </Box>
+      </Box>
+    );
   }
+
+  /**
+   * Renders list of intents for left toolbar second tab
+   * 
+   * @param intents list of intents from one group
+   */
+  private renderIntentsGroup = (intents : Intent[]) => {
+    return (
+      <List>
+        {intents.map(intent => (
+        <ListItem button>
+          <ListItemIcon>
+            <TagFacesIcon/>
+          </ListItemIcon>
+          <ListItemText>
+            { intent.name }
+          </ListItemText>
+          </ListItem>
+          ))
+          }
+      </List>
+    )
+  }
+
+  /**
+   * Fetches knots list for the story
+   */
+  private fetchData = async() => {
+    console.log("fetching test data")
+    const { accessToken } = this.props;
+
+    if (!accessToken) {
+      return;
+    }
+
+    const storiesApi = Api.getStoriesApi(accessToken)
+    const knotsApi = Api.getKnotsApi(accessToken)
+    const intentsApi = Api.getIntentsApi(accessToken)
+
+    const [ stories ] = await Promise.all<Story[]>([
+      storiesApi.listStories()
+    ]);  
+    let mainStoryId: string = stories[0].id as string;
+    console.log("found story "+mainStoryId);
+
+    const foundStory = await storiesApi.findStory({storyId: mainStoryId})
+    console.log(foundStory.id)
+    if (foundStory) {
+      let foundStoryId: string = foundStory.id as string;
+      const [ knotList ] = await Promise.all<Knot[]>([
+        knotsApi.listKnots({
+          storyId: foundStoryId
+        })
+      ]);  
+
+      const [ intentList ] = await Promise.all<Intent[]>([
+        intentsApi.listIntents({
+          storyId: foundStoryId
+        })
+      ]);  
+
+      console.log(knotList)
+      console.log(intentList)
+
+      this.setState({
+        currentStory: foundStory,
+        storyKnots : knotList,
+        storyIntents: intentList
+      });
+    }
+  }
+
+
+    /**
+   * Component did mount life cycle handler
+   */
+  public componentDidMount = () => {
+    //this.clearTestData()
+    //this.createTestData()
+    this.fetchData();
+  }
+
+  /**
+   * Clears all test data
+   */
+  private clearTestData = async() => {
+    console.log("cleaning test data")
+    const { accessToken } = this.props;
+
+    if (!accessToken) {
+      return;
+    }
+
+    const storiesApi = Api.getStoriesApi(accessToken)
+    const knotsApi = Api.getKnotsApi(accessToken)
+    const intentsApi = Api.getIntentsApi(accessToken)
+    
+    const [ allStories ] = await Promise.all<Story[]>([
+      storiesApi.listStories()
+    ]);
+
+    for (let story of allStories) {
+      let storyId: string = story.id as string;
+      //remove all knots
+      const [ allKnots ] = await Promise.all<Knot[]>([
+        knotsApi.listKnots({
+            storyId: storyId
+          })
+      ]);
+      for (let knot of allKnots) {
+        let knotId: string = knot.id as string;
+        knotsApi.deleteKnot(
+          {
+            storyId: storyId,
+            knotId: knotId
+          }
+        )
+      }
+
+      //remove all intents
+      const [ allIntents ] = await Promise.all<Intent[]>([
+        intentsApi.listIntents({
+            storyId: storyId
+          })
+      ]);
+      for (let intent of allIntents) {
+        let intentId: string = intent.id as string;
+        intentsApi.deleteIntent(
+          {
+            storyId: storyId,
+            intentId: intentId
+          }
+        )
+      }
+    }
+  }
+
+    /**
+   * Creates test story and knots for it
+   */
+    private createTestData = async() => {
+      console.log("creating test data")
+      const { accessToken } = this.props;
+  
+      if (!accessToken) {
+        return;
+      }
+      const storiesApi = Api.getStoriesApi(accessToken)
+      const knotsApi = Api.getKnotsApi(accessToken)
+      const intentsApi = Api.getIntentsApi(accessToken)
+    
+      const basicKnot0: Knot = {
+        name: "basic0",
+        type: KnotType.TEXT,
+        tokenizer: TokenizerType.UNTOKENIZED,
+        content: "basic knot 1 text content"
+      };
+  
+      const basicKnot1: Knot = {
+        name: "basic1",
+        type: KnotType.TEXT,
+        tokenizer: TokenizerType.UNTOKENIZED,
+        content: "basic knot 2 text content"
+      };
+  
+      const globalKnot0: Knot = {
+        name: "global0",
+        type: KnotType.TEXT,
+        tokenizer: TokenizerType.UNTOKENIZED,
+        content: "global knot 1 text content"
+      };
+  
+      const globalKnot1: Knot = {
+        name: "global1",
+        type: KnotType.TEXT,
+        tokenizer: TokenizerType.UNTOKENIZED,
+        content: "global knot 1 text content"
+      };
+  
+      const story0: Story = {
+        name: "story 1",
+        locale: "en"
+      }; 
+  
+      const createdStory = await storiesApi.createStory({story: story0})
+      console.log("created story "+createdStory.id)
+
+      const knot1 = await knotsApi.createKnot({knot: basicKnot0, storyId: createdStory.id!})
+      const knot2 = await knotsApi.createKnot({knot: basicKnot1, storyId: createdStory.id!})
+      const knot3 = await knotsApi.createKnot({knot: globalKnot0, storyId: createdStory.id!})
+      const knot4 = await knotsApi.createKnot({knot: globalKnot1, storyId: createdStory.id!})
+      console.log("created knots "+knot1.id+knot2.id+knot3.id+knot4.id+" for "+createdStory.id)
+    }
 }
 
 /**

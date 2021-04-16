@@ -37,13 +37,13 @@ const App: React.FC = () => {
     <ThemeProvider theme={ theme }>
       <CssBaseline />
       <Provider store={ store }>
-        {/* <AccessTokenRefresh> */}
+        <AccessTokenRefresh> 
           <BrowserRouter>
             <Switch>
               <Route exact path="/" component={ EditorScreen } />
             </Switch>
           </BrowserRouter>
-        {/* </AccessTokenRefresh> */}
+        </AccessTokenRefresh> 
       </Provider>
     </ThemeProvider>
   );

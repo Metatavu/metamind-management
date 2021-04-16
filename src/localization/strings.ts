@@ -27,6 +27,7 @@ export interface IStrings extends LocalizedStringsMethods {
       knotsLeftTab: string;
       intentsLeftTab: string;
       knotSearchHelper: string;
+      intentSearchHelper: string;
     };
 
     rightBar: {
