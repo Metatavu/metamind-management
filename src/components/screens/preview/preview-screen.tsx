@@ -15,6 +15,7 @@ import { History } from "history";
 interface Props extends WithStyles<typeof styles> {
   history: History;
   accessToken: AccessToken;
+  storyId: string;
 }
 
 /**

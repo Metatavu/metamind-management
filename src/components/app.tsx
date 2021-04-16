@@ -39,7 +39,7 @@ const App: React.FC = () => {
     <ThemeProvider theme={ theme }>
       <CssBaseline />
       <Provider store={ store }>
-        {/* <AccessTokenRefresh> */}
+        <AccessTokenRefresh>
           <BrowserRouter>
             <Switch>
               <Route
@@ -54,24 +54,26 @@ const App: React.FC = () => {
               <Route 
                 path="/editor/:id"
                 exact={ true } 
-                render={({ history }) => (
+                render={({ history, match }) => (
                   <EditorScreen
                     history={ history }
+                    storyId={ match.params.id }
                   />
                 )}
               />
               <Route
                 exact
                 path="/preview/:id"
-                render={({ history }) => (
+                render={({ history, match }) => (
                   <PreviewScreen
                     history={ history }
+                    storyId={ match.params.id }
                   />
                 )}
               />
             </Switch>
           </BrowserRouter>
-        {/* </AccessTokenRefresh> */}
+        </AccessTokenRefresh>
       </Provider>
     </ThemeProvider>
   );
