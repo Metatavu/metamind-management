@@ -16,7 +16,6 @@ import { History } from "history";
  */
 interface Props extends WithStyles<typeof styles> {
   history: History;
-  keycloak: KeycloakInstance;
   accessToken: AccessToken;
 }
 
