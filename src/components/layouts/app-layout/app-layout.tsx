@@ -132,6 +132,7 @@ class AppLayout extends React.Component<Props, State> {
    */
   private renderPageTitle = () => {
     const { pageTitle } = this.props;
+
     return (
       <Box display="flex" position="absolute" left="0" right="0" justifyContent="center" zIndex="-1">
         <Box display="flex" alignItems="center">
