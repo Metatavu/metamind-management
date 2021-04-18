@@ -104,8 +104,11 @@ class EditorScreen extends React.Component<Props, State> {
    * Component render
    */
   public render = () => {
+    const { keycloak } = this.props;
+
     return (
       <AppLayout
+        keycloak={ keycloak }
         pageTitle="Story name here"
         dataChanged={ true }
         storySelected={ true }
@@ -409,7 +412,7 @@ class EditorScreen extends React.Component<Props, State> {
  */
 const mapStateToProps = (state: ReduxState) => ({
   accessToken: state.auth.accessToken as AccessToken,
-  keycloak: state.auth.keycloak as KeycloakInstance,
+  keycloak: state.auth.keycloak as KeycloakInstance
 });
 
 /**

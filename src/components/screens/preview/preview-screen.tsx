@@ -8,12 +8,14 @@ import { AccessToken } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
 import { styles } from "./preview-screen.styles";
 import { History } from "history";
+import { KeycloakInstance } from 'keycloak-js';
 
 /**
  * Interface describing component props
  */
 interface Props extends WithStyles<typeof styles> {
   history: History;
+  keycloak: KeycloakInstance;
   accessToken: AccessToken;
   storyId: string;
 }
@@ -22,7 +24,6 @@ interface Props extends WithStyles<typeof styles> {
  * Interface describing component state
  */
 interface State {
-
 }
 
 /**
@@ -45,8 +46,10 @@ class PreviewScreen extends React.Component<Props, State> {
    * Component render
    */
   public render = () => {
+    const { keycloak } = this.props;
     return (
       <AppLayout
+        keycloak={ keycloak }
         pageTitle="Story name"
         dataChanged={ true }
         storySelected={ true }
@@ -81,7 +84,8 @@ class PreviewScreen extends React.Component<Props, State> {
  * @returns state from props
  */
 const mapStateToProps = (state: ReduxState) => ({
-  accessToken: state.auth.accessToken as AccessToken
+  accessToken: state.auth.accessToken as AccessToken,
+  keycloak: state.auth.keycloak as KeycloakInstance
 });
 
 /**

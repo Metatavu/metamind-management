@@ -8,6 +8,7 @@ import EditorIcon from "@material-ui/icons/Edit";
 import PreviewIcon from "@material-ui/icons/PlayArrow";
 import SaveIcon from "@material-ui/icons/Save";
 import SettingsIcon from "@material-ui/icons/Settings";
+import { KeycloakInstance } from "keycloak-js";
 
 /**
  * Interface describing component props
@@ -18,6 +19,7 @@ interface Props extends WithStyles<typeof styles> {
   storySelected?: boolean;
   pageTitle: string;
   storyId?: string;
+  keycloak: KeycloakInstance;
 }
 
 /**
@@ -50,8 +52,11 @@ class AppLayout extends React.Component<Props, State> {
       children,
       onSaveClick,
       dataChanged,
-      storySelected
+      storySelected,
+      keycloak
     } = this.props;
+    const firstName = (keycloak.profile && keycloak.profile.firstName) ?? "";
+    const lastName = (keycloak.profile && keycloak.profile.lastName) ?? "";
 
     return (
       <>
@@ -71,15 +76,21 @@ class AppLayout extends React.Component<Props, State> {
                   { strings.generic.save }
                 </Button>
               }
-              <Button
-                variant="text"
-                color="secondary"
-              >
-                { strings.header.signOut }
-              </Button>
-              <IconButton color="secondary">
-                <SettingsIcon/>
-              </IconButton>
+              <Box display="flex" alignItems="center">
+                <Typography color="textSecondary">
+                  { firstName } { lastName }
+                </Typography>
+                <Button
+                  variant="text"
+                  color="secondary"
+                  onClick={ () => this.onLogOutClick() }
+                  >
+                  { strings.header.signOut }
+                </Button>
+                <IconButton color="secondary">
+                  <SettingsIcon/>
+                </IconButton>
+              </Box>
             </Box>
           </Toolbar>
         </AppBar>
@@ -157,6 +168,17 @@ class AppLayout extends React.Component<Props, State> {
         </Box>
       </Box>
     );
+  }
+
+  /**
+   * Handle logout
+   */
+    private onLogOutClick = () => {
+    const { keycloak } = this.props;
+
+    if (keycloak) {
+      keycloak.logout();
+    }
   }
 }
 
