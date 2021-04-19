@@ -84,7 +84,7 @@ class AppLayout extends React.Component<Props, State> {
                   variant="text"
                   color="secondary"
                   onClick={ () => this.onLogOutClick() }
-                  >
+                >
                   { strings.header.signOut }
                 </Button>
                 <IconButton color="secondary">
