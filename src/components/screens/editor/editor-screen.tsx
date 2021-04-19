@@ -334,15 +334,15 @@ class EditorScreen extends React.Component<Props, State> {
         </Box>
         <Divider/>
           <Box>
-          <Typography>Global knots</Typography>
-          <ListItem button>
-            <ListItemIcon>
-              <TagFacesIcon/>
-            </ListItemIcon>
-            <ListItemText>
-              { globalKnot?.name }
-            </ListItemText>
-          </ListItem>
+            <Typography>Global knots</Typography>
+            <ListItem button>
+              <ListItemIcon>
+                <TagFacesIcon/>
+              </ListItemIcon>
+              <ListItemText>
+                { globalKnot?.name }
+              </ListItemText>
+            </ListItem>
           </Box>
         <Divider/>
           <Box>
