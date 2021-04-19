@@ -171,15 +171,15 @@ class AppLayout extends React.Component<Props, State> {
   }
 
   /**
-   * Handle logout
+   * Event handler for logout click
    */
     private onLogOutClick = () => {
-    const { keycloak } = this.props;
+      const { keycloak } = this.props;
 
-    if (keycloak) {
-      keycloak.logout();
+      if (keycloak) {
+        keycloak.logout();
+      }
     }
-  }
 }
 
 export default withStyles(styles)(AppLayout);
