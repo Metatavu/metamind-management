@@ -17,6 +17,7 @@ import { TokenizerType } from "../../../generated/client/models/TokenizerType";
 import { Story } from "../../../generated/client/models/Story";
 import strings from "../../../localization/strings";
 import TagFacesIcon from "@material-ui/icons/TagFaces";
+import { History } from "history";
 import Api from "../../../api/api";
 import { Intent } from '../../../generated/client/models/Intent';
 import { IntentType } from '../../../generated/client/models/IntentType';
@@ -26,8 +27,10 @@ import { IntentType } from '../../../generated/client/models/IntentType';
  * Interface describing component props
  */
 interface Props extends WithStyles<typeof styles> {
+  history: History;
   keycloak: KeycloakInstance;
   accessToken: AccessToken;
+  storyId: string;
 }
 
 /**
@@ -37,6 +40,7 @@ interface State {
   error?: Error;
   leftToolbarIndex: number;
   rightToolbarIndex: number;
+  editorTabIndex: number;
   storyKnots: Knot[];
   storyIntents: Intent[];
   currentKnot?: Knot;
@@ -60,6 +64,7 @@ class EditorScreen extends React.Component<Props, State> {
     this.state = {
       leftToolbarIndex: 0,
       rightToolbarIndex: 0,
+      editorTabIndex: 0,
       storyKnots: [],
       storyIntents: []
     };
@@ -70,9 +75,13 @@ class EditorScreen extends React.Component<Props, State> {
    */
   public render = () => {
     return (
-      <AppLayout>
+      <AppLayout
+        pageTitle="Story name here"
+        dataChanged={ true }
+        storySelected={ true }
+      >
         { this.renderLeftToolbar() }
-        { this.renderContent() }
+        { this.renderEditorContent() }
         { this.renderRightToolbar() }
       </AppLayout>
     );
@@ -83,7 +92,6 @@ class EditorScreen extends React.Component<Props, State> {
    */
   private renderLeftToolbar = () => {
     const { leftToolbarIndex } = this.state;
-
     return (
       <Drawer
         variant="permanent"
@@ -114,12 +122,76 @@ class EditorScreen extends React.Component<Props, State> {
   }
 
   /**
-   * Renders main content area
-   * Todo: make correct margins from top and side panels
+   * Renders main editor area
    */
-  private renderContent = () => {
+  private renderEditorContent = () => {
+    const { classes } = this.props;
+    const { editorTabIndex } = this.state;
+
     return (
-      <Box height="100%"/>
+      <Box
+        marginLeft="320px"
+        marginRight="320px"
+        height="100%"
+      >
+        <Toolbar/>
+        <Toolbar>
+          <Tabs
+            onChange={ this.setEditorTabIndex }
+            value={ editorTabIndex }
+            className={ classes.tabs }
+          >
+            <Tab
+              value={ 0 }
+              className={ classes.tab }
+              label={ strings.editorScreen.story }
+            />
+            <Tab
+              value={ 1 }
+              className={ classes.tab }
+              label={ strings.editorScreen.global }
+            />
+          </Tabs>
+        </Toolbar>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          { editorTabIndex === 0 && this.renderStoryEditor() }
+          { editorTabIndex === 1 && this.renderGlobalEditor() }
+        </Box>
+      </Box>
+    );
+  }
+
+  /**
+   * Renders main editor area
+   *
+   * TODO: replace content with editor
+   */
+  private renderStoryEditor = () => {
+    return (
+      <Box>
+        <Typography color="primary">
+          { strings.editorScreen.story }
+        </Typography>
+      </Box>
+    );
+  }
+
+  /**
+   * Renders main editor area
+   *
+   * TODO: replace content with editor
+   */
+  private renderGlobalEditor = () => {
+    return (
+      <Box>
+        <Typography color="primary">
+          { strings.editorScreen.global }
+        </Typography>
+      </Box>
     );
   }
 
@@ -186,6 +258,16 @@ class EditorScreen extends React.Component<Props, State> {
   }
 
   /**
+   * Sets editor tab index
+   *
+   * @param event event object
+   * @param newValue new tab index value
+   */
+  private setEditorTabIndex = (event: React.ChangeEvent<{ }>, newValue: number) => {
+    this.setState({ editorTabIndex: newValue });
+  }
+
+  /**
    * Renders story tab of right toolbar
    */
   private renderStoryTab = () => {
@@ -205,7 +287,7 @@ class EditorScreen extends React.Component<Props, State> {
   private renderDetailsTab = () => {
     const { currentKnot } = this.state;
 
-    return (   
+    return (
       <Box>
         <TextField
           label={ strings.editorScreen.rightBar.knotNameHelper }
@@ -250,7 +332,7 @@ class EditorScreen extends React.Component<Props, State> {
             label={ strings.editorScreen.leftBar.knotSearchHelper }
           />
         </Box>
-        <Divider/>        
+        <Divider/>
           <Box>
           <Typography>Global knots</Typography>
           <ListItem button>
@@ -260,9 +342,9 @@ class EditorScreen extends React.Component<Props, State> {
             <ListItemText>
               { globalKnot?.name }
             </ListItemText>
-          </ListItem>        
-          </Box>  
-        <Divider/>                   
+          </ListItem>
+          </Box>
+        <Divider/>
           <Box>
             <Typography>Basic knots</Typography>
             <List>
@@ -279,7 +361,7 @@ class EditorScreen extends React.Component<Props, State> {
                 ))
               }
             </List>
-          </Box>    
+          </Box>
       </Box>
     );
   }
@@ -298,30 +380,30 @@ class EditorScreen extends React.Component<Props, State> {
     return (
       <Box>
         <Box p={ 2 }>
-          <TextField 
+          <TextField
             fullWidth
             label={ strings.editorScreen.leftBar.intentSearchHelper }
           />
         </Box>
-        <Divider/>                   
+        <Divider/>
           <Box>
-            <Typography>Normal intents</Typography>      
-            { this.renderIntentsGroup(normalIntents) }      
+            <Typography>Normal intents</Typography>
+            { this.renderIntentsGroup(normalIntents) }
           </Box>
         <Divider/>
           <Box>
-            <Typography>Default intents</Typography>       
-            { this.renderIntentsGroup(defaultIntents) }  
+            <Typography>Default intents</Typography>
+            { this.renderIntentsGroup(defaultIntents) }
           </Box>
         <Divider/>
           <Box>
-            <Typography>Confused intents</Typography>  
-            { this.renderIntentsGroup(confusedIntents) }  
+            <Typography>Confused intents</Typography>
+            { this.renderIntentsGroup(confusedIntents) }
           </Box>
         <Divider/>
           <Box>
-            <Typography>Redirect intents</Typography>  
-            { this.renderIntentsGroup(redirectIntents) }                
+            <Typography>Redirect intents</Typography>
+            { this.renderIntentsGroup(redirectIntents) }
           </Box>
       </Box>
     );
@@ -329,7 +411,7 @@ class EditorScreen extends React.Component<Props, State> {
 
   /**
    * Renders list of intents for left toolbar second tab
-   * 
+   *
    * @param intents list of intents from one group
    */
   private renderIntentsGroup = (intents : Intent[]) => {
@@ -409,17 +491,17 @@ class EditorScreen extends React.Component<Props, State> {
     const storiesApi = Api.getStoriesApi(accessToken)
     const knotsApi = Api.getKnotsApi(accessToken)
     const intentsApi = Api.getIntentsApi(accessToken)
-    
+
     const allStories = await storiesApi.listStories();
 
     allStories.forEach(async (story) => {
       const storyId: string = story.id || "";
-      
+
       const [ allKnots, allIntents ] = await Promise.all([
         knotsApi.listKnots({ storyId: storyId }),
         intentsApi.listIntents({ storyId: storyId })
       ]);
-      
+
       //remove all knots
       allKnots.forEach(knot => {
         const knotId = knot.id || "";
@@ -430,7 +512,7 @@ class EditorScreen extends React.Component<Props, State> {
           }
         );
       });
-      
+
       //remove all intents
       allIntents.forEach(intent => {
         const intentId: string = intent.id as string;
@@ -449,47 +531,47 @@ class EditorScreen extends React.Component<Props, State> {
   */
   private createTestData = async() => {
     const { accessToken } = this.props;
-  
+
     if (!accessToken) {
       return;
     }
     const storiesApi = Api.getStoriesApi(accessToken);
     const knotsApi = Api.getKnotsApi(accessToken);
     const intentsApi = Api.getIntentsApi(accessToken);
-    
+
     const basicKnot0: Knot = {
       name: "basic0",
       type: KnotType.TEXT,
       tokenizer: TokenizerType.UNTOKENIZED,
       content: "basic knot 1 text content"
     };
-  
+
     const basicKnot1: Knot = {
       name: "basic1",
       type: KnotType.TEXT,
       tokenizer: TokenizerType.UNTOKENIZED,
       content: "basic knot 2 text content"
     };
-  
+
     const globalKnot0: Knot = {
       name: "global0",
       type: KnotType.TEXT,
       tokenizer: TokenizerType.UNTOKENIZED,
       content: "global knot 1 text content"
     };
-  
+
     const globalKnot1: Knot = {
       name: "global1",
       type: KnotType.TEXT,
       tokenizer: TokenizerType.UNTOKENIZED,
       content: "global knot 1 text content"
     };
-  
+
     const story0: Story = {
       name: "story 1",
       locale: "en"
-    }; 
-  
+    };
+
     const createdStory = await storiesApi.createStory({story: story0})
 
     const [ knot1, knot2, knot3, knot4 ] = await Promise.all([

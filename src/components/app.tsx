@@ -11,7 +11,9 @@ import moment from "moment";
 import "moment/locale/fi";
 import "moment/locale/en-gb";
 import strings from "../localization/strings";
-import EditorScreen from "./screens/home/editor-screen";
+import EditorScreen from "./screens/editor/editor-screen";
+import PreviewScreen from "./screens/preview/preview-screen";
+import HomeScreen from "./screens/home/home-screen";
 import AccessTokenRefresh from "./containers/access-token-refresh";
 
 /**
@@ -37,13 +39,41 @@ const App: React.FC = () => {
     <ThemeProvider theme={ theme }>
       <CssBaseline />
       <Provider store={ store }>
-        <AccessTokenRefresh> 
+        <AccessTokenRefresh>
           <BrowserRouter>
             <Switch>
-              <Route exact path="/" component={ EditorScreen } />
+              <Route
+                path="/"
+                exact={ true }
+                render={({ history }) => (
+                  <HomeScreen
+                    history={ history }
+                  />
+                )}
+              />
+              <Route
+                path="/editor/:id"
+                exact={ true }
+                render={({ history, match }) => (
+                  <EditorScreen
+                    history={ history }
+                    storyId={ match.params.id }
+                  />
+                )}
+              />
+              <Route
+                exact
+                path="/preview/:id"
+                render={({ history, match }) => (
+                  <PreviewScreen
+                    history={ history }
+                    storyId={ match.params.id }
+                  />
+                )}
+              />
             </Switch>
           </BrowserRouter>
-        </AccessTokenRefresh> 
+        </AccessTokenRefresh>
       </Provider>
     </ThemeProvider>
   );

@@ -1,7 +1,7 @@
 import { createMuiTheme } from "@material-ui/core";
 
-const defaultTheme = createMuiTheme();
-const { spacing, breakpoints } = defaultTheme;
+const theme = createMuiTheme();
+const { spacing, breakpoints, zIndex, palette } = theme;
 
 export default createMuiTheme({
 
@@ -9,17 +9,19 @@ export default createMuiTheme({
     type: "light",
     primary: {
       main: "#36B0F4",
+      light: "#ffffff"
     },
     secondary: {
-      main: "#121212",
+      main: "#ffffff",
       dark: "#121212"
     },
     background: {
-      paper: "#FFF",
-      default: "#EEE",
+      paper: "#F7F7F7",
+      default: "#EEE"
     },
     text: {
-      primary: "#121212"
+      primary: "#121212",
+      secondary: "#f7f7f7"
     }
   },
 
@@ -52,14 +54,14 @@ export default createMuiTheme({
         body: {
         },
         "::-webkit-scrollbar-track": {
-          backgroundColor: defaultTheme.palette.grey[300]
+          backgroundColor: palette.grey[300]
         },
         "::-webkit-scrollbar": {
           height: 10,
           width: 10
         },
         "::-webkit-scrollbar-thumb": {
-          backgroundColor: defaultTheme.palette.text.primary,
+          backgroundColor: palette.text.primary,
           border: "none"
         }
       }
@@ -68,7 +70,7 @@ export default createMuiTheme({
       root: {
         backgroundColor: "#121212",
         borderBottom: "1px solid rgba(255,255,255,0.2)",
-        zIndex: defaultTheme.zIndex.drawer + 1
+        zIndex: zIndex.drawer + 1
       }
     },
     MuiToolbar: {
@@ -168,6 +170,16 @@ export default createMuiTheme({
       },
       selected: {},
     },
+    MuiListItemText: {
+      primary: {
+        fontSize: 16,
+        color: "#121212"
+      },
+      secondary: {
+        fontSize: 12,
+        color: "#36B0F4"
+      }
+    },
     MuiButton: {
       root: {
         minWidth: 100,
@@ -175,7 +187,11 @@ export default createMuiTheme({
       outlined: {
         border: "1px solid #121212",
         borderRadius: 20,
-        margin: "0px 20px 0px 20px"
+        margin: "0px 20px 0px 20px",
+        textTransform: "none"
+      },
+      outlinedSecondary: {
+        color: "#f7f7f7"
       },
       label: {
         fontWeight: 400
@@ -189,12 +205,17 @@ export default createMuiTheme({
     },
     MuiFab: {
       root: {
-        zIndex: defaultTheme.zIndex.drawer + 1
+        zIndex: zIndex.drawer + 1
+      }
+    },
+    MuiFormLabel: {
+      root: {
+        color: "#121212"
       }
     }
   },
   shape: {
-    borderRadius: 0
+    borderRadius: 4
   },
   props: {
     MuiIconButton: {
