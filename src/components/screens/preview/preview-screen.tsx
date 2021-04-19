@@ -47,6 +47,7 @@ class PreviewScreen extends React.Component<Props, State> {
    */
   public render = () => {
     const { keycloak } = this.props;
+
     return (
       <AppLayout
         keycloak={ keycloak }
