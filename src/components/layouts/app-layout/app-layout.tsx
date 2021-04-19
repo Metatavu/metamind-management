@@ -64,7 +64,7 @@ class AppLayout extends React.Component<Props, State> {
           <Toolbar>
             { this.renderNavigation() }
             { this.renderPageTitle() }
-            <Box>
+            <Box display="flex" alignItems="center">
               { storySelected &&
                 <Button
                   onClick={ onSaveClick }
