@@ -26,7 +26,8 @@
     "leftBar" : {
       "knotsLeftTab": "Solmut",
       "intentsLeftTab": "Aikomukset",
-      "knotSearchHelper": "Solmujen haku"
+      "knotSearchHelper": "Solmujen haku",
+      "intentSearchHelper": "Search for an intent"
     },
     "rightBar" : {
       "storyRightTab": "Tarina",
