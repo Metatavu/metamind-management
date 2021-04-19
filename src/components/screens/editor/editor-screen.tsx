@@ -419,15 +419,15 @@ class EditorScreen extends React.Component<Props, State> {
       <List>
         {
           intents.map(intent => (
-          <ListItem button>
-            <ListItemIcon>
-              <TagFacesIcon/>
-            </ListItemIcon>
-            <ListItemText>
-              { intent.name }
-            </ListItemText>
+            <ListItem button>
+              <ListItemIcon>
+                <TagFacesIcon/>
+              </ListItemIcon>
+              <ListItemText>
+                { intent.name }
+              </ListItemText>
             </ListItem>
-            ))
+          ))
         }
       </List>
     )
