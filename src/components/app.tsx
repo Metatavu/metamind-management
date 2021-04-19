@@ -51,9 +51,9 @@ const App: React.FC = () => {
                   />
                 )}
               />
-              <Route 
+              <Route
                 path="/editor/:id"
-                exact={ true } 
+                exact={ true }
                 render={({ history, match }) => (
                   <EditorScreen
                     history={ history }

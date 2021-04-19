@@ -1,5 +1,8 @@
 import { Configuration } from "../generated/client";
 import { AccessToken } from "../types";
+import { KnotsApi } from '../generated/client/apis/KnotsApi';
+import { StoriesApi } from '../generated/client/apis/StoriesApi';
+import { IntentsApi } from '../generated/client/apis/IntentsApi';
 
 /**
  * Utility class for loading api with predefined configuration
@@ -19,4 +22,33 @@ export default class Api {
     });
   }
 
+  /**
+   * Gets initialized Knots API
+   * 
+   * @param AccessToken Gets knots API
+   * @returns initialized Knots API
+   */
+  public static getKnotsApi(accessToken: AccessToken) {
+    return new KnotsApi(Api.getConfiguration(accessToken));
+  }
+
+  /**
+   * Gets initialized Stories API
+   * 
+   * @param accessToken access token
+   * @returns initialized Stories API
+   */
+  public static getStoriesApi(accessToken: AccessToken) {
+    return new StoriesApi(Api.getConfiguration(accessToken));
+  }
+
+  /**
+   * Gets initialized Intents API
+   * 
+   * @param accessToken access token
+   * @returns initialized Intents API
+   */
+  public static getIntentsApi(accessToken: AccessToken) {
+    return new IntentsApi(Api.getConfiguration(accessToken));
+  }
 }

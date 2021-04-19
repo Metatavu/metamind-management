@@ -26,7 +26,8 @@
     "leftBar" : {
       "knotsLeftTab": "Knots",
       "intentsLeftTab": "Intents",
-      "knotSearchHelper": "Knot search"
+      "knotSearchHelper": "Knot search",
+      "intentSearchHelper": "Search for an intent"
     },
     "rightBar" : {
       "storyRightTab": "Story",
