@@ -9,6 +9,7 @@ import { AccessToken } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
 import { styles } from "./home-screen.styles";
 import { History } from "history";
+import { KeycloakInstance } from "keycloak-js";
 
 /**
  * Interface describing component props
@@ -16,6 +17,7 @@ import { History } from "history";
 interface Props extends WithStyles<typeof styles> {
   history: History;
   accessToken: AccessToken;
+  keycloak: KeycloakInstance;
 }
 
 /**
@@ -44,10 +46,13 @@ class HomeScreen extends React.Component<Props, State> {
    * Component render
    */
   public render = () => {
-    const { classes } = this.props;
+    const { classes, keycloak } = this.props;
 
     return (
-      <AppLayout pageTitle={ strings.homeScreen.title }>
+      <AppLayout 
+        pageTitle={ strings.homeScreen.title }
+        keycloak={ keycloak }
+      >
         { this.renderRightToolbar() }
         <Box className={ classes.root }>
           { this.renderSelectStoryCard() }
@@ -149,7 +154,8 @@ class HomeScreen extends React.Component<Props, State> {
  * @returns state from props
  */
 const mapStateToProps = (state: ReduxState) => ({
-  accessToken: state.auth.accessToken as AccessToken
+  accessToken: state.auth.accessToken as AccessToken,
+  keycloak: state.auth.keycloak as KeycloakInstance
 });
 
 /**
