@@ -19,8 +19,8 @@ import strings from "../../../localization/strings";
 import TagFacesIcon from "@material-ui/icons/TagFaces";
 import { History } from "history";
 import Api from "../../../api/api";
-import { Intent } from '../../../generated/client/models/Intent';
-import { IntentType } from '../../../generated/client/models/IntentType';
+import { Intent } from "../../../generated/client/models/Intent";
+import { IntentType } from "../../../generated/client/models/IntentType";
 
 
 /**

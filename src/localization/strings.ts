@@ -33,6 +33,9 @@ export interface IStrings extends LocalizedStringsMethods {
     selectStoryText: string;
     createNewStory: string;
     lastEditedStories: string;
+    selectStory: string;
+    selectStoryToEdit: string;
+    open: string;
   };
 
   /**

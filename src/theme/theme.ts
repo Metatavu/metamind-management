@@ -212,6 +212,11 @@ export default createMuiTheme({
       root: {
         color: "#121212"
       }
+    },
+    MuiDivider: {
+      light: {
+        backgroundColor: "rgba(255,255,255,0.54)"
+      }
     }
   },
   shape: {
@@ -259,6 +264,9 @@ export default createMuiTheme({
     MuiFab: {
       size: "large",
       color: "primary"
+    },
+    MuiTextField: {
+      fullWidth: true
     }
   }
 });

@@ -1,5 +1,6 @@
-import { Box, Button, Divider, Drawer, List, ListItem, ListItemText, Typography, WithStyles, withStyles } from "@material-ui/core";
-import Toolbar from "@material-ui/core/Toolbar";
+import { Box, Button, List, ListItem, ListItemText, Typography, WithStyles, withStyles, TextField, Divider } from "@material-ui/core";
+import { History } from "history";
+import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
@@ -8,8 +9,6 @@ import { ReduxActions, ReduxState } from "../../../store";
 import { AccessToken } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
 import { styles } from "./home-screen.styles";
-import { History } from "history";
-import { KeycloakInstance } from "keycloak-js";
 
 /**
  * Interface describing component props
@@ -24,6 +23,7 @@ interface Props extends WithStyles<typeof styles> {
  * Interface describing component state
  */
 interface State {
+  selectedStoryId: string;
 }
 
 /**
@@ -39,7 +39,9 @@ class HomeScreen extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    this.state = {}
+    this.state = {
+      selectedStoryId: ""
+    }
   }
 
   /**
@@ -53,7 +55,6 @@ class HomeScreen extends React.Component<Props, State> {
         pageTitle={ strings.homeScreen.title }
         keycloak={ keycloak }
       >
-        { this.renderRightToolbar() }
         <Box className={ classes.root }>
           { this.renderSelectStoryCard() }
         </Box>
@@ -62,36 +63,11 @@ class HomeScreen extends React.Component<Props, State> {
   }
 
   /**
-   * Renders left toolbar
-   */
-  private renderRightToolbar = () => {
-    return (
-      <Drawer
-        variant="permanent"
-        anchor="right"
-      >
-        <Toolbar/>
-        <Toolbar>
-          <Box
-            display="flex"
-            flex={ 1 }
-            justifyContent="center"
-          >
-            <Typography variant="h3">
-              { strings.homeScreen.myStories }
-            </Typography>
-          </Box>
-        </Toolbar>
-        <Divider/>
-      </Drawer>
-    );
-  }
-
-  /**
    * Renders select story card
    */
   private renderSelectStoryCard = () => {
     const { classes } = this.props;
+    const { selectedStoryId } = this.state;
 
     return (
       <Box className={ classes.storySelectCard }>
@@ -100,11 +76,40 @@ class HomeScreen extends React.Component<Props, State> {
             { strings.homeScreen.selectStoryText }
           </Typography>
         </Box>
+        <Box p={ 2 } mb={ 2 }>
+          <TextField
+            select
+            className={ classes.select }
+            label={ strings.homeScreen.selectStory }
+            value={ selectedStoryId }
+            onChange={ this.onSelectedStoryChange }
+            title={ strings.homeScreen.selectStoryToEdit }
+            variant="outlined"
+            color="primary"
+            >
+              {/* TODO: map available stories */}
+          </TextField>
+        </Box>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={ () => this.onOpenSelectedStoryClick() }
+        >
+          { strings.homeScreen.open }
+        </Button>
+        <Box 
+          mb={ 4 }
+          mt={ 4 }
+          ml={ 2 }
+          mr={ 2 }
+        >
+          <Divider light />
+        </Box>
         <Button
           variant="outlined"
           color="secondary"
           onClick={ () => this.onCreateNewStoryClick() }
-        >
+          >
           { strings.homeScreen.createNewStory }
         </Button>
         { this.renderRecentStories() }
@@ -142,6 +147,20 @@ class HomeScreen extends React.Component<Props, State> {
    * Event handler for create new story click
    */
   private onCreateNewStoryClick = () => {
+    // TODO: Not yet implemented
+  }
+
+  /**
+   * Event handler for selected story change
+   */
+  private onSelectedStoryChange = () => {
+    // TODO: Not yet implemented
+  }
+
+  /**
+   * Event handler for selected story open click
+   */
+  private onOpenSelectedStoryClick = () => {
     // TODO: Not yet implemented
   }
 

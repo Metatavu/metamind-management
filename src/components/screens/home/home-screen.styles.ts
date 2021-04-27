@@ -26,5 +26,24 @@ export const styles = createStyles({
     "& .MuiListItemText-primary": {
       color: "#ddd"
     }
+  },
+
+  select: {
+    "& .MuiInputLabel-outlined": {
+      color: "rgba(255,255,255,0.54)",
+      "&.Mui-focused": {
+        color: theme.palette.primary.main
+      }
+    },
+    "& .MuiOutlinedInput-notchedOutline": {
+      borderColor: "rgba(255,255,255,0.54)",
+      transition: "border-color 0.2s ease-out"
+    },
+    "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
+      borderColor: "rgba(255,255,255,0.80)"
+    },
+    "& .MuiSelect-icon": {
+      color: "rgba(255,255,255,0.54)"
+    }
   }
 })

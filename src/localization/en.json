@@ -17,7 +17,10 @@
     "myStories": "My stories",
     "selectStoryText": "Select a Story or create a new one.",
     "createNewStory": "Create a new story",
-    "lastEditedStories": "Last edited"
+    "lastEditedStories": "Last edited",
+    "selectStory": "Select a story",
+    "selectStoryToEdit": "Edit existing story",
+    "open": "Open"
   },
 
   "editorScreen": {
