@@ -9,7 +9,8 @@
     "title": "Metamind Hallinta",
     "editor": "Editori",
     "preview": "Esikatselu",
-    "signOut": "Kirjaudu ulos"
+    "signOut": "Kirjaudu ulos",
+    "settings": "Asetukset"
   },
 
   "homeScreen": {

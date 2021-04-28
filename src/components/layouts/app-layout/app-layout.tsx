@@ -80,16 +80,21 @@ class AppLayout extends React.Component<Props, State> {
                 <Typography color="textSecondary">
                   { firstName } { lastName }
                 </Typography>
+                <Typography color="textSecondary">{ "//" }</Typography>
                 <Button
                   variant="text"
-                  color="secondary"
                   onClick={ () => this.onLogOutClick() }
                 >
                   { strings.header.signOut }
                 </Button>
-                <IconButton color="secondary">
-                  <SettingsIcon/>
-                </IconButton>
+                <Box ml={ 2 }>
+                  <IconButton
+                    title={ strings.header.settings }
+                    color="secondary"
+                    >
+                    <SettingsIcon/>
+                  </IconButton>
+                </Box>
               </Box>
             </Box>
           </Toolbar>
