@@ -1,27 +1,24 @@
-import * as React from "react";
-
-import { Dispatch } from "redux";
-import { connect } from "react-redux";
-import { ReduxActions, ReduxState } from "../../../store";
-import Toolbar from "@material-ui/core/Toolbar";
+import { Box, Drawer, Tab, Tabs, TextField, Typography, WithStyles, withStyles } from "@material-ui/core";
 import Divider from "@material-ui/core/Divider";
-import ListItemText from "@material-ui/core/ListItemText";
-import { styles } from "./editor-screen.styles";
-import { KeycloakInstance } from "keycloak-js";
-import AppLayout from "../../layouts/app-layout/app-layout";
-import { AccessToken } from "../../../types";
-import { Box, List, ListItem, ListItemIcon, WithStyles, withStyles, Drawer, Tab, Tabs, TextField, Typography } from "@material-ui/core";
-import { Knot } from "../../../generated/client/models/Knot";
-import { KnotType } from "../../../generated/client/models/KnotType";
-import { TokenizerType } from "../../../generated/client/models/TokenizerType";
-import { Story } from "../../../generated/client/models/Story";
-import strings from "../../../localization/strings";
-import TagFacesIcon from "@material-ui/icons/TagFaces";
+import Toolbar from "@material-ui/core/Toolbar";
 import { History } from "history";
+import { KeycloakInstance } from "keycloak-js";
+import * as React from "react";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import Api from "../../../api/api";
 import { Intent } from "../../../generated/client/models/Intent";
-import { IntentType } from "../../../generated/client/models/IntentType";
-
+import { Knot } from "../../../generated/client/models/Knot";
+import { KnotType } from "../../../generated/client/models/KnotType";
+import { Story } from "../../../generated/client/models/Story";
+import { TokenizerType } from "../../../generated/client/models/TokenizerType";
+import strings from "../../../localization/strings";
+import { ReduxActions, ReduxState } from "../../../store";
+import { AccessToken } from "../../../types";
+import AppLayout from "../../layouts/app-layout/app-layout";
+import IntentPanel from "../../panels/intent-panel";
+import KnotPanel from "../../panels/knot-panel";
+import { styles } from "./editor-screen.styles";
 
 /**
  * Interface describing component props
@@ -46,6 +43,7 @@ interface State {
   currentKnot?: Knot;
   currentStory?: Story;
   storyId?: String;
+  dataChanged: boolean;
 }
 
 /**
@@ -66,8 +64,16 @@ class EditorScreen extends React.Component<Props, State> {
       rightToolbarIndex: 0,
       editorTabIndex: 0,
       storyKnots: [],
-      storyIntents: []
+      storyIntents: [],
+      dataChanged: false
     };
+  }
+
+  /**
+   * Component did mount life cycle handler
+   */
+  public componentDidMount = () => {
+    this.fetchData();
   }
 
   /**
@@ -75,12 +81,13 @@ class EditorScreen extends React.Component<Props, State> {
    */
   public render = () => {
     const { keycloak } = this.props;
+    const { dataChanged } = this.state;
 
     return (
       <AppLayout
         keycloak={ keycloak }
         pageTitle="Story name here"
-        dataChanged={ true }
+        dataChanged={ dataChanged }
         storySelected={ true }
       >
         { this.renderLeftToolbar() }
@@ -94,7 +101,12 @@ class EditorScreen extends React.Component<Props, State> {
    * Renders left toolbar
    */
   private renderLeftToolbar = () => {
-    const { leftToolbarIndex } = this.state;
+    const {
+      leftToolbarIndex,
+      storyKnots,
+      storyIntents
+    } = this.state;
+
     return (
       <Drawer
         variant="permanent"
@@ -117,8 +129,8 @@ class EditorScreen extends React.Component<Props, State> {
           />
         </Tabs>
         <Box>
-          { leftToolbarIndex === 0 && this.renderKnotsTab() }
-          { leftToolbarIndex === 1 && this.renderIntentsTab() }
+          { leftToolbarIndex === 0 && <KnotPanel knots={ storyKnots }/> }
+          { leftToolbarIndex === 1 && <IntentPanel intents={ storyIntents }/> }
         </Box>
       </Drawer>
     );
@@ -319,124 +331,6 @@ class EditorScreen extends React.Component<Props, State> {
   }
 
   /**
-   * Renders tab of knots (left toolbar)
-   * 
-   * Todo dropdown list
-   */
-  private renderKnotsTab = () => {
-    const { storyKnots } = this.state;
-
-    const globalKnot = storyKnots[0];
-    return (
-      <Box>
-        <Box p={ 2 }>
-          <TextField 
-            fullWidth
-            label={ strings.editorScreen.leftBar.knotSearchHelper }
-          />
-        </Box>
-        <Divider/>
-          <Box>
-            <Typography>Global knots</Typography>
-            <ListItem button>
-              <ListItemIcon>
-                <TagFacesIcon/>
-              </ListItemIcon>
-              <ListItemText>
-                { globalKnot?.name }
-              </ListItemText>
-            </ListItem>
-          </Box>
-        <Divider/>
-          <Box>
-            <Typography>Basic knots</Typography>
-            <List>
-              {
-                storyKnots?.map(knot => (
-                  <ListItem button>
-                    <ListItemIcon>
-                      <TagFacesIcon/>
-                    </ListItemIcon>
-                    <ListItemText>
-                      { knot.name }
-                    </ListItemText>
-                  </ListItem>
-                ))
-              }
-            </List>
-          </Box>
-      </Box>
-    );
-  }
-
-  /*
-  * Renders tab of intents (left toolbar)
-  */
-  private renderIntentsTab = () => {
-    const { storyIntents } = this.state;
-
-    const normalIntents = storyIntents.filter(intent => intent.type === IntentType.NORMAL)
-    const defaultIntents = storyIntents.filter(intent => intent.type === IntentType.DEFAULT)
-    const confusedIntents = storyIntents.filter(intent => intent.type === IntentType.CONFUSED)
-    const redirectIntents = storyIntents.filter(intent => intent.type === IntentType.REDIRECT)
-
-    return (
-      <Box>
-        <Box p={ 2 }>
-          <TextField
-            fullWidth
-            label={ strings.editorScreen.leftBar.intentSearchHelper }
-          />
-        </Box>
-        <Divider/>
-          <Box>
-            <Typography>Normal intents</Typography>
-            { this.renderIntentsGroup(normalIntents) }
-          </Box>
-        <Divider/>
-          <Box>
-            <Typography>Default intents</Typography>
-            { this.renderIntentsGroup(defaultIntents) }
-          </Box>
-        <Divider/>
-          <Box>
-            <Typography>Confused intents</Typography>
-            { this.renderIntentsGroup(confusedIntents) }
-          </Box>
-        <Divider/>
-          <Box>
-            <Typography>Redirect intents</Typography>
-            { this.renderIntentsGroup(redirectIntents) }
-          </Box>
-      </Box>
-    );
-  }
-
-  /**
-   * Renders list of intents for left toolbar second tab
-   *
-   * @param intents list of intents from one group
-   */
-  private renderIntentsGroup = (intents : Intent[]) => {
-    return (
-      <List>
-        {
-          intents.map(intent => (
-            <ListItem button>
-              <ListItemIcon>
-                <TagFacesIcon/>
-              </ListItemIcon>
-              <ListItemText>
-                { intent.name }
-              </ListItemText>
-            </ListItem>
-          ))
-        }
-      </List>
-    )
-  }
-
-  /**
    * Fetches knots list for the story
    */
   private fetchData = async() => {
@@ -469,16 +363,6 @@ class EditorScreen extends React.Component<Props, State> {
       storyKnots : knotList,
       storyIntents: intentList
     });
-  }
-
-
-    /**
-   * Component did mount life cycle handler
-   */
-  public componentDidMount = () => {
-    //this.clearTestData()
-    //this.createTestData()
-    this.fetchData();
   }
 
   /**
