@@ -9,9 +9,7 @@ import { Dispatch } from "redux";
 import Api from "../../../api/api";
 import { Intent } from "../../../generated/client/models/Intent";
 import { Knot } from "../../../generated/client/models/Knot";
-import { KnotType } from "../../../generated/client/models/KnotType";
 import { Story } from "../../../generated/client/models/Story";
-import { TokenizerType } from "../../../generated/client/models/TokenizerType";
 import strings from "../../../localization/strings";
 import { ReduxActions, ReduxState } from "../../../store";
 import { AccessToken } from "../../../types";
@@ -411,62 +409,6 @@ class EditorScreen extends React.Component<Props, State> {
         );
       });
     });
-  }
-
-  /**
-  * Creates test story and knots for it
-  */
-  private createTestData = async() => {
-    const { accessToken } = this.props;
-
-    if (!accessToken) {
-      return;
-    }
-    const storiesApi = Api.getStoriesApi(accessToken);
-    const knotsApi = Api.getKnotsApi(accessToken);
-    const intentsApi = Api.getIntentsApi(accessToken);
-
-    const basicKnot0: Knot = {
-      name: "basic0",
-      type: KnotType.TEXT,
-      tokenizer: TokenizerType.UNTOKENIZED,
-      content: "basic knot 1 text content"
-    };
-
-    const basicKnot1: Knot = {
-      name: "basic1",
-      type: KnotType.TEXT,
-      tokenizer: TokenizerType.UNTOKENIZED,
-      content: "basic knot 2 text content"
-    };
-
-    const globalKnot0: Knot = {
-      name: "global0",
-      type: KnotType.TEXT,
-      tokenizer: TokenizerType.UNTOKENIZED,
-      content: "global knot 1 text content"
-    };
-
-    const globalKnot1: Knot = {
-      name: "global1",
-      type: KnotType.TEXT,
-      tokenizer: TokenizerType.UNTOKENIZED,
-      content: "global knot 1 text content"
-    };
-
-    const story0: Story = {
-      name: "story 1",
-      locale: "en"
-    };
-
-    const createdStory = await storiesApi.createStory({story: story0})
-
-    const [ knot1, knot2, knot3, knot4 ] = await Promise.all([
-      knotsApi.createKnot({knot: basicKnot0, storyId: createdStory.id || ""}),
-      knotsApi.createKnot({knot: basicKnot1, storyId: createdStory.id || ""}),
-      knotsApi.createKnot({knot: globalKnot0, storyId: createdStory.id || ""}),
-      knotsApi.createKnot({knot: globalKnot1, storyId: createdStory.id || ""})
-    ]);
   }
 }
 

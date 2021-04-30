@@ -1,4 +1,4 @@
-import { Box, Divider, List, ListItem, ListItemIcon, ListItemText, TextField, Typography, withStyles, WithStyles } from "@material-ui/core";
+import { Box, Divider, List, ListItem, ListItemIcon, ListItemText, TextField, withStyles, WithStyles } from "@material-ui/core";
 import * as React from "react";
 import strings from "../../../localization/strings";
 import { styles } from "./knot-panel.styles";
@@ -38,10 +38,6 @@ class KnotPanel extends React.Component<Props, State> {
    * Component render method
    */
   public render = () => {
-    const {
-      classes,
-      knots
-    } = this.props;
 
     return (
       <Box>
@@ -65,7 +61,7 @@ class KnotPanel extends React.Component<Props, State> {
    * TODO: fetch global knots
    */
   private renderGlobalKnots = () => {
-    const { classes, knots} = this.props;
+    const { knots } = this.props;
     const globalKnot = knots[0];
 
     return (
@@ -90,7 +86,7 @@ class KnotPanel extends React.Component<Props, State> {
    * TODO: fetch basic knots
    */
   private renderBasicKnots = () => {
-    const { classes, knots} = this.props;
+    const { knots} = this.props;
 
     return (
       <AccordionItem title="Basic knots">

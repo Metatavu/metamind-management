@@ -1,4 +1,4 @@
-import { Box, Divider, List, ListItem, ListItemIcon, ListItemText, TextField, Typography, withStyles, WithStyles } from "@material-ui/core";
+import { Box, List, ListItem, ListItemIcon, ListItemText, TextField, withStyles, WithStyles } from "@material-ui/core";
 import * as React from "react";
 import { styles } from "./intent-panel.styles";
 import { Intent } from "../../../generated/client/models/Intent";
