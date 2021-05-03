@@ -25,13 +25,15 @@
   },
 
   "editorScreen": {
-    "story": "Tarina",
-    "global": "Globaalit",
+    "storyKnots": "Tarinan solmut",
+    "globalKnots": "Globaalit solmut",
+    "storyEditor": "Tarinaeditori",
+    "globalEditor": "Globaalieditori",
     "leftBar" : {
       "knotsLeftTab": "Solmut",
       "intentsLeftTab": "Aikomukset",
       "knotSearchHelper": "Solmujen haku",
-      "intentSearchHelper": "Search for an intent"
+      "intentSearchHelper": "Hae aikomuksia"
     },
     "rightBar" : {
       "storyRightTab": "Tarina",
@@ -39,6 +41,12 @@
       "linkingRightTab": "Linkit",
       "storyNameHelper": "Tarinan nimi",
       "knotNameHelper": "Solmun nimi"
-    } 
+    },
+    "intents": {
+      "normalIntents": "Normaalit aikomukset",
+      "defaultIntents": "Oletusaikomukset",
+      "confusedIntents": "Hämmentymiset",
+      "redirectIntents": "Uudelleenohjaukset"
+    }
   }
 }

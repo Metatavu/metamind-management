@@ -54,16 +54,16 @@ class IntentPanel extends React.Component<Props, State> {
             label={ strings.editorScreen.leftBar.intentSearchHelper }
           />
         </Box>
-        <AccordionItem title="Normal intents">
+        <AccordionItem title={ strings.editorScreen.intents.normalIntents }>
           { this.renderIntentsGroup(normalIntents) }
         </AccordionItem>
-        <AccordionItem title="Default intents">
+        <AccordionItem title={ strings.editorScreen.intents.defaultIntents }>
           { this.renderIntentsGroup(defaultIntents) }
         </AccordionItem>
-        <AccordionItem title="Confused intents">
+        <AccordionItem title={ strings.editorScreen.intents.confusedIntents }>
           { this.renderIntentsGroup(confusedIntents) }
         </AccordionItem>
-        <AccordionItem title="Redirect intents">
+        <AccordionItem title={ strings.editorScreen.intents.redirectIntents }>
           { this.renderIntentsGroup(redirectIntents) }
         </AccordionItem>
       </Box>

@@ -65,7 +65,7 @@ class KnotPanel extends React.Component<Props, State> {
     const globalKnot = knots[0];
 
     return (
-      <AccordionItem title="Global knots" >
+      <AccordionItem title={ strings.editorScreen.globalKnots } >
         <List>
           <ListItem button>
             <ListItemIcon>
@@ -89,7 +89,7 @@ class KnotPanel extends React.Component<Props, State> {
     const { knots} = this.props;
 
     return (
-      <AccordionItem title="Basic knots">
+      <AccordionItem title={ strings.editorScreen.storyKnots }>
         <List>
           {
             knots?.map(knot => (

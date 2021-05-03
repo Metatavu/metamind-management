@@ -1,4 +1,4 @@
-import { Box, Drawer, Tab, Tabs, TextField, Typography, WithStyles, withStyles } from "@material-ui/core";
+import { Box, Drawer, Tab, Tabs, TextField, WithStyles, withStyles } from "@material-ui/core";
 import Divider from "@material-ui/core/Divider";
 import Toolbar from "@material-ui/core/Toolbar";
 import { History } from "history";
@@ -16,6 +16,8 @@ import { AccessToken } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
 import IntentPanel from "../../panels/intent-panel";
 import KnotPanel from "../../panels/knot-panel";
+import StoryEditorView from "../../views/story-editor-view";
+import GlobalEditorView from "../../views/global-editor-view";
 import { styles } from "./editor-screen.styles";
 
 /**
@@ -157,53 +159,19 @@ class EditorScreen extends React.Component<Props, State> {
             <Tab
               value={ 0 }
               className={ classes.tab }
-              label={ strings.editorScreen.story }
+              label={ strings.editorScreen.storyEditor }
             />
             <Tab
               value={ 1 }
               className={ classes.tab }
-              label={ strings.editorScreen.global }
+              label={ strings.editorScreen.globalEditor }
             />
           </Tabs>
         </Toolbar>
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          { editorTabIndex === 0 && this.renderStoryEditor() }
-          { editorTabIndex === 1 && this.renderGlobalEditor() }
+        <Box className={ classes.editorContainer }>
+          { editorTabIndex === 0 && <StoryEditorView/> }
+          { editorTabIndex === 1 && <GlobalEditorView/> }
         </Box>
-      </Box>
-    );
-  }
-
-  /**
-   * Renders main editor area
-   *
-   * TODO: replace content with editor
-   */
-  private renderStoryEditor = () => {
-    return (
-      <Box>
-        <Typography color="primary">
-          { strings.editorScreen.story }
-        </Typography>
-      </Box>
-    );
-  }
-
-  /**
-   * Renders main editor area
-   *
-   * TODO: replace content with editor
-   */
-  private renderGlobalEditor = () => {
-    return (
-      <Box>
-        <Typography color="primary">
-          { strings.editorScreen.global }
-        </Typography>
       </Box>
     );
   }

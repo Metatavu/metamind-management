@@ -76,11 +76,13 @@ class AppLayout extends React.Component<Props, State> {
                   { strings.generic.save }
                 </Button>
               }
-              <Box display="flex" alignItems="center">
+              <Box ml={ 2 } display="flex" alignItems="center">
                 <Typography color="textSecondary">
                   { firstName } { lastName }
                 </Typography>
-                <Typography color="textSecondary">{ "//" }</Typography>
+                <Box ml={ 1 }>
+                  <Typography color="textSecondary">{ "//" }</Typography>
+                </Box>
                 <Button
                   variant="text"
                   onClick={ () => this.onLogOutClick() }

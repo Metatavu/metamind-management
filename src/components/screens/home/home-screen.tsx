@@ -1,4 +1,4 @@
-import { Box, Button, List, ListItem, ListItemText, Typography, WithStyles, withStyles, TextField, Divider } from "@material-ui/core";
+import { Box, Button, List, ListItem, ListItemText, Typography, WithStyles, withStyles, TextField, Divider, MenuItem } from "@material-ui/core";
 import { History } from "history";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
@@ -87,7 +87,7 @@ class HomeScreen extends React.Component<Props, State> {
             variant="outlined"
             color="primary"
             >
-              {/* TODO: map available stories */}
+              <MenuItem>{ strings.homeScreen.myStories }</MenuItem>
           </TextField>
         </Box>
         <Button
@@ -147,21 +147,21 @@ class HomeScreen extends React.Component<Props, State> {
    * Event handler for create new story click
    */
   private onCreateNewStoryClick = () => {
-    // TODO: Not yet implemented
+    // TODO: add functionality
   }
 
   /**
    * Event handler for selected story change
    */
   private onSelectedStoryChange = () => {
-    // TODO: Not yet implemented
+    // TODO: add functionality
   }
 
   /**
    * Event handler for selected story open click
    */
   private onOpenSelectedStoryClick = () => {
-    // TODO: Not yet implemented
+    // TODO: add functionality
   }
 
 }

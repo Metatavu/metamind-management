@@ -43,8 +43,10 @@ export interface IStrings extends LocalizedStringsMethods {
   * Translations related to editor screen
   */
   editorScreen: {
-    story: string,
-    global: string,
+    storyKnots: string,
+    globalKnots: string,
+    storyEditor: string,
+    globalEditor: string,
     leftBar: {
       knotsLeftTab: string;
       intentsLeftTab: string;
@@ -58,6 +60,12 @@ export interface IStrings extends LocalizedStringsMethods {
       knotNameHelper: string;
       storyNameHelper: string;
     };
+    intents: {
+      normalIntents: string;
+      defaultIntents: string;
+      confusedIntents: string;
+      redirectIntents: string;
+    }
   };
 
   /**
