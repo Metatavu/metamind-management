@@ -93,7 +93,7 @@ class AppLayout extends React.Component<Props, State> {
                   <IconButton
                     title={ strings.header.settings }
                     color="secondary"
-                    >
+                  >
                     <SettingsIcon/>
                   </IconButton>
                 </Box>
