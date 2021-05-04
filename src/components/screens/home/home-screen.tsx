@@ -93,7 +93,7 @@ class HomeScreen extends React.Component<Props, State> {
         <Button
           variant="outlined"
           color="secondary"
-          onClick={ () => this.onOpenSelectedStoryClick() }
+          onClick={ this.onOpenSelectedStoryClick }
         >
           { strings.homeScreen.open }
         </Button>
