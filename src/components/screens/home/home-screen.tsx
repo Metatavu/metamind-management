@@ -108,8 +108,8 @@ class HomeScreen extends React.Component<Props, State> {
         <Button
           variant="outlined"
           color="secondary"
-          onClick={ () => this.onCreateNewStoryClick() }
-          >
+          onClick={ this.onCreateNewStoryClick }
+        >
           { strings.homeScreen.createNewStory }
         </Button>
         { this.renderRecentStories() }
