@@ -30,6 +30,7 @@ class StoryEditorView extends React.Component<Props, State> {
     this.state = {
     }
   }
+
   /**
    * Component render method
    */
