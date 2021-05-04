@@ -38,7 +38,6 @@ class AccordionItem extends React.Component<Props, State> {
   public render = () => {
     const {
       children,
-      classes,
       title
     } = this.props;
 

@@ -1,80 +1,47 @@
-import { Box, Divider, List, ListItem, ListItemIcon, ListItemText, TextField, withStyles, WithStyles } from "@material-ui/core";
+import { Box, Divider, List, TextField } from "@material-ui/core";
 import * as React from "react";
-import strings from "../../../localization/strings";
-import { styles } from "./knot-panel.styles";
 import { Knot } from "../../../generated/client/models/Knot";
+import strings from "../../../localization/strings";
+import GlobalKnotIcon from "../../../resources/svg/global-knot-icon";
+import KnotIcon from "../../../resources/svg/knot-icon";
 import AccordionItem from "../../generic/accordion-item";
-import TagFacesIcon from "@material-ui/icons/TagFaces";
+import InteractiveListItem from "../../generic/list-items/interactive-list-item";
 
 /**
  * Interface describing component props
  */
-interface Props extends WithStyles<typeof styles> {
+interface Props {
   knots: Knot[];
 }
 
 /**
- * Interface describing component state
- */
-interface State {
-}
-
-/**
  * Knot panel component
+ * 
+ * @param props component properties
  */
-class KnotPanel extends React.Component<Props, State> {
+const KnotPanel: React.FC<Props> = ({ knots }) => {
 
-  /**
-   * Constructor
-   *
-   * @param props props
-   */
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {}
-  }
-  /**
-   * Component render method
-   */
-  public render = () => {
-
-    return (
-      <Box>
-        <Box p={ 2 }>
-          <TextField 
-            fullWidth
-            label={ strings.editorScreen.leftBar.knotSearchHelper }
-          />
-        </Box>
-        <Divider/>
-        { this.renderGlobalKnots() }
-        <Divider/>
-        { this.renderBasicKnots() }
-      </Box>
-    );
-  }
+  const globalKnot = knots[0];
 
   /**
    * Render global knots
    * 
    * TODO: fetch global knots
    */
-  private renderGlobalKnots = () => {
-    const { knots } = this.props;
-    const globalKnot = knots[0];
+  const renderGlobalKnots = () => {
+
+    if (!knots) {
+      return  null;
+    }
 
     return (
       <AccordionItem title={ strings.editorScreen.globalKnots } >
         <List>
-          <ListItem button>
-            <ListItemIcon>
-              <TagFacesIcon/>
-            </ListItemIcon>
-            <ListItemText>
-              { globalKnot?.name }
-            </ListItemText>
-          </ListItem>
+          <InteractiveListItem
+            title={ globalKnot?.name }
+            icon={ <GlobalKnotIcon htmlColor="#000"/> }
+            onClick={ () => {} }
+          />
         </List>
       </AccordionItem>
     );
@@ -85,28 +52,43 @@ class KnotPanel extends React.Component<Props, State> {
    * 
    * TODO: fetch basic knots
    */
-  private renderBasicKnots = () => {
-    const { knots } = this.props;
+  const renderBasicKnots = () => {
+
+    if (!knots) {
+      return null;
+    }
 
     return (
       <AccordionItem title={ strings.editorScreen.storyKnots }>
         <List>
           {
             knots?.map(knot => (
-              <ListItem button>
-                <ListItemIcon>
-                  <TagFacesIcon/>
-                </ListItemIcon>
-                <ListItemText>
-                  { knot.name }
-                </ListItemText>
-              </ListItem>
+              <InteractiveListItem
+                icon={ <KnotIcon htmlColor="#000"/> }
+                title={ knot.name }
+                onClick={ () => {} }
+              />
             ))
           }
         </List>
       </AccordionItem>
     );
   }
+
+  return (
+    <Box>
+      <Box p={ 2 }>
+        <TextField 
+          fullWidth
+          label={ strings.editorScreen.leftBar.knotSearchHelper }
+        />
+      </Box>
+      <Divider/>
+      { renderGlobalKnots() }
+      <Divider/>
+      { renderBasicKnots() }
+    </Box>
+  );
 }
 
-export default withStyles(styles)(KnotPanel);
+export default KnotPanel;
