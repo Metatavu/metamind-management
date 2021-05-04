@@ -72,8 +72,8 @@ class EditorScreen extends React.Component<Props, State> {
   /**
    * Component did mount life cycle handler
    */
-  public componentDidMount = () => {
-    this.fetchData();
+  public componentDidMount = async () => {
+    await this.fetchData();
   }
 
   /**
