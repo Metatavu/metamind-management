@@ -86,7 +86,7 @@ class HomeScreen extends React.Component<Props, State> {
             title={ strings.homeScreen.selectStoryToEdit }
             variant="outlined"
             color="primary"
-            >
+          >
               <MenuItem>{ strings.homeScreen.myStories }</MenuItem>
           </TextField>
         </Box>
