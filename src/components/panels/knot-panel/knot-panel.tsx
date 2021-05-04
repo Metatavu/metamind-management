@@ -86,7 +86,7 @@ class KnotPanel extends React.Component<Props, State> {
    * TODO: fetch basic knots
    */
   private renderBasicKnots = () => {
-    const { knots} = this.props;
+    const { knots } = this.props;
 
     return (
       <AccordionItem title={ strings.editorScreen.storyKnots }>
