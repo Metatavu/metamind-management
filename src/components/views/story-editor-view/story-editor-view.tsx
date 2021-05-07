@@ -10,40 +10,24 @@ interface Props extends WithStyles<typeof styles> {
 }
 
 /**
- * Interface describing component state
+ * Functional story editor component
  */
-interface State {}
+const StoryEditorView: React.FC<Props> = ({ }) => {
 
-/**
- * Story editor component
- */
-class StoryEditorView extends React.Component<Props, State> {
+  React.useEffect(() => {
+    // TODO: Add fetch logic
+  }, []);
 
   /**
-   * Constructor
-   *
-   * @param props props
+   * Component render
    */
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-    }
-  }
-
-  /**
-   * Component render method
-   */
-  public render = () => {
-
-    return (
-      <Box>
-        <Typography color="primary">
-          { strings.editorScreen.storyEditor }
-        </Typography>
-      </Box>
-    );
-  }
+  return (
+    <Box>
+      <Typography color="primary">
+        { strings.editorScreen.storyEditor }
+      </Typography>
+    </Box>
+  );
 }
 
 export default withStyles(styles)(StoryEditorView);

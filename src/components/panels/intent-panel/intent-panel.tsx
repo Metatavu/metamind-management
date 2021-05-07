@@ -15,36 +15,29 @@ interface Props {
 }
 
 /**
- * Intent panel component
+ * Functional intent panel component
  */
 const IntentPanel: React.FC<Props> = ({ intents }) => {
 
-  const normalIntents = intents.filter(intent => intent.type === IntentType.NORMAL)
-  const defaultIntents = intents.filter(intent => intent.type === IntentType.DEFAULT)
-  const confusedIntents = intents.filter(intent => intent.type === IntentType.CONFUSED)
-  const redirectIntents = intents.filter(intent => intent.type === IntentType.REDIRECT)
-
   /**
-   * Renders list of intents for left toolbar second tab
+   * Renders list of intents based on type for left toolbar second tab
    *
-   * @param intents list of intents from one group
+   * @param type intent type
    */
-    const renderIntentsGroup = (intents : Intent[]) => {
-
-    if (!intents) {
-      return null;
-    }
+    const renderIntentGroups = (type: IntentType) => {
 
     return (
       <List>
         {
-          intents.map(intent => (
-            <InteractiveListItem
-              icon={ <IntentIcon/> }
-              title={ intent.name}
-              onClick={ () => {} }
-            />
-          ))
+          intents
+            .filter(intent => intent.type === type)
+            .map(intent => (
+              <InteractiveListItem
+                icon={ <IntentIcon/> }
+                title={ intent.name}
+                onClick={ () => { } }
+              />
+            ))
         }
       </List>
     )
@@ -59,16 +52,16 @@ const IntentPanel: React.FC<Props> = ({ intents }) => {
         />
       </Box>
       <AccordionItem title={ strings.editorScreen.intents.normalIntents }>
-        { renderIntentsGroup(normalIntents) }
+        { renderIntentGroups(IntentType.NORMAL) }
       </AccordionItem>
       <AccordionItem title={ strings.editorScreen.intents.defaultIntents }>
-        { renderIntentsGroup(defaultIntents) }
+        { renderIntentGroups(IntentType.DEFAULT) }
       </AccordionItem>
       <AccordionItem title={ strings.editorScreen.intents.confusedIntents }>
-        { renderIntentsGroup(confusedIntents) }
+        { renderIntentGroups(IntentType.CONFUSED) }
       </AccordionItem>
       <AccordionItem title={ strings.editorScreen.intents.redirectIntents }>
-        { renderIntentsGroup(redirectIntents) }
+        { renderIntentGroups(IntentType.REDIRECT) }
       </AccordionItem>
     </Box>
   );

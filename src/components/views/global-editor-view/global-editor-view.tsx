@@ -10,40 +10,24 @@ interface Props extends WithStyles<typeof styles> {
 }
 
 /**
- * Interface describing component state
- */
-interface State {}
-
-/**
  * Global editor component
  */
-class GlobalEditorView extends React.Component<Props, State> {
+const GlobalEditorView: React.FC<Props> = ({ }) => {
 
-  /**
-   * Constructor
-   *
-   * @param props props
-   */
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-    }
-  }
+  React.useEffect(() => {
+    // TODO: Add fetch logic
+  }, []);
 
   /**
    * Component render method
    */
-  public render = () => {
-
-    return (
-      <Box>
-        <Typography color="primary">
-          { strings.editorScreen.globalEditor }
-        </Typography>
-      </Box>
-    );
-  }
+  return (
+    <Box>
+      <Typography color="primary">
+        { strings.editorScreen.globalEditor }
+      </Typography>
+    </Box>
+  );
 }
 
 export default withStyles(styles)(GlobalEditorView);

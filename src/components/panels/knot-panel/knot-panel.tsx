@@ -23,6 +23,10 @@ const KnotPanel: React.FC<Props> = ({ knots }) => {
 
   const globalKnot = knots[0];
 
+  React.useEffect(() => {
+    // TODO: Add fetch logic
+  }, []);
+
   /**
    * Render global knots
    * 
@@ -31,7 +35,7 @@ const KnotPanel: React.FC<Props> = ({ knots }) => {
   const renderGlobalKnots = () => {
 
     if (!knots) {
-      return  null;
+      return null;
     }
 
     return (
@@ -62,11 +66,11 @@ const KnotPanel: React.FC<Props> = ({ knots }) => {
       <AccordionItem title={ strings.editorScreen.storyKnots }>
         <List>
           {
-            knots?.map(knot => (
+            knots.map(knot => (
               <InteractiveListItem
                 icon={ <KnotIcon htmlColor="#000"/> }
                 title={ knot.name }
-                onClick={ () => {} }
+                onClick={ () => { } }
               />
             ))
           }

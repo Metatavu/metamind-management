@@ -11,47 +11,23 @@ interface Props extends WithStyles<typeof styles> {
 }
 
 /**
- * Interface describing component state
+ * Functional accordion item component
  */
-interface State {}
-
-/**
- * Accordion item component
- */
-class AccordionItem extends React.Component<Props, State> {
+const AccordionItem: React.FC<Props> = ({ title, children }) => {
 
   /**
-   * Constructor
-   *
-   * @param props props
+   * Component render
    */
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      expanded: true
-    }
-  }
-  /**
-   * Component render method
-   */
-  public render = () => {
-    const {
-      children,
-      title
-    } = this.props;
-
-    return (
-      <Accordion>
-        <AccordionSummary expandIcon={ <ExpandMoreIcon color="primary"/> }>
-          <Typography>{ title }</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          { children }
-        </AccordionDetails>
-      </Accordion>
-    );
-  }
+  return (
+    <Accordion>
+      <AccordionSummary expandIcon={ <ExpandMoreIcon color="primary"/> }>
+        <Typography>{ title }</Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        { children }
+      </AccordionDetails>
+    </Accordion>
+  );
 }
 
 export default withStyles(styles)(AccordionItem);
