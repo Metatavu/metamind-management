@@ -12,7 +12,7 @@ interface Props extends WithStyles<typeof styles> {
 /**
  * Functional story editor component
  */
-const StoryEditorView: React.FC<Props> = ({ }) => {
+const StoryEditorView: React.FC<Props> = () => {
 
   React.useEffect(() => {
     // TODO: Add fetch logic

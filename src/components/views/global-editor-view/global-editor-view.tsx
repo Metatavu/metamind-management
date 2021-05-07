@@ -12,7 +12,7 @@ interface Props extends WithStyles<typeof styles> {
 /**
  * Global editor component
  */
-const GlobalEditorView: React.FC<Props> = ({ }) => {
+const GlobalEditorView: React.FC<Props> = () => {
 
   React.useEffect(() => {
     // TODO: Add fetch logic

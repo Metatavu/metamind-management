@@ -347,36 +347,36 @@ class EditorScreen extends React.Component<Props, State> {
 
     const allStories = await storiesApi.listStories();
 
-    // allStories.forEach(async (story) => {
-    //   const storyId: string = story.id || "";
+    allStories.forEach(async (story) => {
+      const storyId: string = story.id || "";
 
-    //   const [ allKnots, allIntents ] = await Promise.all([
-    //     knotsApi.listKnots({ storyId: storyId }),
-    //     intentsApi.listIntents({ storyId: storyId })
-    //   ]);
+      const [ allKnots, allIntents ] = await Promise.all([
+        knotsApi.listKnots({ storyId: storyId }),
+        intentsApi.listIntents({ storyId: storyId })
+      ]);
 
-    //   //remove all knots
-    //   allKnots.forEach(knot => {
-    //     const knotId = knot.id || "";
-    //     knotsApi.deleteKnot(
-    //       {
-    //         storyId: storyId,
-    //         knotId: knotId
-    //       }
-    //     );
-    //   });
+      //remove all knots
+      allKnots.forEach(knot => {
+        const knotId = knot.id || "";
+        knotsApi.deleteKnot(
+          {
+            storyId: storyId,
+            knotId: knotId
+          }
+        );
+      });
 
-    //   //remove all intents
-    //   allIntents.forEach(intent => {
-    //     const intentId: string = intent.id as string;
-    //     intentsApi.deleteIntent(
-    //       {
-    //         storyId: storyId,
-    //         intentId: intentId
-    //       }
-    //     );
-    //   });
-    // });
+      //remove all intents
+      allIntents.forEach(intent => {
+        const intentId: string = intent.id as string;
+        intentsApi.deleteIntent(
+          {
+            storyId: storyId,
+            intentId: intentId
+          }
+        );
+      });
+    });
   }
 }
 
