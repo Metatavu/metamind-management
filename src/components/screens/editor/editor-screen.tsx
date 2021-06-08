@@ -1,4 +1,4 @@
-import { Box, Drawer, Tab, Tabs, TextField, WithStyles, withStyles } from "@material-ui/core";
+import { Box, Drawer, Tab, Tabs, TextField, WithStyles, withStyles, Button } from "@material-ui/core";
 import Divider from "@material-ui/core/Divider";
 import Toolbar from "@material-ui/core/Toolbar";
 import { History } from "history";
@@ -7,9 +7,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../../../api/api";
-import { Intent } from "../../../generated/client/models/Intent";
-import { Knot } from "../../../generated/client/models/Knot";
-import { Story } from "../../../generated/client/models/Story";
+import { TokenizerType, KnotType, Story, Knot, Intent, IntentType } from "../../../generated/client/models";
 import strings from "../../../localization/strings";
 import { ReduxActions, ReduxState } from "../../../store";
 import { AccessToken } from "../../../types";
@@ -19,14 +17,15 @@ import KnotPanel from "../../panels/knot-panel";
 import StoryEditorView from "../../views/story-editor-view";
 import GlobalEditorView from "../../views/global-editor-view";
 import { styles } from "./editor-screen.styles";
+import { CustomNodeModel } from "../../diagram-components/custom-node/custom-node-model";
 
 /**
  * Interface describing component props
  */
 interface Props extends WithStyles<typeof styles> {
   history: History;
-  keycloak: KeycloakInstance;
-  accessToken: AccessToken;
+  keycloak?: KeycloakInstance;
+  accessToken?: AccessToken;
   storyId: string;
 }
 
@@ -38,12 +37,13 @@ interface State {
   leftToolbarIndex: number;
   rightToolbarIndex: number;
   editorTabIndex: number;
-  storyKnots: Knot[];
+  storyKnots?: Knot[];
   storyIntents: Intent[];
   currentKnot?: Knot;
   currentStory?: Story;
   storyId?: string;
   dataChanged: boolean;
+  addingKnots: boolean;
 }
 
 /**
@@ -63,9 +63,9 @@ class EditorScreen extends React.Component<Props, State> {
       leftToolbarIndex: 0,
       rightToolbarIndex: 0,
       editorTabIndex: 0,
-      storyKnots: [],
       storyIntents: [],
-      dataChanged: false
+      dataChanged: false,
+      addingKnots: false
     };
   }
 
@@ -82,6 +82,10 @@ class EditorScreen extends React.Component<Props, State> {
   public render = () => {
     const { keycloak } = this.props;
     const { dataChanged } = this.state;
+
+    if (!keycloak) {
+      return;
+    }
 
     return (
       <AppLayout
@@ -129,7 +133,7 @@ class EditorScreen extends React.Component<Props, State> {
           />
         </Tabs>
         <Box>
-          { leftToolbarIndex === 0 && <KnotPanel knots={ storyKnots }/> }
+          { leftToolbarIndex === 0 && <KnotPanel knots={ storyKnots || [] }/> }
           { leftToolbarIndex === 1 && <IntentPanel intents={ storyIntents }/> }
         </Box>
       </Drawer>
@@ -141,7 +145,11 @@ class EditorScreen extends React.Component<Props, State> {
    */
   private renderEditorContent = () => {
     const { classes } = this.props;
-    const { editorTabIndex } = this.state;
+    const { editorTabIndex, storyKnots, storyIntents, addingKnots } = this.state;
+
+    if (!storyKnots) {
+      return;
+    }
 
     return (
       <Box
@@ -167,12 +175,40 @@ class EditorScreen extends React.Component<Props, State> {
               label={ strings.editorScreen.globalEditor }
             />
           </Tabs>
+          { this.renderActionButtons() }
         </Toolbar>
+        <Divider variant="fullWidth" style={{ backgroundColor: "white" }}/>
         <Box className={ classes.editorContainer }>
-          { editorTabIndex === 0 && <StoryEditorView/> }
+          {
+            editorTabIndex === 0 && 
+              <StoryEditorView
+                knots={ storyKnots }
+                intents={ storyIntents }
+                addingKnots={ addingKnots }
+                onAddNode={ this.onAddNode }
+                onMoveNode={ this.onMoveNode }
+                onRemoveNode={ this.onRemoveNode }
+                onAddLink={ this.onAddLink }
+                onRemoveLink={ this.onRemoveLink }
+              />
+          }
           { editorTabIndex === 1 && <GlobalEditorView/> }
         </Box>
       </Box>
+    );
+  }
+
+  /**
+   * Renders toolbar action buttons
+   */
+  private renderActionButtons = () => {
+    return (
+      <Button
+        variant="contained"
+        onClick={ () => this.setState({ addingKnots: !this.state.addingKnots }) }
+      >
+        { strings.editorScreen.add.knot }
+      </Button>
     );
   }
 
@@ -212,40 +248,6 @@ class EditorScreen extends React.Component<Props, State> {
         </Box>
       </Drawer>
     );
-  }
-
-  /**
-   * Sets left tab index
-   * 
-   * @param event event object
-   * @param newValue new tab index value
-   */
-  private setLeftTabIndex = (event: React.ChangeEvent<{}>, newValue: number) => {
-    this.setState({
-      leftToolbarIndex: newValue
-    });
-  }
-
-  /**
-   * Sets right tab index
-   * 
-   * @param event event object
-   * @param newValue new tab index value
-   */
-  private setRightTabIndex = (event: React.ChangeEvent<{}>, newValue: number) => {
-    this.setState({
-      rightToolbarIndex: newValue
-    });
-  }
-
-  /**
-   * Sets editor tab index
-   *
-   * @param event event object
-   * @param newValue new tab index value
-   */
-  private setEditorTabIndex = (event: React.ChangeEvent<{ }>, newValue: number) => {
-    this.setState({ editorTabIndex: newValue });
   }
 
   /**
@@ -297,45 +299,174 @@ class EditorScreen extends React.Component<Props, State> {
   }
 
   /**
-   * Fetches knots list for the story
+   * Event handler for add node
+   *
+   * @param node added node
    */
-  private fetchData = async() => {
-    const { accessToken } = this.props;
+  private onAddNode = async (node: CustomNodeModel) => {
+    const { accessToken, storyId } = this.props;
 
     if (!accessToken) {
       return;
     }
 
-    const storiesApi = Api.getStoriesApi(accessToken)
-    const knotsApi = Api.getKnotsApi(accessToken)
-    const intentsApi = Api.getIntentsApi(accessToken)
+    const { x, y } = node.getPosition();
+    const newKnot: Knot = {
+      name: "New Knot",
+      content: "",
+      tokenizer: TokenizerType.UNTOKENIZED,
+      type: KnotType.TEXT,
+      coordinates: {
+        x: x,
+        y: y
+      }
+    };
 
-    const stories = await storiesApi.listStories();
-    const mainStory = stories.length ? stories[0] : undefined;
+    const knotsApi = Api.getKnotsApi(accessToken);
+    const createdKnot = await knotsApi.createKnot({
+      storyId: storyId,
+      knot: newKnot
+    });
 
-    if (!mainStory) {
+    //TODO: add support for created knot
+  }
+
+  /**
+   * Event handler for node move
+   *
+   * @param movedNode moved node
+   * @param knot knot that needs update
+   */
+  private onMoveNode = async (movedNode: CustomNodeModel, knot?: Knot) => {
+    const { accessToken, storyId } = this.props;
+
+    if (!accessToken || !knot || !knot.id) {
       return;
     }
 
-    const mainStoryId = mainStory.id || "";
+    const { x, y } = movedNode.getPosition();
 
-    const [ knotList, intentList ] = await Promise.all([
-      knotsApi.listKnots({ storyId: mainStoryId }),
-      intentsApi.listIntents({ storyId: mainStoryId })
-    ]);
+    const knotsApi = Api.getKnotsApi(accessToken);
+    const updatedKnot = await knotsApi.updateKnot({
+      storyId: storyId,
+      knotId: knot.id,
+      knot: { ...knot, coordinates: { x, y } }
+    });
 
-    this.setState({
-      currentStory: mainStory,
-      storyKnots : knotList,
-      storyIntents: intentList
+    //TODO: add support for update node list
+  }
+
+  /**
+   * Event handler for remove node
+   *
+   * @param removedNodeId Removed node id (knot ID)
+   */
+  private onRemoveNode = async (removedNodeId: string) => {
+    const { accessToken, storyId } = this.props;
+
+    if (!accessToken) {
+      return;
+    }
+
+    const knotsApi = Api.getKnotsApi(accessToken);
+    await knotsApi.deleteKnot({
+      storyId: storyId,
+      knotId: removedNodeId,
     });
   }
 
   /**
-   * Clears all test data
+   * Event handler for add link
+   *
+   * @param sourceNodeId link (intent) source node (knot) id
+   * @param targetNodeId link (intent) target node (knot) id
    */
-  private clearTestData = async() => {
-    const { accessToken } = this.props;
+  private onAddLink = async (sourceNodeId: string, targetNodeId: string) => {
+    const { accessToken, storyId } = this.props;
+
+    if (!accessToken) {
+      return;
+    }
+
+    const newIntent: Intent = {
+      name: "New intent name",
+      global: false,
+      sourceKnotId: sourceNodeId,
+      targetKnotId: targetNodeId,
+      quickResponseOrder: 0,
+      trainingMaterials: {},
+      type: IntentType.NORMAL
+    };
+
+    const intentsApi = Api.getIntentsApi(accessToken);
+    const createdIntent = await intentsApi.createIntent({
+      storyId: storyId,
+      intent: newIntent
+    });
+
+    //TODO: add support for update node list
+  }
+
+  /**
+   * Event handler for remove link
+   *
+   * @param linkId removed link (intent) id
+   */
+  private onRemoveLink = async (linkId: string) => {
+    const { accessToken, storyId } = this.props;
+
+    if (!accessToken) {
+      return;
+    }
+
+    const intentsApi = Api.getIntentsApi(accessToken);
+    await intentsApi.deleteIntent({
+      storyId: storyId,
+      intentId: linkId
+    });
+
+    //TODO: add support for update node list
+  }
+
+  /**
+   * Sets left tab index
+   * 
+   * @param event event object
+   * @param newValue new tab index value
+   */
+  private setLeftTabIndex = (event: React.ChangeEvent<{}>, newValue: number) => {
+    this.setState({
+      leftToolbarIndex: newValue
+    });
+  }
+
+  /**
+   * Sets right tab index
+   * 
+   * @param event event object
+   * @param newValue new tab index value
+   */
+  private setRightTabIndex = (event: React.ChangeEvent<{}>, newValue: number) => {
+    this.setState({
+      rightToolbarIndex: newValue
+    });
+  }
+
+  /**
+   * Sets editor tab index
+   *
+   * @param event event object
+   * @param newValue new tab index value
+   */
+  private setEditorTabIndex = (event: React.ChangeEvent<{ }>, newValue: number) => {
+    this.setState({ editorTabIndex: newValue });
+  }
+
+  /**
+   * Fetches knots list for the story
+   */
+  private fetchData = async () => {
+    const { accessToken, storyId } = this.props;
 
     if (!accessToken) {
       return;
@@ -345,37 +476,16 @@ class EditorScreen extends React.Component<Props, State> {
     const knotsApi = Api.getKnotsApi(accessToken)
     const intentsApi = Api.getIntentsApi(accessToken)
 
-    const allStories = await storiesApi.listStories();
+    const [ story, knotList, intentList ] = await Promise.all([
+      storiesApi.findStory({ storyId }),
+      knotsApi.listKnots({ storyId }),
+      intentsApi.listIntents({ storyId })
+    ]);
 
-    allStories.forEach(async (story) => {
-      const storyId: string = story.id || "";
-
-      const [ allKnots, allIntents ] = await Promise.all([
-        knotsApi.listKnots({ storyId: storyId }),
-        intentsApi.listIntents({ storyId: storyId })
-      ]);
-
-      //remove all knots
-      allKnots.forEach(knot => {
-        const knotId = knot.id || "";
-        knotsApi.deleteKnot(
-          {
-            storyId: storyId,
-            knotId: knotId
-          }
-        );
-      });
-
-      //remove all intents
-      allIntents.forEach(intent => {
-        const intentId: string = intent.id as string;
-        intentsApi.deleteIntent(
-          {
-            storyId: storyId,
-            intentId: intentId
-          }
-        );
-      });
+    this.setState({
+      currentStory: story,
+      storyKnots : knotList,
+      storyIntents: intentList
     });
   }
 }
@@ -387,8 +497,8 @@ class EditorScreen extends React.Component<Props, State> {
  * @returns state from props
  */
 const mapStateToProps = (state: ReduxState) => ({
-  accessToken: state.auth.accessToken as AccessToken,
-  keycloak: state.auth.keycloak as KeycloakInstance
+  accessToken: state.auth.accessToken,
+  keycloak: state.auth.keycloak
 });
 
 /**

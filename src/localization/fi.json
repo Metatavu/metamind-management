@@ -47,6 +47,14 @@
       "defaultIntents": "Oletusaikomukset",
       "confusedIntents": "Hämmentymiset",
       "redirectIntents": "Uudelleenohjaukset"
+    },
+    "add": {
+      "knot": "Lisää solmu",
+      "indent": "Lisää aikomus"
+    },
+    "confirm": {
+      "knot": "Poistetaanko valittu solmu ja kaikki siihen liitetyt aikomukset?",
+      "intent": "Poistetaanko valittu aikomus?"
     }
   }
 }

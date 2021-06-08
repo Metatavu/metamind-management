@@ -1,9 +1,13 @@
 import { Box, Button, List, ListItem, ListItemText, Typography, WithStyles, withStyles, TextField, Divider, MenuItem } from "@material-ui/core";
+import { RestaurantMenuTwoTone } from "@material-ui/icons";
+import { access } from "fs";
 import { History } from "history";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
+import Api from "../../../api/api";
+import { Story } from "../../../generated/client";
 import strings from "../../../localization/strings";
 import { ReduxActions, ReduxState } from "../../../store";
 import { AccessToken } from "../../../types";
@@ -15,15 +19,16 @@ import { styles } from "./home-screen.styles";
  */
 interface Props extends WithStyles<typeof styles> {
   history: History;
-  accessToken: AccessToken;
-  keycloak: KeycloakInstance;
+  accessToken?: AccessToken;
+  keycloak?: KeycloakInstance;
 }
 
 /**
  * Interface describing component state
  */
 interface State {
-  selectedStoryId: string;
+  stories: Story[];
+  selectedStoryId?: string;
 }
 
 /**
@@ -40,8 +45,15 @@ class HomeScreen extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      selectedStoryId: ""
+      stories: []
     }
+  }
+
+  /**
+   * Component did mount life cycle handler
+   */
+  public componentDidMount = async () => {
+    await this.fetchData();
   }
 
   /**
@@ -49,6 +61,10 @@ class HomeScreen extends React.Component<Props, State> {
    */
   public render = () => {
     const { classes, keycloak } = this.props;
+
+    if (!keycloak) {
+      return null;
+    }
 
     return (
       <AppLayout 
@@ -87,7 +103,7 @@ class HomeScreen extends React.Component<Props, State> {
             variant="outlined"
             color="primary"
           >
-              <MenuItem>{ strings.homeScreen.myStories }</MenuItem>
+            { this.renderStoryOptions() }
           </TextField>
         </Box>
         <Button
@@ -114,6 +130,17 @@ class HomeScreen extends React.Component<Props, State> {
         </Button>
         { this.renderRecentStories() }
       </Box>
+    );
+  }
+
+  /**
+   * Renders story options
+   */
+  private renderStoryOptions = () => {
+    return this.state.stories.map(story =>
+      <MenuItem value={ story.id } key={ story.id }>
+        { story.name }
+      </MenuItem>
     );
   }
 
@@ -152,16 +179,43 @@ class HomeScreen extends React.Component<Props, State> {
 
   /**
    * Event handler for selected story change
+   *
+   * @param event React change event
    */
-  private onSelectedStoryChange = () => {
-    // TODO: add functionality
+  private onSelectedStoryChange: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement> = event => {
+    this.setState({ selectedStoryId: event.target.value });
   }
 
   /**
    * Event handler for selected story open click
    */
   private onOpenSelectedStoryClick = () => {
-    // TODO: add functionality
+    const { selectedStoryId } = this.state;
+
+    if (!selectedStoryId) {
+      return;
+    }
+
+    this.props.history.push(`editor/${selectedStoryId}`);
+  }
+
+  /**
+   * Fetches data from API
+   */
+  private fetchData = async () => {
+    const { accessToken } = this.props;
+
+    if (!accessToken) {
+      return;
+    }
+
+    try {
+      const storiesApi = Api.getStoriesApi(accessToken);
+      const stories = await storiesApi.listStories();
+      this.setState({ stories });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
 }
@@ -173,8 +227,8 @@ class HomeScreen extends React.Component<Props, State> {
  * @returns state from props
  */
 const mapStateToProps = (state: ReduxState) => ({
-  accessToken: state.auth.accessToken as AccessToken,
-  keycloak: state.auth.keycloak as KeycloakInstance
+  accessToken: state.auth.accessToken,
+  keycloak: state.auth.keycloak
 });
 
 /**

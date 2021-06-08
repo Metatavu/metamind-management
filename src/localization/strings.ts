@@ -6,8 +6,8 @@ import LocalizedStrings, { LocalizedStringsMethods } from "localized-strings";
 export interface IStrings extends LocalizedStringsMethods {
 
   /**
-  * Translations related to generic terms
-  */
+   * Translations related to generic terms
+   */
   generic: {
     save: string;
     cancel: string;
@@ -15,8 +15,8 @@ export interface IStrings extends LocalizedStringsMethods {
   };
 
   /**
-  * Translations related to header terms
-  */
+   * Translations related to header terms
+   */
   header: {
     title: string;
     editor: string;
@@ -26,8 +26,8 @@ export interface IStrings extends LocalizedStringsMethods {
   };
 
   /**
-  * Translations related to home screen
-  */
+   * Translations related to home screen
+   */
   homeScreen: {
     title: string;
     myStories: string;
@@ -40,13 +40,13 @@ export interface IStrings extends LocalizedStringsMethods {
   };
 
   /**
-  * Translations related to editor screen
-  */
+   * Translations related to editor screen
+   */
   editorScreen: {
-    storyKnots: string,
-    globalKnots: string,
-    storyEditor: string,
-    globalEditor: string,
+    storyKnots: string;
+    globalKnots: string;
+    storyEditor: string;
+    globalEditor: string;
     leftBar: {
       knotsLeftTab: string;
       intentsLeftTab: string;
@@ -65,17 +65,25 @@ export interface IStrings extends LocalizedStringsMethods {
       defaultIntents: string;
       confusedIntents: string;
       redirectIntents: string;
+    };
+    add: {
+      knot: string;
+      indent: string;
+    };
+    confirm: {
+      knot: string;
+      intent: string;
     }
   };
 
   /**
-  * Translations related to story view
-  */
+   * Translations related to story view
+   */
   storyView: {};
   
   /**
-  * Translations related to global view
-  */
+   * Translations related to global view
+   */
   globalView: {};
 }
 

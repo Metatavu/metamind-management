@@ -47,6 +47,14 @@
       "defaultIntents": "Default intents",
       "confusedIntents": "Confused intents",
       "redirectIntents": "Redirect intents"
+    },
+    "add": {
+      "knot": "Add knot",
+      "indent": "Add intent"
+    },
+    "confirm": {
+      "knot": "Remove knot and all related intents?",
+      "intent": "Remove selected intent?"
     }
   }
 }
