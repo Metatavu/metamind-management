@@ -3,6 +3,9 @@ import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 import { CustomPortModel } from '../custom-port/custom-port-model';
 import { Action, ActionEvent, InputType, State } from '@projectstorm/react-canvas-core';
 
+/**
+ * Interface for link state options
+ */
 interface CreateLinkStateOptions {
 	allowLooseLinks?: boolean;
 	allowLinksFromLockedPorts?: boolean;
@@ -39,7 +42,7 @@ export class CreateLinkState extends State<DiagramEngine> {
             this.port = this.engine.getMouseElement(actionEvent.event) as CustomPortModel;
             const rel = this.engine.getRelativePoint(actionEvent.event.clientX, actionEvent.event.clientY);
             this.initialXRelative = rel.x;
-					  this.initialYRelative = rel.y;
+            this.initialYRelative = rel.y;
             this.initialX = actionEvent.event.clientX;
             this.initialY = actionEvent.event.clientY;
 
