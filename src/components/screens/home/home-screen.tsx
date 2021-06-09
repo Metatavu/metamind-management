@@ -1,6 +1,4 @@
 import { Box, Button, List, ListItem, ListItemText, Typography, WithStyles, withStyles, TextField, Divider, MenuItem } from "@material-ui/core";
-import { RestaurantMenuTwoTone } from "@material-ui/icons";
-import { access } from "fs";
 import { History } from "history";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";

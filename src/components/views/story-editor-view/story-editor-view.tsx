@@ -1,28 +1,20 @@
-import { makeStyles, withStyles, WithStyles } from "@material-ui/core";
 import * as React from "react";
-import { styles } from "./story-editor-view";
-import createEngine, {  DiagramEngine, DiagramModel } from '@projectstorm/react-diagrams';
+import { useStoryEditorViewStyles } from "./story-editor-view";
+import createEngine, { DiagramModel } from '@projectstorm/react-diagrams';
 import { DefaultState } from "../../diagram-components/custom-state-machine/default-state";
 import { CustomNodeFactory } from "../../diagram-components/custom-node/custom-node-factory";
 import { CustomNodeModel } from "../../diagram-components/custom-node/custom-node-model";
-import { Action, ActionEvent, CanvasWidget, InputType } from '@projectstorm/react-canvas-core';
+import { Action, CanvasWidget, InputType } from '@projectstorm/react-canvas-core';
 import CustomLinkFactory from "../../diagram-components/custom-link/custom-link-factory";
 import { CustomLabelFactory } from "../../diagram-components/custom-label/custom-label-factory";
+import CustomLinkModel from "../../diagram-components/custom-link/custom-link-model";
 import { Intent, Knot } from "../../../generated/client";
 import { Point } from "@projectstorm/geometry";
-import CustomLinkModel from "../../diagram-components/custom-link/custom-link-model";
-import { CustomPortModel } from "../../diagram-components/custom-port/custom-port-model";
-
-const useLocalStyles = makeStyles({
-  canvas: {
-    height: "100vh"
-  }
-});
 
 /**
  * Interface describing component props
  */
-interface Props extends WithStyles<typeof styles> {
+interface Props {
   knots: Knot[];
   intents: Intent[];
   addingKnots: boolean;
@@ -35,6 +27,8 @@ interface Props extends WithStyles<typeof styles> {
 
 /**
  * Functional story editor component
+ *
+ * @param props component properties
  */
 const StoryEditorView: React.FC<Props> = ({
   knots,
@@ -46,8 +40,7 @@ const StoryEditorView: React.FC<Props> = ({
   onAddLink,
   onRemoveLink
 }) => {
-
-  const classes = useLocalStyles();
+  const classes = useStoryEditorViewStyles();
   const [ newPoint, setNewPoint ] = React.useState<Point>();
   const [ movedNode, setMovedNode ] = React.useState<CustomNodeModel>();
   const [ initialized, setInitialized ] = React.useState(false);
@@ -56,157 +49,36 @@ const StoryEditorView: React.FC<Props> = ({
   const debounceTimer = React.useRef<NodeJS.Timeout>();
 
   /**
-   * Initializes react-diagrams engine
+   * Effect that initializes diagram and adds initial data to it when component mounts
    */
-  const initializeEngine = (engine: DiagramEngine) => {
-
-    const engineState = new DefaultState();
-    engineState.registerAction(
-      new Action({
-				type: InputType.MOUSE_DOWN,
-				fire: (event: ActionEvent<any>) => {
-          const { clientX, clientY } = event.event;
-          const mousePoint = engine.getRelativeMousePoint({
-            clientX: clientX,
-            clientY: clientY
-          });
-
-          setNewPoint(mousePoint);
-        }
-			})
-    );
-
-    const diagramModel: DiagramModel = new DiagramModel();
-    diagramModel.registerListener({
-      linksUpdated: (linkUpdateEvent: any) => {
-        const link = linkUpdateEvent.link as CustomLinkModel;
-        const linkSourceNode = link.getSourcePort().getParent() as CustomNodeModel;
-
-        link.registerListener({
-          targetPortChanged: (portChangedEvent: any) => {
-            const port = portChangedEvent.port as CustomPortModel;
-            const linkTargetNode = port.getParent() as CustomNodeModel;
-            onAddLink(linkSourceNode.getID(), linkTargetNode.getID());
-          },
-          entityRemoved: (entityRemovedEvent: any) => {
-            const removedLink = entityRemovedEvent.entity as CustomLinkModel;
-            const linkId = removedLink.getID();
-            if (linkId) {
-              onRemoveLink(removedLink.getID());
-            }
-          }
-        });
-      }
-    });
-
-    engine.getStateMachine().pushState(engineState);
-    engine.getNodeFactories().registerFactory(new CustomNodeFactory());
-    engine.getLinkFactories().registerFactory(new CustomLinkFactory());
-    engine.getLabelFactories().registerFactory(new CustomLabelFactory());
-    engine.setModel(diagramModel);
-
-    setInitialized(true);
-  }
-
-  /**
-   * Creates nodes from knots
-   */
-  const createNodes = () => {
-    return knots.map(knot => {
-      const node = new CustomNodeModel({ name: knot.name, id: knot.id });
-      node.setPosition(knot.coordinates?.x || 200, knot.coordinates?.y || 200);
-
-      return addNodeListeners(node);
-    })
-  }
-
-  /**
-   * Adds node listeners
-   *
-   * @param node node
-   * @returns node with event handlers
-   */
-  const addNodeListeners = (node: CustomNodeModel) => {
-    node.registerListener({
-      selectionChanged: (selectionChangedEvent: any) => {
-        console.log("TODO");
-      },
-      positionChanged: (positionChangeEvent: any) => {
-        const eventNode = positionChangeEvent.entity as CustomNodeModel;
-        setMovedNode(eventNode);
-      },
-      entityRemoved: (entityRemovedEvent: any) => {
-        const removedNode = entityRemovedEvent.entity as CustomNodeModel;
-        onRemoveNode(removedNode.getID());
-      }
-    });
-
-    return node;
-  }
-
-  /**
-   * Creates links
-   *
-   * @param nodes list of nodes
-   * @returns list of custom link models
-   */
-  const createLinks = (nodes: CustomNodeModel[]) => {
-    const links: CustomLinkModel[] = [];
-    intents.forEach(intent => {
-      const sourceNode = nodes.find(node => node.getID() === intent.sourceKnotId);
-      const targetNode = nodes.find(node => node.getID() === intent.targetKnotId);
-
-      if (sourceNode && targetNode) {
-        const link = new CustomLinkModel({ id: intent.id });
-
-        const sourcePort = sourceNode.getOutPorts()[0];
-        const targetPort = targetNode.getInPorts()[0];
-
-        link.setSourcePort(sourcePort);
-        link.setTargetPort(targetPort);
-        links.push(link);
-      }
-    });
-
-    return links;
-  }
-
-  /**
-   * Adds initial knot data
-   */
-  const addInitialData = () => {
-    const nodes = createNodes();
-    const links = createLinks(nodes);
-    engineRef.current.getModel().addAll(...nodes, ...links);
-  }
-
-  /**
-   * Event handler for node move
-   */
-  const moveNode = () => {
-    if (movedNode) {
-      const id = movedNode.getID();
-      const knot = knots.find(_knot => _knot.id === id);
-      onMoveNode(movedNode, knot);
-    }
-  }
-
-  /**
-   * Event handler for adding changed nodes to engine
-   */
-  const addChangedNodes = () => {
-    console.log("TODO");
-  }
-
   React.useEffect(() => {
-    initializeEngine(engineRef.current);
+    initializeEngine();
     addInitialData();
+    // eslint-disable-next-line
   }, []);
 
+  /**
+   * Effect that syncs knots to diagram nodes when length of knots list is changed
+   */
   React.useEffect(() => {
-    addChangedNodes();
-  }, [ knots ]);
+    const engine = engineRef.current;
+    const nodes = engine.getModel().getNodes();
 
+    nodes.forEach(node => 
+      knots.every(knot => knot.id !== node.getID()) && engine.getModel().removeNode(node)
+    );
+
+    knots.forEach(knot =>
+      nodes.every(node => node.getID() !== knot.id) && engine.getModel().addNode(translateToNode(knot))
+    );
+
+    engine.repaintCanvas();
+    // eslint-disable-next-line
+  }, [ knots.length ]);
+
+  /**
+   * Effect that creates new node when diagram is clicked and addingKnots is true
+   */
   React.useEffect(() => {
     if (!addingKnots) {
       setNewPoint(undefined);
@@ -223,12 +95,135 @@ const StoryEditorView: React.FC<Props> = ({
     }
   }, [ addingKnots, newPoint, onAddNode ]);
 
+  /**
+   * Effect that delays actual update of coordinates in knot when corresponding node is moved in diagram
+   */
   React.useEffect(() => {
-    if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current);
-    }
+    debounceTimer.current && clearTimeout(debounceTimer.current);
     debounceTimer.current = setTimeout(() => moveNode(), 1000);
+    // eslint-disable-next-line
   }, [ movedNode ]);
+
+  /**
+   * Initializes react-diagrams engine
+   *
+   * @param engine diagram engine
+   */
+  const initializeEngine = () => {
+    const engineState = new DefaultState();
+    engineState.registerAction(
+      new Action({
+				type: InputType.MOUSE_DOWN,
+				fire: (event: any) => setNewPoint(engineRef.current.getRelativeMousePoint(event.event))
+			})
+    );
+
+    const diagramModel: DiagramModel = new DiagramModel();
+    diagramModel.registerListener({
+      linksUpdated: ({ link }: any) => {
+        link.registerListener({
+          targetPortChanged: ({ port }: any) => {
+            onAddLink(
+              link.getSourcePort().getParent().getID(),
+              port.getParent().getID()
+            );
+          },
+          entityRemoved: ({ entity }: any) => {
+            entity.getID() && onRemoveLink(entity.getID());
+          }
+        });
+      }
+    });
+
+    engineRef.current.getStateMachine().pushState(engineState);
+    engineRef.current.getNodeFactories().registerFactory(new CustomNodeFactory());
+    engineRef.current.getLinkFactories().registerFactory(new CustomLinkFactory());
+    engineRef.current.getLabelFactories().registerFactory(new CustomLabelFactory());
+    engineRef.current.setModel(diagramModel);
+
+    setInitialized(true);
+  }
+
+  /**
+   * Translates knot to node
+   *
+   * @param knot knot
+   * @returns node model
+   */
+  const translateToNode = (knot: Knot) => {
+    const node = new CustomNodeModel({ name: knot.name, id: knot.id });
+    node.setPosition(knot.coordinates?.x || 200, knot.coordinates?.y || 200);
+    return addNodeListeners(node);
+  }
+
+  /**
+   * Adds node listeners
+   *
+   * @param node node
+   * @returns node with event handlers
+   */
+  const addNodeListeners = (node: CustomNodeModel) => {
+    node.registerListener({
+      selectionChanged: (selectionChangedEvent: any) => {
+        console.log("TODO");
+      },
+      positionChanged: ({ entity }: any) => {
+        setMovedNode(entity as CustomNodeModel);
+      },
+      entityRemoved: ({ entity }: any) => {
+        onRemoveNode(entity.getID() as string);
+      }
+    });
+
+    return node;
+  }
+
+  /**
+   * Translates intent to link
+   *
+   * @param intent intent
+   * @param nodes list of nodes
+   * @returns custom link model
+   */
+  const translateToLink = (intent: Intent, nodes: CustomNodeModel[]) => {
+    const sourceNode = nodes.find(node => node.getID() === intent.sourceKnotId);
+    const targetNode = nodes.find(node => node.getID() === intent.targetKnotId);
+
+    if (!sourceNode || !targetNode) {
+      return;
+    }
+
+    const link = new CustomLinkModel({ id: intent.id });
+
+    link.setSourcePort(sourceNode.getOutPorts()[0]);
+    link.setTargetPort(targetNode.getInPorts()[0]);
+
+    return link;
+  }
+
+  /**
+   * Adds initial knot data
+   */
+  const addInitialData = () => {
+    const nodes = knots.map(translateToNode);
+    const links = intents.reduce<CustomLinkModel[]>((links, intent) => {
+      const translatedLink = translateToLink(intent, nodes);
+      return translatedLink ? [ ...links, translatedLink ] : links
+    }, []);
+
+    engineRef.current.getModel().addAll(...nodes, ...links);
+  }
+
+  /**
+   * Event handler for node move
+   */
+  const moveNode = () => {
+    if (movedNode) {
+      const id = movedNode.getID();
+      const foundKnot = knots.find(knot => knot.id === id);
+      onMoveNode(movedNode, foundKnot);
+    }
+  }
 
   /**
    * Component render
@@ -242,4 +237,4 @@ const StoryEditorView: React.FC<Props> = ({
   );
 }
 
-export default withStyles(styles)(StoryEditorView);
+export default StoryEditorView;
