@@ -64,13 +64,8 @@ const StoryEditorView: React.FC<Props> = ({
     const engine = engineRef.current;
     const nodes = engine.getModel().getNodes();
 
-    nodes.forEach(node => 
-      knots.every(knot => knot.id !== node.getID()) && engine.getModel().removeNode(node)
-    );
-
-    knots.forEach(knot =>
-      nodes.every(node => node.getID() !== knot.id) && engine.getModel().addNode(translateToNode(knot))
-    );
+    nodes.forEach(node => knots.every(knot => knot.id !== node.getID()) && engine.getModel().removeNode(node));
+    knots.forEach(knot => nodes.every(node => node.getID() !== knot.id) && engine.getModel().addNode(translateToNode(knot)));
 
     engine.repaintCanvas();
     // eslint-disable-next-line
