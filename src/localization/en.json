@@ -9,7 +9,8 @@
     "title": "Metamind Management",
     "editor": "Editor",
     "preview": "Preview",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "settings": "Settings"
   },
 
   "homeScreen": {
@@ -17,12 +18,17 @@
     "myStories": "My stories",
     "selectStoryText": "Select a Story or create a new one.",
     "createNewStory": "Create a new story",
-    "lastEditedStories": "Last edited"
+    "lastEditedStories": "Last edited",
+    "selectStory": "Select a story",
+    "selectStoryToEdit": "Edit existing story",
+    "open": "Open"
   },
 
   "editorScreen": {
-    "story": "Story",
-    "global": "Global",
+    "storyKnots": "Story knots",
+    "globalKnots": "Global knots",
+    "storyEditor": "Story editor",
+    "globalEditor": "Global editor",
     "leftBar" : {
       "knotsLeftTab": "Knots",
       "intentsLeftTab": "Intents",
@@ -35,6 +41,20 @@
       "linkingRightTab": "Linking",
       "storyNameHelper": "Story name",
       "knotNameHelper": "Knot name"
-    } 
+    },
+    "intents": {
+      "normalIntents": "Normal intents",
+      "defaultIntents": "Default intents",
+      "confusedIntents": "Confused intents",
+      "redirectIntents": "Redirect intents"
+    },
+    "add": {
+      "knot": "Add knot",
+      "indent": "Add intent"
+    },
+    "confirm": {
+      "knot": "Remove knot and all related intents?",
+      "intent": "Remove selected intent?"
+    }
   }
 }

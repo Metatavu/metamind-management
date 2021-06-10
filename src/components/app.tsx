@@ -51,23 +51,16 @@ const App: React.FC = () => {
                   />
                 )}
               />
-              <Route
-                path="/editor/:id"
-                exact={ true }
-                render={({ history, match }) => (
-                  <EditorScreen
-                    history={ history }
-                    storyId={ match.params.id }
-                  />
-                )}
-              />
+              <Route exact path="/editor/:storyId">
+                <EditorScreen/>
+              </Route>
               <Route
                 exact
-                path="/preview/:id"
+                path="/preview/:storyId"
                 render={({ history, match }) => (
                   <PreviewScreen
                     history={ history }
-                    storyId={ match.params.id }
+                    storyId={ match.params.storyId }
                   />
                 )}
               />

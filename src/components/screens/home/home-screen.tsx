@@ -1,29 +1,32 @@
-import { Box, Button, Divider, Drawer, List, ListItem, ListItemText, Typography, WithStyles, withStyles } from "@material-ui/core";
-import Toolbar from "@material-ui/core/Toolbar";
+import { Box, Button, List, ListItem, ListItemText, Typography, WithStyles, withStyles, TextField, Divider, MenuItem } from "@material-ui/core";
+import { History } from "history";
+import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
+import Api from "../../../api/api";
+import { Story } from "../../../generated/client";
 import strings from "../../../localization/strings";
 import { ReduxActions, ReduxState } from "../../../store";
 import { AccessToken } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
 import { styles } from "./home-screen.styles";
-import { History } from "history";
-import { KeycloakInstance } from "keycloak-js";
 
 /**
  * Interface describing component props
  */
 interface Props extends WithStyles<typeof styles> {
   history: History;
-  accessToken: AccessToken;
-  keycloak: KeycloakInstance;
+  accessToken?: AccessToken;
+  keycloak?: KeycloakInstance;
 }
 
 /**
  * Interface describing component state
  */
 interface State {
+  stories: Story[];
+  selectedStoryId?: string;
 }
 
 /**
@@ -39,7 +42,16 @@ class HomeScreen extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    this.state = {}
+    this.state = {
+      stories: []
+    }
+  }
+
+  /**
+   * Component did mount life cycle handler
+   */
+  public componentDidMount = async () => {
+    await this.fetchData();
   }
 
   /**
@@ -48,12 +60,15 @@ class HomeScreen extends React.Component<Props, State> {
   public render = () => {
     const { classes, keycloak } = this.props;
 
+    if (!keycloak) {
+      return null;
+    }
+
     return (
       <AppLayout 
         pageTitle={ strings.homeScreen.title }
         keycloak={ keycloak }
       >
-        { this.renderRightToolbar() }
         <Box className={ classes.root }>
           { this.renderSelectStoryCard() }
         </Box>
@@ -62,36 +77,11 @@ class HomeScreen extends React.Component<Props, State> {
   }
 
   /**
-   * Renders left toolbar
-   */
-  private renderRightToolbar = () => {
-    return (
-      <Drawer
-        variant="permanent"
-        anchor="right"
-      >
-        <Toolbar/>
-        <Toolbar>
-          <Box
-            display="flex"
-            flex={ 1 }
-            justifyContent="center"
-          >
-            <Typography variant="h3">
-              { strings.homeScreen.myStories }
-            </Typography>
-          </Box>
-        </Toolbar>
-        <Divider/>
-      </Drawer>
-    );
-  }
-
-  /**
    * Renders select story card
    */
   private renderSelectStoryCard = () => {
     const { classes } = this.props;
+    const { selectedStoryId } = this.state;
 
     return (
       <Box className={ classes.storySelectCard }>
@@ -100,15 +90,55 @@ class HomeScreen extends React.Component<Props, State> {
             { strings.homeScreen.selectStoryText }
           </Typography>
         </Box>
+        <Box p={ 2 } mb={ 2 }>
+          <TextField
+            select
+            className={ classes.select }
+            label={ strings.homeScreen.selectStory }
+            value={ selectedStoryId }
+            onChange={ this.onSelectedStoryChange }
+            title={ strings.homeScreen.selectStoryToEdit }
+            variant="outlined"
+            color="primary"
+          >
+            { this.renderStoryOptions() }
+          </TextField>
+        </Box>
         <Button
           variant="outlined"
           color="secondary"
-          onClick={ () => this.onCreateNewStoryClick() }
+          onClick={ this.onOpenSelectedStoryClick }
+        >
+          { strings.homeScreen.open }
+        </Button>
+        <Box 
+          mb={ 4 }
+          mt={ 4 }
+          ml={ 2 }
+          mr={ 2 }
+        >
+          <Divider light />
+        </Box>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={ this.onCreateNewStoryClick }
         >
           { strings.homeScreen.createNewStory }
         </Button>
         { this.renderRecentStories() }
       </Box>
+    );
+  }
+
+  /**
+   * Renders story options
+   */
+  private renderStoryOptions = () => {
+    return this.state.stories.map(story =>
+      <MenuItem value={ story.id } key={ story.id }>
+        { story.name }
+      </MenuItem>
     );
   }
 
@@ -142,7 +172,47 @@ class HomeScreen extends React.Component<Props, State> {
    * Event handler for create new story click
    */
   private onCreateNewStoryClick = () => {
-    // TODO: Not yet implemented
+    // TODO: add functionality
+  }
+
+  /**
+   * Event handler for selected story change
+   *
+   * @param event React change event
+   */
+  private onSelectedStoryChange: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement> = event => {
+    this.setState({ selectedStoryId: event.target.value });
+  }
+
+  /**
+   * Event handler for selected story open click
+   */
+  private onOpenSelectedStoryClick = () => {
+    const { selectedStoryId } = this.state;
+
+    if (!selectedStoryId) {
+      return;
+    }
+
+    this.props.history.push(`editor/${selectedStoryId}`);
+  }
+
+  /**
+   * Fetches data from API
+   */
+  private fetchData = async () => {
+    const { accessToken } = this.props;
+
+    if (!accessToken) {
+      return;
+    }
+
+    try {
+      const stories = await Api.getStoriesApi(accessToken).listStories();
+      this.setState({ stories });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
 }
@@ -154,8 +224,8 @@ class HomeScreen extends React.Component<Props, State> {
  * @returns state from props
  */
 const mapStateToProps = (state: ReduxState) => ({
-  accessToken: state.auth.accessToken as AccessToken,
-  keycloak: state.auth.keycloak as KeycloakInstance
+  accessToken: state.auth.accessToken,
+  keycloak: state.auth.keycloak
 });
 
 /**

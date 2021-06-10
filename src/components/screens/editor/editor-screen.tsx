@@ -1,100 +1,212 @@
-import * as React from "react";
-
-import { Dispatch } from "redux";
-import { connect } from "react-redux";
-import { ReduxActions, ReduxState } from "../../../store";
-import Toolbar from "@material-ui/core/Toolbar";
+import { Box, Drawer, Tab, Tabs, TextField, Button } from "@material-ui/core";
 import Divider from "@material-ui/core/Divider";
-import ListItemText from "@material-ui/core/ListItemText";
-import { styles } from "./editor-screen.styles";
+import Toolbar from "@material-ui/core/Toolbar";
 import { KeycloakInstance } from "keycloak-js";
-import AppLayout from "../../layouts/app-layout/app-layout";
-import { AccessToken } from "../../../types";
-import { Box, List, ListItem, ListItemIcon, WithStyles, withStyles, Drawer, Tab, Tabs, TextField, Typography } from "@material-ui/core";
-import { Knot } from "../../../generated/client/models/Knot";
-import { KnotType } from "../../../generated/client/models/KnotType";
-import { TokenizerType } from "../../../generated/client/models/TokenizerType";
-import { Story } from "../../../generated/client/models/Story";
-import strings from "../../../localization/strings";
-import TagFacesIcon from "@material-ui/icons/TagFaces";
-import { History } from "history";
+import * as React from "react";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import Api from "../../../api/api";
-import { Intent } from '../../../generated/client/models/Intent';
-import { IntentType } from '../../../generated/client/models/IntentType';
-
+import { TokenizerType, KnotType, Story, Knot, Intent, IntentType } from "../../../generated/client/models";
+import strings from "../../../localization/strings";
+import { ReduxActions, ReduxState } from "../../../store";
+import { AccessToken } from "../../../types";
+import AppLayout from "../../layouts/app-layout/app-layout";
+import IntentPanel from "../../panels/intent-panel";
+import KnotPanel from "../../panels/knot-panel";
+import StoryEditorView from "../../views/story-editor-view";
+import { CustomNodeModel } from "../../diagram-components/custom-node/custom-node-model";
+import { useEditorScreenStyles } from "./editor-screen.styles";
+import { useParams } from "react-router-dom";
 
 /**
- * Interface describing component props
+ * Component props
  */
-interface Props extends WithStyles<typeof styles> {
-  history: History;
-  keycloak: KeycloakInstance;
-  accessToken: AccessToken;
-  storyId: string;
+interface Props {
+  keycloak?: KeycloakInstance;
+  accessToken?: AccessToken;
 }
 
 /**
- * Interface describing component state
+ * Story data
  */
-interface State {
-  error?: Error;
-  leftToolbarIndex: number;
-  rightToolbarIndex: number;
-  editorTabIndex: number;
-  storyKnots: Knot[];
-  storyIntents: Intent[];
-  currentKnot?: Knot;
-  currentStory?: Story;
-  storyId?: String;
+interface StoryData {
+  story?: Story;
+  knots?: Knot[];
+  intents?: Intent[];
+  selectedKnot?: Knot;
 }
 
 /**
  * Editor screen component
+ *
+ * @param props component properties
  */
-class EditorScreen extends React.Component<Props, State> {
+const EditorScreen: React.FC<Props> = ({
+  accessToken,
+  keycloak
+}) => {
+  const { storyId } = useParams<{ storyId: string }>();
+  const classes = useEditorScreenStyles();
+
+  const [ storyData, setStoryData ] = React.useState<StoryData>({});
+  const { story, knots, selectedKnot, intents } = storyData;
+  const [ leftToolBarIndex, setLeftToolBarIndex ] = React.useState(0);
+  const [ rightToolBarIndex, setRightToolBarIndex ] = React.useState(0);
+  const [ addingKnots, setAddingKnots ] = React.useState(false);
+  const [ dataChanged, setDataChanged ] = React.useState(false);
+
+  React.useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line
+  }, []);
 
   /**
-   * Constructor
+   * Event handler for add node
    *
-   * @param props props
+   * @param node added node
    */
-  constructor(props: Props) {
-    super(props);
+  const onAddNode = async (node: CustomNodeModel) => {
+    if (!accessToken || !knots) {
+      return;
+    }
 
-    this.state = {
-      leftToolbarIndex: 0,
-      rightToolbarIndex: 0,
-      editorTabIndex: 0,
-      storyKnots: [],
-      storyIntents: []
-    };
+    const createdKnot = await Api.getKnotsApi(accessToken).createKnot({
+      storyId: storyId,
+      knot: {
+        name: "New Knot",
+        content: "",
+        tokenizer: TokenizerType.UNTOKENIZED,
+        type: KnotType.TEXT,
+        coordinates: node.getPosition()
+      }
+    });
+
+    setStoryData({
+      ...storyData,
+      knots: [ ...knots, createdKnot ]
+    });
   }
 
   /**
-   * Component render
+   * Event handler for node move
+   *
+   * @param movedNode moved node
+   * @param knot knot that needs update
    */
-  public render = () => {
-    const { keycloak } = this.props;
+  const onMoveNode = async (movedNode: CustomNodeModel, knot?: Knot) => {
+    if (!accessToken || !knots || !knot?.id) {
+      return;
+    }
 
-    return (
-      <AppLayout
-        keycloak={ keycloak }
-        pageTitle="Story name here"
-        dataChanged={ true }
-        storySelected={ true }
-      >
-        { this.renderLeftToolbar() }
-        { this.renderEditorContent() }
-        { this.renderRightToolbar() }
-      </AppLayout>
-    );
+    const updatedKnot = await Api.getKnotsApi(accessToken).updateKnot({
+      storyId: storyId,
+      knotId: knot.id,
+      knot: { ...knot, coordinates: movedNode.getPosition() }
+    });
+
+    setStoryData({
+      ...storyData,
+      knots: knots.map(knot => knot.id === updatedKnot.id ? updatedKnot : knot)
+    });
+  }
+
+  /**
+   * Event handler for remove node
+   *
+   * @param removedNodeId Removed node id (knot ID)
+   */
+  const onRemoveNode = async (removedNodeId: string) => {
+    if (!accessToken || !knots) {
+      return;
+    }
+
+    await Api.getKnotsApi(accessToken).deleteKnot({
+      storyId: storyId,
+      knotId: removedNodeId,
+    });
+
+    setStoryData({
+      ...storyData,
+      knots: knots.filter(knot => knot.id !== removedNodeId)
+    });
+  }
+
+  /**
+   * Event handler for add link
+   *
+   * @param sourceNodeId link (intent) source node (knot) id
+   * @param targetNodeId link (intent) target node (knot) id
+   */
+  const onAddLink = async (sourceNodeId: string, targetNodeId: string) => {
+    if (!accessToken || !intents) {
+      return;
+    }
+
+    const createdIntent = await Api.getIntentsApi(accessToken).createIntent({
+      storyId: storyId,
+      intent: {
+        name: "New intent name",
+        global: false,
+        sourceKnotId: sourceNodeId,
+        targetKnotId: targetNodeId,
+        quickResponseOrder: 0,
+        trainingMaterials: {},
+        type: IntentType.NORMAL
+      }
+    });
+
+    setStoryData({
+      ...storyData,
+      intents: [ ...intents, createdIntent ]
+    });
+  }
+
+  /**
+   * Event handler for remove link
+   *
+   * @param linkId removed link (intent) id
+   */
+  const onRemoveLink = async (linkId: string) => {
+    if (!accessToken || !intents) {
+      return;
+    }
+
+    await Api.getIntentsApi(accessToken).deleteIntent({
+      storyId: storyId,
+      intentId: linkId
+    });
+
+    setStoryData({
+      ...storyData,
+      intents: intents.filter(intent => intent.id !== linkId)
+    });
+  }
+
+  /**
+   * Fetches knots list for the story
+   */
+  const fetchData = async () => {
+    if (!accessToken) {
+      return;
+    }
+
+    const [ story, knotList, intentList ] = await Promise.all([
+      Api.getStoriesApi(accessToken).findStory({ storyId }),
+      Api.getKnotsApi(accessToken).listKnots({ storyId }),
+      Api.getIntentsApi(accessToken).listIntents({ storyId })
+    ]);
+
+    setStoryData({
+      story: story,
+      knots: knotList,
+      intents: intentList
+    });
   }
 
   /**
    * Renders left toolbar
    */
-  private renderLeftToolbar = () => {
-    const { leftToolbarIndex } = this.state;
+  const renderLeftToolbar = () => {
     return (
       <Drawer
         variant="permanent"
@@ -102,8 +214,8 @@ class EditorScreen extends React.Component<Props, State> {
       >
         <Toolbar/>
         <Tabs
-          onChange={ this.setLeftTabIndex }
-          value={ leftToolbarIndex }
+          onChange={ (event, value: number) => setLeftToolBarIndex(value) }
+          value={ leftToolBarIndex }
         >
           <Tab
             fullWidth
@@ -117,19 +229,20 @@ class EditorScreen extends React.Component<Props, State> {
           />
         </Tabs>
         <Box>
-          { leftToolbarIndex === 0 && this.renderKnotsTab() }
-          { leftToolbarIndex === 1 && this.renderIntentsTab() }
+          { leftToolBarIndex === 0 && <KnotPanel knots={ knots ?? [] }/> }
+          { leftToolBarIndex === 1 && <IntentPanel intents={ intents ?? [] }/> }
         </Box>
       </Drawer>
     );
   }
 
   /**
-   * Renders main editor area
-   */
-  private renderEditorContent = () => {
-    const { classes } = this.props;
-    const { editorTabIndex } = this.state;
+     * Renders main editor area
+     */
+  const renderEditorContent = () => {
+    if (!knots || !intents) {
+      return;
+    }
 
     return (
       <Box
@@ -139,71 +252,43 @@ class EditorScreen extends React.Component<Props, State> {
       >
         <Toolbar/>
         <Toolbar>
-          <Tabs
-            onChange={ this.setEditorTabIndex }
-            value={ editorTabIndex }
-            className={ classes.tabs }
-          >
-            <Tab
-              value={ 0 }
-              className={ classes.tab }
-              label={ strings.editorScreen.story }
-            />
-            <Tab
-              value={ 1 }
-              className={ classes.tab }
-              label={ strings.editorScreen.global }
-            />
-          </Tabs>
+          { renderActionButtons() }
         </Toolbar>
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          { editorTabIndex === 0 && this.renderStoryEditor() }
-          { editorTabIndex === 1 && this.renderGlobalEditor() }
+        <Divider variant="fullWidth" style={{ backgroundColor: "white" }}/>
+        <Box className={ classes.editorContainer }>
+          <StoryEditorView
+            knots={ knots }
+            intents={ intents }
+            addingKnots={ addingKnots }
+            onAddNode={ onAddNode }
+            onMoveNode={ onMoveNode }
+            onRemoveNode={ onRemoveNode }
+            onAddLink={ onAddLink }
+            onRemoveLink={ onRemoveLink }
+          />
         </Box>
       </Box>
     );
   }
 
   /**
-   * Renders main editor area
-   *
-   * TODO: replace content with editor
+   * Renders toolbar action buttons
    */
-  private renderStoryEditor = () => {
+  const renderActionButtons = () => {
     return (
-      <Box>
-        <Typography color="primary">
-          { strings.editorScreen.story }
-        </Typography>
-      </Box>
-    );
-  }
-
-  /**
-   * Renders main editor area
-   *
-   * TODO: replace content with editor
-   */
-  private renderGlobalEditor = () => {
-    return (
-      <Box>
-        <Typography color="primary">
-          { strings.editorScreen.global }
-        </Typography>
-      </Box>
+      <Button
+        variant="contained"
+        onClick={ () => setAddingKnots(!addingKnots) }
+      >
+        { strings.editorScreen.add.knot }
+      </Button>
     );
   }
 
   /**
    * Renders right toolbar
    */
-  private renderRightToolbar = () => {
-    const { rightToolbarIndex } = this.state;
-
+  const renderRightToolbar = () => {
     return (
       <Drawer
         variant="permanent"
@@ -211,8 +296,8 @@ class EditorScreen extends React.Component<Props, State> {
       >
         <Toolbar/>
         <Tabs
-          onChange={ this.setRightTabIndex }
-          value={ rightToolbarIndex } 
+          onChange={ (event, value: number) => setRightToolBarIndex(value) }
+          value={ rightToolBarIndex } 
         >
           <Tab
             value={ 0 }
@@ -228,58 +313,22 @@ class EditorScreen extends React.Component<Props, State> {
           />
         </Tabs>
         <Box p={ 2 }>
-          { rightToolbarIndex === 0 && this.renderStoryTab() }
-          { rightToolbarIndex === 1 && this.renderDetailsTab() }
-          { rightToolbarIndex === 2 && this.renderLinkingTab() }
+          { rightToolBarIndex === 0 && renderStoryTab() }
+          { rightToolBarIndex === 1 && renderDetailsTab() }
+          { rightToolBarIndex === 2 && renderLinkingTab() }
         </Box>
       </Drawer>
     );
   }
 
   /**
-   * Sets left tab index
-   * 
-   * @param event event object
-   * @param newValue new tab index value
-   */
-  private setLeftTabIndex = (event: React.ChangeEvent<{}>, newValue: number) => {
-    this.setState({
-      leftToolbarIndex: newValue
-    });
-  }
-
-  /**
-   * Sets right tab index
-   * 
-   * @param event event object
-   * @param newValue new tab index value
-   */
-  private setRightTabIndex = (event: React.ChangeEvent<{}>, newValue: number) => {
-    this.setState({
-      rightToolbarIndex: newValue
-    });
-  }
-
-  /**
-   * Sets editor tab index
-   *
-   * @param event event object
-   * @param newValue new tab index value
-   */
-  private setEditorTabIndex = (event: React.ChangeEvent<{ }>, newValue: number) => {
-    this.setState({ editorTabIndex: newValue });
-  }
-
-  /**
    * Renders story tab of right toolbar
    */
-  private renderStoryTab = () => {
-    const { currentStory } = this.state;
-
+  const renderStoryTab = () => {
     return (
       <TextField
         label={ strings.editorScreen.rightBar.storyNameHelper }
-        defaultValue={ currentStory?.name }
+        defaultValue={ story?.name }
       />
     );
   }
@@ -287,17 +336,15 @@ class EditorScreen extends React.Component<Props, State> {
   /**
    * Renders details tab if global knot is selected  
    */
-  private renderDetailsTab = () => {
-    const { currentKnot } = this.state;
-
+  const renderDetailsTab = () => {
     return (
       <Box>
         <TextField
           label={ strings.editorScreen.rightBar.knotNameHelper }
-          defaultValue={ currentKnot?.name }
+          defaultValue={ selectedKnot?.name }
         />
         <Divider/>
-        { this.renderKnotDetails(currentKnot?.name) }
+        { renderKnotDetails(selectedKnot?.name) }
       </Box>
     )
   }
@@ -307,283 +354,33 @@ class EditorScreen extends React.Component<Props, State> {
    * 
    * @param currentKnot current knot
    */
-  private renderKnotDetails = (currentKnot?: String) => {
+  const renderKnotDetails = (currentKnot?: String) => {
     return null;
   }
 
   /**
    * Renders right toolbar linking tab
    */
-  private renderLinkingTab = () => {
+  const renderLinkingTab = () => {
     return null;
   }
 
-  /**
-   * Renders tab of knots (left toolbar)
-   * 
-   * Todo dropdown list
-   */
-  private renderKnotsTab = () => {
-    const { storyKnots } = this.state;
-
-    const globalKnot = storyKnots[0];
-    return (
-      <Box>
-        <Box p={ 2 }>
-          <TextField 
-            fullWidth
-            label={ strings.editorScreen.leftBar.knotSearchHelper }
-          />
-        </Box>
-        <Divider/>
-          <Box>
-            <Typography>Global knots</Typography>
-            <ListItem button>
-              <ListItemIcon>
-                <TagFacesIcon/>
-              </ListItemIcon>
-              <ListItemText>
-                { globalKnot?.name }
-              </ListItemText>
-            </ListItem>
-          </Box>
-        <Divider/>
-          <Box>
-            <Typography>Basic knots</Typography>
-            <List>
-              {
-                storyKnots?.map(knot => (
-                  <ListItem button>
-                    <ListItemIcon>
-                      <TagFacesIcon/>
-                    </ListItemIcon>
-                    <ListItemText>
-                      { knot.name }
-                    </ListItemText>
-                  </ListItem>
-                ))
-              }
-            </List>
-          </Box>
-      </Box>
-    );
+  if (!keycloak) {
+    return null;
   }
 
-  /*
-  * Renders tab of intents (left toolbar)
-  */
-  private renderIntentsTab = () => {
-    const { storyIntents } = this.state;
-
-    const normalIntents = storyIntents.filter(intent => intent.type === IntentType.NORMAL)
-    const defaultIntents = storyIntents.filter(intent => intent.type === IntentType.DEFAULT)
-    const confusedIntents = storyIntents.filter(intent => intent.type === IntentType.CONFUSED)
-    const redirectIntents = storyIntents.filter(intent => intent.type === IntentType.REDIRECT)
-
-    return (
-      <Box>
-        <Box p={ 2 }>
-          <TextField
-            fullWidth
-            label={ strings.editorScreen.leftBar.intentSearchHelper }
-          />
-        </Box>
-        <Divider/>
-          <Box>
-            <Typography>Normal intents</Typography>
-            { this.renderIntentsGroup(normalIntents) }
-          </Box>
-        <Divider/>
-          <Box>
-            <Typography>Default intents</Typography>
-            { this.renderIntentsGroup(defaultIntents) }
-          </Box>
-        <Divider/>
-          <Box>
-            <Typography>Confused intents</Typography>
-            { this.renderIntentsGroup(confusedIntents) }
-          </Box>
-        <Divider/>
-          <Box>
-            <Typography>Redirect intents</Typography>
-            { this.renderIntentsGroup(redirectIntents) }
-          </Box>
-      </Box>
-    );
-  }
-
-  /**
-   * Renders list of intents for left toolbar second tab
-   *
-   * @param intents list of intents from one group
-   */
-  private renderIntentsGroup = (intents : Intent[]) => {
-    return (
-      <List>
-        {
-          intents.map(intent => (
-            <ListItem button>
-              <ListItemIcon>
-                <TagFacesIcon/>
-              </ListItemIcon>
-              <ListItemText>
-                { intent.name }
-              </ListItemText>
-            </ListItem>
-          ))
-        }
-      </List>
-    )
-  }
-
-  /**
-   * Fetches knots list for the story
-   */
-  private fetchData = async() => {
-    const { accessToken } = this.props;
-
-    if (!accessToken) {
-      return;
-    }
-
-    const storiesApi = Api.getStoriesApi(accessToken)
-    const knotsApi = Api.getKnotsApi(accessToken)
-    const intentsApi = Api.getIntentsApi(accessToken)
-
-    const stories = await storiesApi.listStories();
-    const mainStory = stories.length ? stories[0] : undefined;
-
-    if (!mainStory) {
-      return;
-    }
-
-    const mainStoryId = mainStory.id || "";
-
-    const [ knotList, intentList ] = await Promise.all([
-      knotsApi.listKnots({ storyId: mainStoryId }),
-      intentsApi.listIntents({ storyId: mainStoryId })
-    ]);
-
-    this.setState({
-      currentStory: mainStory,
-      storyKnots : knotList,
-      storyIntents: intentList
-    });
-  }
-
-
-    /**
-   * Component did mount life cycle handler
-   */
-  public componentDidMount = () => {
-    //this.clearTestData()
-    //this.createTestData()
-    this.fetchData();
-  }
-
-  /**
-   * Clears all test data
-   */
-  private clearTestData = async() => {
-    const { accessToken } = this.props;
-
-    if (!accessToken) {
-      return;
-    }
-
-    const storiesApi = Api.getStoriesApi(accessToken)
-    const knotsApi = Api.getKnotsApi(accessToken)
-    const intentsApi = Api.getIntentsApi(accessToken)
-
-    const allStories = await storiesApi.listStories();
-
-    allStories.forEach(async (story) => {
-      const storyId: string = story.id || "";
-
-      const [ allKnots, allIntents ] = await Promise.all([
-        knotsApi.listKnots({ storyId: storyId }),
-        intentsApi.listIntents({ storyId: storyId })
-      ]);
-
-      //remove all knots
-      allKnots.forEach(knot => {
-        const knotId = knot.id || "";
-        knotsApi.deleteKnot(
-          {
-            storyId: storyId,
-            knotId: knotId
-          }
-        );
-      });
-
-      //remove all intents
-      allIntents.forEach(intent => {
-        const intentId: string = intent.id as string;
-        intentsApi.deleteIntent(
-          {
-            storyId: storyId,
-            intentId: intentId
-          }
-        );
-      });
-    });
-  }
-
-  /**
-  * Creates test story and knots for it
-  */
-  private createTestData = async() => {
-    const { accessToken } = this.props;
-
-    if (!accessToken) {
-      return;
-    }
-    const storiesApi = Api.getStoriesApi(accessToken);
-    const knotsApi = Api.getKnotsApi(accessToken);
-    const intentsApi = Api.getIntentsApi(accessToken);
-
-    const basicKnot0: Knot = {
-      name: "basic0",
-      type: KnotType.TEXT,
-      tokenizer: TokenizerType.UNTOKENIZED,
-      content: "basic knot 1 text content"
-    };
-
-    const basicKnot1: Knot = {
-      name: "basic1",
-      type: KnotType.TEXT,
-      tokenizer: TokenizerType.UNTOKENIZED,
-      content: "basic knot 2 text content"
-    };
-
-    const globalKnot0: Knot = {
-      name: "global0",
-      type: KnotType.TEXT,
-      tokenizer: TokenizerType.UNTOKENIZED,
-      content: "global knot 1 text content"
-    };
-
-    const globalKnot1: Knot = {
-      name: "global1",
-      type: KnotType.TEXT,
-      tokenizer: TokenizerType.UNTOKENIZED,
-      content: "global knot 1 text content"
-    };
-
-    const story0: Story = {
-      name: "story 1",
-      locale: "en"
-    };
-
-    const createdStory = await storiesApi.createStory({story: story0})
-
-    const [ knot1, knot2, knot3, knot4 ] = await Promise.all([
-      knotsApi.createKnot({knot: basicKnot0, storyId: createdStory.id || ""}),
-      knotsApi.createKnot({knot: basicKnot1, storyId: createdStory.id || ""}),
-      knotsApi.createKnot({knot: globalKnot0, storyId: createdStory.id || ""}),
-      knotsApi.createKnot({knot: globalKnot1, storyId: createdStory.id || ""})
-    ]);
-  }
+  return (
+    <AppLayout
+      keycloak={ keycloak }
+      pageTitle="Story name here"
+      dataChanged={ dataChanged }
+      storySelected
+    >
+      { renderLeftToolbar() }
+      { renderEditorContent() }
+      { renderRightToolbar() }
+    </AppLayout>
+  );
 }
 
 /**
@@ -593,8 +390,8 @@ class EditorScreen extends React.Component<Props, State> {
  * @returns state from props
  */
 const mapStateToProps = (state: ReduxState) => ({
-  accessToken: state.auth.accessToken as AccessToken,
-  keycloak: state.auth.keycloak as KeycloakInstance
+  accessToken: state.auth.accessToken,
+  keycloak: state.auth.keycloak
 });
 
 /**
@@ -604,4 +401,4 @@ const mapStateToProps = (state: ReduxState) => ({
  */
 const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({});
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(EditorScreen));
+export default connect(mapStateToProps, mapDispatchToProps)(EditorScreen);

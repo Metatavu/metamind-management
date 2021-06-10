@@ -76,20 +76,27 @@ class AppLayout extends React.Component<Props, State> {
                   { strings.generic.save }
                 </Button>
               }
-              <Box display="flex" alignItems="center">
+              <Box ml={ 2 } display="flex" alignItems="center">
                 <Typography color="textSecondary">
                   { firstName } { lastName }
                 </Typography>
+                <Box ml={ 1 }>
+                  <Typography color="textSecondary">{ "//" }</Typography>
+                </Box>
                 <Button
                   variant="text"
-                  color="secondary"
                   onClick={ () => this.onLogOutClick() }
                 >
                   { strings.header.signOut }
                 </Button>
-                <IconButton color="secondary">
-                  <SettingsIcon/>
-                </IconButton>
+                <Box ml={ 2 }>
+                  <IconButton
+                    title={ strings.header.settings }
+                    color="secondary"
+                  >
+                    <SettingsIcon/>
+                  </IconButton>
+                </Box>
               </Box>
             </Box>
           </Toolbar>
@@ -173,13 +180,13 @@ class AppLayout extends React.Component<Props, State> {
   /**
    * Event handler for logout click
    */
-    private onLogOutClick = () => {
-      const { keycloak } = this.props;
+  private onLogOutClick = () => {
+    const { keycloak } = this.props;
 
-      if (keycloak) {
-        keycloak.logout();
-      }
+    if (keycloak) {
+      keycloak.logout();
     }
+  }
 }
 
 export default withStyles(styles)(AppLayout);

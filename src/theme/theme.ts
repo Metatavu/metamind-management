@@ -200,8 +200,12 @@ export default createMuiTheme({
         textTransform: "none"
       },
       textSecondary: {
-        textTransform: "none"
+        textTransform: "none",
+        "&$disabled": {
+          color: "rgba(255,255,255,0.25)"
+        }
       },
+      disabled: {}
     },
     MuiFab: {
       root: {
@@ -210,7 +214,26 @@ export default createMuiTheme({
     },
     MuiFormLabel: {
       root: {
-        color: "#121212"
+        color: "#555",
+        "&$focused": {
+          color: "#121212",
+        }
+      },
+      focused: {},
+    },
+    MuiDivider: {
+      light: {
+        backgroundColor: "rgba(255,255,255,0.54)"
+      }
+    },
+    MuiTextField: {
+
+    },
+    MuiInput: {
+      underline: {
+        "&:before": {
+          borderBottom: "1px solid rgba(0, 0, 0, 0)"
+        }
       }
     }
   },
@@ -259,6 +282,9 @@ export default createMuiTheme({
     MuiFab: {
       size: "large",
       color: "primary"
+    },
+    MuiTextField: {
+      fullWidth: true
     }
   }
 });

@@ -9,7 +9,8 @@
     "title": "Metamind Hallinta",
     "editor": "Editori",
     "preview": "Esikatselu",
-    "signOut": "Kirjaudu ulos"
+    "signOut": "Kirjaudu ulos",
+    "settings": "Asetukset"
   },
 
   "homeScreen": {
@@ -17,17 +18,22 @@
     "myStories": "Omat tarinat",
     "selectStoryText": "Valitse tarina tai luo uusi.",
     "createNewStory": "Luo uusi tarina",
-    "lastEditedStories": "Viimeksi muokatut tarinat"
+    "lastEditedStories": "Viimeksi muokatut tarinat",
+    "selectStory": "Valitse tarina",
+    "selectStoryToEdit": "Valitse jo olemassaoleva tarina editoitavaksi",
+    "open": "Avaa"
   },
 
   "editorScreen": {
-    "story": "Tarina",
-    "global": "Globaalit",
+    "storyKnots": "Tarinan solmut",
+    "globalKnots": "Globaalit solmut",
+    "storyEditor": "Tarinaeditori",
+    "globalEditor": "Globaalieditori",
     "leftBar" : {
       "knotsLeftTab": "Solmut",
       "intentsLeftTab": "Aikomukset",
       "knotSearchHelper": "Solmujen haku",
-      "intentSearchHelper": "Search for an intent"
+      "intentSearchHelper": "Hae aikomuksia"
     },
     "rightBar" : {
       "storyRightTab": "Tarina",
@@ -35,6 +41,20 @@
       "linkingRightTab": "Linkit",
       "storyNameHelper": "Tarinan nimi",
       "knotNameHelper": "Solmun nimi"
-    } 
+    },
+    "intents": {
+      "normalIntents": "Normaalit aikomukset",
+      "defaultIntents": "Oletusaikomukset",
+      "confusedIntents": "Hämmentymiset",
+      "redirectIntents": "Uudelleenohjaukset"
+    },
+    "add": {
+      "knot": "Lisää solmu",
+      "indent": "Lisää aikomus"
+    },
+    "confirm": {
+      "knot": "Poistetaanko valittu solmu ja kaikki siihen liitetyt aikomukset?",
+      "intent": "Poistetaanko valittu aikomus?"
+    }
   }
 }

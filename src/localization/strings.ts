@@ -6,8 +6,8 @@ import LocalizedStrings, { LocalizedStringsMethods } from "localized-strings";
 export interface IStrings extends LocalizedStringsMethods {
 
   /**
-  * Translations related to generic terms
-  */
+   * Translations related to generic terms
+   */
   generic: {
     save: string;
     cancel: string;
@@ -15,32 +15,38 @@ export interface IStrings extends LocalizedStringsMethods {
   };
 
   /**
-  * Translations related to header terms
-  */
+   * Translations related to header terms
+   */
   header: {
     title: string;
     editor: string;
     preview: string;
     signOut: string;
+    settings: string;
   };
 
   /**
-  * Translations related to home screen
-  */
+   * Translations related to home screen
+   */
   homeScreen: {
     title: string;
     myStories: string;
     selectStoryText: string;
     createNewStory: string;
     lastEditedStories: string;
+    selectStory: string;
+    selectStoryToEdit: string;
+    open: string;
   };
 
   /**
-  * Translations related to editor screen
-  */
+   * Translations related to editor screen
+   */
   editorScreen: {
-    story: string,
-    global: string,
+    storyKnots: string;
+    globalKnots: string;
+    storyEditor: string;
+    globalEditor: string;
     leftBar: {
       knotsLeftTab: string;
       intentsLeftTab: string;
@@ -54,16 +60,30 @@ export interface IStrings extends LocalizedStringsMethods {
       knotNameHelper: string;
       storyNameHelper: string;
     };
+    intents: {
+      normalIntents: string;
+      defaultIntents: string;
+      confusedIntents: string;
+      redirectIntents: string;
+    };
+    add: {
+      knot: string;
+      indent: string;
+    };
+    confirm: {
+      knot: string;
+      intent: string;
+    }
   };
 
   /**
-  * Translations related to story view
-  */
+   * Translations related to story view
+   */
   storyView: {};
   
   /**
-  * Translations related to global view
-  */
+   * Translations related to global view
+   */
   globalView: {};
 }
 
