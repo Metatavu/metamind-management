@@ -106,7 +106,7 @@ const EditorScreen: React.FC<Props> = ({
 
     setStoryData({
       ...storyData,
-      knots: knots.map(knot => knot.id === updatedKnot.id ? { ...updatedKnot, name: "töttöröö" } : knot)
+      knots: knots.map(knot => knot.id === updatedKnot.id ? updatedKnot : knot)
     });
   }
 
