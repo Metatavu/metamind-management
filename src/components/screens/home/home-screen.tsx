@@ -208,8 +208,7 @@ class HomeScreen extends React.Component<Props, State> {
     }
 
     try {
-      const storiesApi = Api.getStoriesApi(accessToken);
-      const stories = await storiesApi.listStories();
+      const stories = await Api.getStoriesApi(accessToken).listStories();
       this.setState({ stories });
     } catch (error) {
       console.error(error);
