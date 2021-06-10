@@ -79,6 +79,9 @@ const KnotPanel: React.FC<Props> = ({ knots }) => {
     );
   }
 
+  /**
+   * Component render
+   */
   return (
     <Box>
       <Box p={ 2 }>
