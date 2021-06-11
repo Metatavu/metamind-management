@@ -40,7 +40,8 @@
       "detailsRightTab": "Tiedot",
       "linkingRightTab": "Linkit",
       "storyNameHelper": "Tarinan nimi",
-      "knotNameHelper": "Solmun nimi"
+      "knotNameHelper": "Solmun nimi",
+      "intentNameHelper": "Linkin nimi"
     },
     "intents": {
       "normalIntents": "Normaalit aikomukset",

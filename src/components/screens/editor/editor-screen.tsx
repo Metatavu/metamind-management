@@ -17,6 +17,7 @@ import StoryEditorView from "../../views/story-editor-view";
 import { CustomNodeModel } from "../../diagram-components/custom-node/custom-node-model";
 import { useEditorScreenStyles } from "./editor-screen.styles";
 import { useParams } from "react-router-dom";
+import CustomLinkModel from "../../diagram-components/custom-link/custom-link-model";
 
 /**
  * Component props
@@ -34,6 +35,7 @@ interface StoryData {
   knots?: Knot[];
   intents?: Intent[];
   selectedKnot?: Knot;
+  selectedIntent? : Intent;
 }
 
 /**
@@ -49,7 +51,7 @@ const EditorScreen: React.FC<Props> = ({
   const classes = useEditorScreenStyles();
 
   const [ storyData, setStoryData ] = React.useState<StoryData>({});
-  const { story, knots, selectedKnot, intents } = storyData;
+  const { story, knots, selectedKnot, selectedIntent, intents } = storyData;
   const [ leftToolBarIndex, setLeftToolBarIndex ] = React.useState(0);
   const [ rightToolBarIndex, setRightToolBarIndex ] = React.useState(0);
   const [ addingKnots, setAddingKnots ] = React.useState(false);
@@ -183,6 +185,98 @@ const EditorScreen: React.FC<Props> = ({
   }
 
   /**
+   * Event handler for node selection change
+   * 
+   * @param node node
+   */
+  const onNodeSelectionChange = async (node: CustomNodeModel) => {
+    if (!accessToken || !intents) {
+      return;
+    }
+
+    const knot = await Api.getKnotsApi(accessToken).findKnot({
+      storyId: storyId,
+      knotId: node.getID()
+    });
+
+    setStoryData({
+      ...storyData,
+      selectedIntent: undefined,
+      selectedKnot: knot
+    });
+  }
+
+  /**
+   * Event handler for link selection change
+   * 
+   * @param link link
+   */
+  const onLinkSelectionChange = async (link: CustomLinkModel) => {
+    if (!accessToken || !intents) {
+      return;
+    }
+
+    const intent = await Api.getIntentsApi(accessToken).findIntent({
+      storyId: storyId,
+      intentId: link.getID()
+    });
+
+    setStoryData({
+      ...storyData,
+      selectedIntent: intent,
+      selectedKnot: undefined
+    });
+  }
+
+  /**
+   * Event handler for updating knot info
+   * 
+   * TODO: add other attributes
+   * @param knot knot with updated info
+   */
+  const onUpdateKnotInfo = async (event: React.ChangeEvent<any>, knot: Knot) => {
+    let { value } = event?.target;
+    if (!accessToken || !knots || !knot?.id) {
+      return;
+    }
+
+    const updatedKnot = await Api.getKnotsApi(accessToken).updateKnot({
+      storyId: storyId,
+      knotId: knot.id,
+      knot: { ...knot, name: value }
+    });
+
+    setStoryData({
+      ...storyData,
+      knots: knots.map(item => item.id === updatedKnot.id ? updatedKnot : item)
+    });
+  }
+
+  /**
+   * Event handler for updating knot info
+   * 
+   * TODO: add other attributes
+   * @param knot knot with updated info
+   */
+  const onUpdateIntentInfo = async (event: React.ChangeEvent<any>, intent: Intent) => {
+    let { value } = event?.target;
+    if (!accessToken || !intents || !intent?.id) {
+      return;
+    }
+
+    const updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
+      storyId: storyId,
+      intentId: intent.id,
+      intent: { ...intent, name: value }
+    });
+
+    setStoryData({
+      ...storyData,
+      intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
+    });
+  }
+
+  /**
    * Fetches knots list for the story
    */
   const fetchData = async () => {
@@ -237,8 +331,8 @@ const EditorScreen: React.FC<Props> = ({
   }
 
   /**
-     * Renders main editor area
-     */
+   * Renders main editor area
+   */
   const renderEditorContent = () => {
     if (!knots || !intents) {
       return;
@@ -265,6 +359,8 @@ const EditorScreen: React.FC<Props> = ({
             onRemoveNode={ onRemoveNode }
             onAddLink={ onAddLink }
             onRemoveLink={ onRemoveLink }
+            onNodeSelectionChange={ onNodeSelectionChange }
+            onLinkSelectionChange={ onLinkSelectionChange }
           />
         </Box>
       </Box>
@@ -334,17 +430,33 @@ const EditorScreen: React.FC<Props> = ({
   }
 
   /**
-   * Renders details tab if global knot is selected  
+   * Renders details tab if an entity is selected  
    */
   const renderDetailsTab = () => {
     return (
       <Box>
-        <TextField
-          label={ strings.editorScreen.rightBar.knotNameHelper }
-          defaultValue={ selectedKnot?.name }
-        />
+        { selectedKnot &&
+          <TextField
+            label={ strings.editorScreen.rightBar.knotNameHelper }
+            defaultValue={ selectedKnot.name ?? "" }
+            onChange={ e => onUpdateKnotInfo(e, selectedKnot) }
+          />
+        }
+        { selectedIntent &&
+          <TextField
+            label={ strings.editorScreen.rightBar.intentNameHelper }
+            defaultValue={ selectedIntent.name }
+            onChange={ e => onUpdateIntentInfo(e, selectedIntent) }
+          />
+        }
         <Divider/>
-        { renderKnotDetails(selectedKnot?.name) }
+        { 
+          selectedKnot ?
+            renderKnotDetails(selectedKnot.name) :
+            selectedIntent ?
+              renderIntentDetails(selectedIntent.name) :
+              null
+        }
       </Box>
     )
   }
@@ -355,6 +467,15 @@ const EditorScreen: React.FC<Props> = ({
    * @param currentKnot current knot
    */
   const renderKnotDetails = (currentKnot?: String) => {
+    return null;
+  }
+
+  /**
+   * Renders detailed tab of intent details
+   * 
+   * @param currentKnot current intent
+   */
+  const renderIntentDetails = (currentIntent?: String) => {
     return null;
   }
 

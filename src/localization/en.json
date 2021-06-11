@@ -40,7 +40,8 @@
       "detailsRightTab": "Details",
       "linkingRightTab": "Linking",
       "storyNameHelper": "Story name",
-      "knotNameHelper": "Knot name"
+      "knotNameHelper": "Knot name",
+      "intentNameHelper": "Intent name"
     },
     "intents": {
       "normalIntents": "Normal intents",

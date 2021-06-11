@@ -23,6 +23,8 @@ interface Props {
   onRemoveNode: (nodeId: string) => void;
   onAddLink: (sourceNodeId: string, targetNodeId: string) => void;
   onRemoveLink: (linkId: string) => void;
+  onNodeSelectionChange: (node: CustomNodeModel) => void;
+  onLinkSelectionChange: (link: CustomLinkModel) => void;
 }
 
 /**
@@ -38,7 +40,9 @@ const StoryEditorView: React.FC<Props> = ({
   onMoveNode,
   onRemoveNode,
   onAddLink,
-  onRemoveLink
+  onRemoveLink,
+  onNodeSelectionChange,
+  onLinkSelectionChange
 }) => {
   const classes = useStoryEditorViewStyles();
   const [ newPoint, setNewPoint ] = React.useState<Point>();
@@ -160,7 +164,7 @@ const StoryEditorView: React.FC<Props> = ({
   const addNodeListeners = (node: CustomNodeModel) => {
     node.registerListener({
       selectionChanged: (selectionChangedEvent: any) => {
-        console.log("TODO");
+        onNodeSelectionChange(selectionChangedEvent.entity as CustomNodeModel);
       },
       positionChanged: ({ entity }: any) => {
         setMovedNode(entity as CustomNodeModel);
@@ -192,6 +196,12 @@ const StoryEditorView: React.FC<Props> = ({
 
     link.setSourcePort(sourceNode.getOutPorts()[0]);
     link.setTargetPort(targetNode.getInPorts()[0]);
+
+    link.registerListener({
+      selectionChanged: (selectionChangedEvent: any) => {
+        onLinkSelectionChange(selectionChangedEvent.entity as CustomLinkModel);
+      },
+    })
 
     return link;
   }

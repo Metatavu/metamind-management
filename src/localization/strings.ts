@@ -59,6 +59,7 @@ export interface IStrings extends LocalizedStringsMethods {
       linkingRightTab: string;
       knotNameHelper: string;
       storyNameHelper: string;
+      intentNameHelper: string;
     };
     intents: {
       normalIntents: string;
