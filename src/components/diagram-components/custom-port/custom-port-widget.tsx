@@ -31,7 +31,7 @@ export class CustomPortWidget extends React.Component<PortProps> {
 	 */
 	private report = () => {
 		const { port, engine } = this.props;
-
+		console.log(engine.getPortCoords(port, this.ref.current || undefined));
 		port.updateCoords(engine.getPortCoords(port, this.ref.current || undefined));
 	}
 
@@ -50,6 +50,7 @@ export class CustomPortWidget extends React.Component<PortProps> {
 	 * @param snapshot snapshot
 	 */
 	public componentDidUpdate = (prevProps: Readonly<PortProps>, prevState: any, snapshot?: any) => {
+		console.log(this.props.engine.getModel().getActiveLinkLayer());
 		if (!this.props.port.reportedPosition) {
 			this.report();
 		}

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useStoryEditorViewStyles } from "./story-editor-view";
-import createEngine, { DiagramModel } from '@projectstorm/react-diagrams';
+import createEngine, { DiagramModel, PointModel } from '@projectstorm/react-diagrams';
 import { DefaultState } from "../../diagram-components/custom-state-machine/default-state";
 import { CustomNodeFactory } from "../../diagram-components/custom-node/custom-node-factory";
 import { CustomNodeModel } from "../../diagram-components/custom-node/custom-node-model";
@@ -10,6 +10,7 @@ import { CustomLabelFactory } from "../../diagram-components/custom-label/custom
 import CustomLinkModel from "../../diagram-components/custom-link/custom-link-model";
 import { Intent, Knot } from "../../../generated/client";
 import { Point } from "@projectstorm/geometry";
+import CustomLinkWidget from "../../diagram-components/custom-link/custom-link-widget";
 
 /**
  * Interface describing component props
@@ -17,12 +18,22 @@ import { Point } from "@projectstorm/geometry";
 interface Props {
   knots: Knot[];
   intents: Intent[];
+  mousePosition: MouseCoordinates;
   addingKnots: boolean;
   onAddNode: (node: CustomNodeModel) => void;
+  onUpdateMousePosition: () => void;
   onMoveNode: (node: CustomNodeModel, knot?: Knot) => void;
   onRemoveNode: (nodeId: string) => void;
   onAddLink: (sourceNodeId: string, targetNodeId: string) => void;
   onRemoveLink: (linkId: string) => void;
+}
+
+/**
+ * Interface describing mouse coordinates
+ */
+interface MouseCoordinates {
+  x: number;
+  y: number;
 }
 
 /**
@@ -33,11 +44,13 @@ interface Props {
 const StoryEditorView: React.FC<Props> = ({
   knots,
   intents,
+  mousePosition,
   addingKnots,
   onAddNode,
   onMoveNode,
   onRemoveNode,
   onAddLink,
+  onUpdateMousePosition,
   onRemoveLink
 }) => {
   const classes = useStoryEditorViewStyles();
@@ -116,7 +129,29 @@ const StoryEditorView: React.FC<Props> = ({
     const diagramModel: DiagramModel = new DiagramModel();
     diagramModel.registerListener({
       linksUpdated: ({ link }: any) => {
+        const test = link as CustomLinkModel;
+        test.registerListener({
+          selectionChanged: (event: any) => {
+            
+          }
+        });
         link.registerListener({
+          sourcePortChanged: ({ port }: any) => {
+            onAddLink(
+              port.getParent().getID(),
+              link.getSourcePort().getParent().getID(),
+            );
+            // console.log("Source port has been changed.");
+            // const node = new CustomNodeModel({
+            //   id: "cursor",
+            //   name: "cursor",
+            //   position: new Point(mousePosition.x, mousePosition.y)
+            // });
+            // onAddLink(
+            //   port.getParent().getID(),
+            //   node.getID()
+            // );
+          },
           targetPortChanged: ({ port }: any) => {
             onAddLink(
               link.getSourcePort().getParent().getID(),
@@ -224,7 +259,7 @@ const StoryEditorView: React.FC<Props> = ({
    * Component render
    */
   return (
-    <div style={{ width: "100%", height: "100%" }}>
+    <div style={{ width: "100%", height: "100%" }} onMouseMove={ onUpdateMousePosition }>
       { initialized && engineRef.current &&
         <CanvasWidget className={ classes.canvas } engine={ engineRef.current } />
       }

@@ -17,6 +17,8 @@ import StoryEditorView from "../../views/story-editor-view";
 import { CustomNodeModel } from "../../diagram-components/custom-node/custom-node-model";
 import { useEditorScreenStyles } from "./editor-screen.styles";
 import { useParams } from "react-router-dom";
+import { Point } from "@projectstorm/geometry";
+import { v4 as uuid } from "uuid";
 
 /**
  * Component props
@@ -37,6 +39,14 @@ interface StoryData {
 }
 
 /**
+ * Interface describing mouse coordinates
+ */
+interface MouseCoordinates {
+  x: number;
+  y: number;
+}
+
+/**
  * Editor screen component
  *
  * @param props component properties
@@ -54,6 +64,7 @@ const EditorScreen: React.FC<Props> = ({
   const [ rightToolBarIndex, setRightToolBarIndex ] = React.useState(0);
   const [ addingKnots, setAddingKnots ] = React.useState(false);
   const [ dataChanged, setDataChanged ] = React.useState(false);
+  const [ mousePosition, setMousePosition ] = React.useState<MouseCoordinates>({ x: 0, y: 0 });
 
   React.useEffect(() => {
     fetchData();
@@ -128,6 +139,50 @@ const EditorScreen: React.FC<Props> = ({
     setStoryData({
       ...storyData,
       knots: knots.filter(knot => knot.id !== removedNodeId)
+    });
+  }
+
+  /**
+   * Event handler for attempting to add link
+   * 
+   * @param sourceNodeId link (intent) source node (knot) id
+   */
+  const onUpdateMousePosition = () => {
+    const updateMousePosition = (event: any) => {
+      const savedEvent = event;
+      const { clientX, clientY } = savedEvent;
+      setTimeout(function() {
+        setMousePosition({ x: clientX, y: clientY });
+      }, 0);
+    }
+    window.addEventListener("mousemove", updateMousePosition);
+  }
+
+  const onAddDraftLink = (sourceNodeId: string) => {
+    if (!accessToken || !intents) {
+      return;
+    }
+
+    const targetNode = new CustomNodeModel({
+      id: "cursor",
+      name: "cursor",
+      position: new Point(mousePosition.x, mousePosition.y)
+    });
+
+    const createdIntent: Intent = {
+      id: uuid(),
+      name: "New intent name",
+      global: false,
+      sourceKnotId: sourceNodeId,
+      targetKnotId: targetNode.getID(),
+      quickResponseOrder: 0,
+      trainingMaterials: {},
+      type: IntentType.NORMAL
+    };
+
+    setStoryData({
+      ...storyData,
+      intents: [ ...intents, createdIntent ]
     });
   }
 
@@ -260,10 +315,12 @@ const EditorScreen: React.FC<Props> = ({
             knots={ knots }
             intents={ intents }
             addingKnots={ addingKnots }
+            mousePosition={ mousePosition }
             onAddNode={ onAddNode }
             onMoveNode={ onMoveNode }
             onRemoveNode={ onRemoveNode }
             onAddLink={ onAddLink }
+            onUpdateMousePosition={ onUpdateMousePosition }
             onRemoveLink={ onRemoveLink }
           />
         </Box>
