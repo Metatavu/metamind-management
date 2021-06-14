@@ -60,6 +60,15 @@ export interface IStrings extends LocalizedStringsMethods {
       knotNameHelper: string;
       storyNameHelper: string;
       intentNameHelper: string;
+      intentTypeHelper: string;
+      quickResponsesHelper: string;
+      quickResponseButtonDefault: string;
+      intentType: {
+        NORMAL: string;
+        CONFUSED: string;
+        REDIRECT: string;
+        DEFAULT: string;
+      }
     };
     intents: {
       normalIntents: string;

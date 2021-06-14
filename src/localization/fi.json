@@ -41,7 +41,16 @@
       "linkingRightTab": "Linkit",
       "storyNameHelper": "Tarinan nimi",
       "knotNameHelper": "Solmun nimi",
-      "intentNameHelper": "Linkin nimi"
+      "intentNameHelper": "Linkin nimi",
+      "intentTypeHelper": "Linkin tyyppi",
+      "quickResponsesHelper": "Pikavastaus",
+      "quickResponseButtonDefault": "Klikkaa lisätäksesi pikavastaus",
+      "intentType": {
+        "NORMAL": "Normaali",
+        "CONFUSED": "Hämmentynyt",
+        "REDIRECT": "Uudelleenohjaus",
+        "DEFAULT": "Oletus"
+      }
     },
     "intents": {
       "normalIntents": "Normaalit aikomukset",

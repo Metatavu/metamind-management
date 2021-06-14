@@ -41,7 +41,16 @@
       "linkingRightTab": "Linking",
       "storyNameHelper": "Story name",
       "knotNameHelper": "Knot name",
-      "intentNameHelper": "Intent name"
+      "intentNameHelper": "Intent name",
+      "intentTypeHelper": "Intent type",
+      "quickResponsesHelper": "Quick responses",
+      "quickResponseButtonDefault": "Click to add a quick response",
+      "intentType": {
+        "NORMAL": "Normal",
+        "CONFUSED": "Confused",
+        "REDIRECT": "Redirect",
+        "DEFAULT": "Default"
+      }
     },
     "intents": {
       "normalIntents": "Normal intents",

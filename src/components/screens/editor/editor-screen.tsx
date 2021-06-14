@@ -1,4 +1,4 @@
-import { Box, Drawer, Tab, Tabs, TextField, Button } from "@material-ui/core";
+import { Box, Drawer, Tab, Tabs, TextField, Button, MenuItem, InputLabel, List, ListItem, ListItemSecondaryAction, IconButton } from "@material-ui/core";
 import Divider from "@material-ui/core/Divider";
 import Toolbar from "@material-ui/core/Toolbar";
 import { KeycloakInstance } from "keycloak-js";
@@ -18,6 +18,8 @@ import { CustomNodeModel } from "../../diagram-components/custom-node/custom-nod
 import { useEditorScreenStyles } from "./editor-screen.styles";
 import { useParams } from "react-router-dom";
 import CustomLinkModel from "../../diagram-components/custom-link/custom-link-model";
+import AccordionItem from "../../generic/accordion-item";
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 
 /**
  * Component props
@@ -56,6 +58,11 @@ const EditorScreen: React.FC<Props> = ({
   const [ rightToolBarIndex, setRightToolBarIndex ] = React.useState(0);
   const [ addingKnots, setAddingKnots ] = React.useState(false);
   const [ dataChanged, setDataChanged ] = React.useState(false);
+  const [ quickResponse, setQuickResponse ] = React.useState(
+    selectedIntent?.quickResponse ? selectedIntent.quickResponse : strings.editorScreen.rightBar.quickResponseButtonDefault
+  );
+  const [ editingQuickResponse, setEditingQuickResponse ] = React.useState(false);
+  
 
   React.useEffect(() => {
     fetchData();
@@ -231,11 +238,10 @@ const EditorScreen: React.FC<Props> = ({
   /**
    * Event handler for updating knot info
    * 
-   * TODO: add other attributes
    * @param knot knot with updated info
    */
   const onUpdateKnotInfo = async (event: React.ChangeEvent<any>, knot: Knot) => {
-    let { value } = event?.target;
+    let { name, value } = event?.target;
     if (!accessToken || !knots || !knot?.id) {
       return;
     }
@@ -243,7 +249,7 @@ const EditorScreen: React.FC<Props> = ({
     const updatedKnot = await Api.getKnotsApi(accessToken).updateKnot({
       storyId: storyId,
       knotId: knot.id,
-      knot: { ...knot, name: value }
+      knot: { ...knot, [name]: value }
     });
 
     setStoryData({
@@ -255,11 +261,10 @@ const EditorScreen: React.FC<Props> = ({
   /**
    * Event handler for updating knot info
    * 
-   * TODO: add other attributes
    * @param knot knot with updated info
    */
   const onUpdateIntentInfo = async (event: React.ChangeEvent<any>, intent: Intent) => {
-    let { value } = event?.target;
+    let { name, value } = event?.target;
     if (!accessToken || !intents || !intent?.id) {
       return;
     }
@@ -267,7 +272,7 @@ const EditorScreen: React.FC<Props> = ({
     const updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
       storyId: storyId,
       intentId: intent.id,
-      intent: { ...intent, name: value }
+      intent: { ...intent, [name]: value }
     });
 
     setStoryData({
@@ -438,23 +443,25 @@ const EditorScreen: React.FC<Props> = ({
         { selectedKnot &&
           <TextField
             label={ strings.editorScreen.rightBar.knotNameHelper }
+            name="name"
             defaultValue={ selectedKnot.name ?? "" }
-            onChange={ e => onUpdateKnotInfo(e, selectedKnot) }
+            onChange={ (e: any) => onUpdateKnotInfo(e, selectedKnot) }
           />
         }
         { selectedIntent &&
           <TextField
             label={ strings.editorScreen.rightBar.intentNameHelper }
+            name="name"
             defaultValue={ selectedIntent.name }
-            onChange={ e => onUpdateIntentInfo(e, selectedIntent) }
+            onChange={ (e: any) => onUpdateIntentInfo(e, selectedIntent) }
           />
         }
-        <Divider/>
+        <Divider className={ classes.divider }/>
         { 
           selectedKnot ?
-            renderKnotDetails(selectedKnot.name) :
+            renderKnotDetails() :
             selectedIntent ?
-              renderIntentDetails(selectedIntent.name) :
+              renderIntentDetails() :
               null
         }
       </Box>
@@ -466,7 +473,7 @@ const EditorScreen: React.FC<Props> = ({
    * 
    * @param currentKnot current knot
    */
-  const renderKnotDetails = (currentKnot?: String) => {
+  const renderKnotDetails = () => {
     return null;
   }
 
@@ -475,8 +482,77 @@ const EditorScreen: React.FC<Props> = ({
    * 
    * @param currentKnot current intent
    */
-  const renderIntentDetails = (currentIntent?: String) => {
-    return null;
+  const renderIntentDetails = () => {
+    if (!selectedIntent) {
+      return null;
+    }
+
+    const intentTypes: string[] = Object.values(IntentType);
+
+    return (
+      <>
+        <TextField
+          label={ strings.editorScreen.rightBar.intentTypeHelper }
+          name="type"
+          select
+          defaultValue={ selectedIntent.type }
+          onChange={ (e: any) => onUpdateIntentInfo(e, selectedIntent) }
+        >
+          { intentTypes.map(name => 
+            <MenuItem key={ name } value={ name }>
+              { strings.editorScreen.rightBar.intentType[name as keyof object] }
+            </MenuItem>
+            )
+          }
+        </TextField>
+        <Divider className={ classes.divider }/>
+        <InputLabel className={ classes.buttonLabel }>
+          { strings.editorScreen.rightBar.quickResponsesHelper }
+        </InputLabel>
+        { !editingQuickResponse && 
+          <Button
+            className={ classes.button }
+            onClick={ () => setEditingQuickResponse(true) }
+          >
+            { quickResponse }
+          </Button>
+        }
+        { editingQuickResponse &&
+          <List>
+            <ListItem
+              className={ classes.specialButton }
+              button={ false }
+            >
+              <TextField
+                name="quickResponse"
+                value={ quickResponse }
+                InputProps={ { disableUnderline: true } }
+                onChange={ (e: any) => setQuickResponse(e.target.value) }
+              />
+              <ListItemSecondaryAction>
+              <IconButton
+                  edge="end"
+                  onClick={ () => setEditingQuickResponse(false) }
+                >
+                  <HighlightOffIcon className={ classes.buttonIcon }/>
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
+          </List>
+        }
+        <Divider className={ classes.divider }/>
+        <Box>
+          <AccordionItem title={ "Training materials" } >
+          <List>
+            <Box>
+              Hello
+            </Box>
+          </List>
+        </AccordionItem>
+        </Box>
+        <Divider className={ classes.divider }/>
+      </>
+    );
   }
 
   /**
