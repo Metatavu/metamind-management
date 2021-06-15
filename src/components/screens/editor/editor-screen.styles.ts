@@ -63,7 +63,6 @@ export const useEditorScreenStyles = makeStyles({
   trainingSelectionAddButton: {
     margin: 0,
     width: "100%",
-    color: "#fff",
     borderRadius: 18,
     textTransform: "none",
     marginTop: theme.spacing(1)

@@ -2,6 +2,7 @@
   "generic": {
     "save": "Save",
     "cancel": "Cancel",
+    "edit": "Edit",
     "edited": "Edited",
     "remove": "Remove"
   },

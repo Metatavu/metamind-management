@@ -6,7 +6,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../../../api/api";
-import { TokenizerType, KnotType, Story, Knot, Intent, IntentType, TrainingMaterial, TrainingMaterialType, TrainingMaterialVisibility } from "../../../generated/client/models";
+import { TokenizerType, KnotType, Story, Knot, Intent, IntentType, TrainingMaterial, TrainingMaterialType, TrainingMaterialVisibility, IntentTrainingMaterials } from "../../../generated/client/models";
 import strings from "../../../localization/strings";
 import { ReduxActions, ReduxState } from "../../../store";
 import { AccessToken } from "../../../types";
@@ -20,7 +20,6 @@ import { useParams } from "react-router-dom";
 import CustomLinkModel from "../../diagram-components/custom-link/custom-link-model";
 import AccordionItem from "../../generic/accordion-item";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
-import { v4 as uuid } from "uuid";
 
 /**
  * Component props
@@ -66,7 +65,7 @@ const EditorScreen: React.FC<Props> = ({
   const [ editingQuickResponse, setEditingQuickResponse ] = React.useState(false);
   const [ editingTrainingMaterial, setEditingTrainingMaterial ] = React.useState(false);
   const [ selectedTrainingMaterialType, setSelectedTrainingMaterialType ] = React.useState<TrainingMaterialType | null>(null);
-  const [ editedTrainingMaterial, setEditedTrainingMaterial ] = React.useState<TrainingMaterial | null>(null);
+  const [ editedTrainingMaterial, setEditedTrainingMaterial ] = React.useState<TrainingMaterial | undefined>(undefined);
 
 
   React.useEffect(() => {
@@ -241,9 +240,45 @@ const EditorScreen: React.FC<Props> = ({
   }
 
   /**
+   * Event handler for set active training material change 
+   * 
+   * @param event event
+   */
+  const onSetActiveTrainingMaterialChange = (event: any) => {
+    const { name, value } = event.target;
+    if (!name || !value || !trainingMaterial || !selectedIntent || !intents) {
+      return;
+    }
+    let foundMaterial: TrainingMaterial | undefined;
+    if (value === "none") {
+      setEditedTrainingMaterial(undefined);
+    } else {
+      foundMaterial = trainingMaterial.find(item => item.id === value);
+      foundMaterial && setEditedTrainingMaterial(foundMaterial);
+    }
+    const key = objectKeyConversion(name);
+    selectedIntent.trainingMaterials = { ...selectedIntent.trainingMaterials, [key]: foundMaterial?.id ?? undefined };
+
+    if (accessToken && selectedIntent.id) {
+      Api.getIntentsApi(accessToken).updateIntent({
+        intentId: selectedIntent.id,
+        intent: selectedIntent,
+        storyId: storyId
+      });
+    }
+    
+    
+    setStoryData({
+      ...storyData,
+      selectedIntent: selectedIntent,
+      intents: [ ...intents.filter(item => item.id !== selectedIntent.id), selectedIntent ]
+    });
+  }
+
+  /**
    * Event handler for add training material click
    * 
-   * @param name name of the trainig material type
+   * @param name name of the training material type
    */
   const onAddTrainingMaterialClick = (name: any) => {
     if (!selectedIntent?.id) {
@@ -261,51 +296,98 @@ const EditorScreen: React.FC<Props> = ({
     });
   }
 
-  const onSaveTrainingMaterialClick = async (action: string) => {
-    // let updatedTrainingMaterial: TrainingMaterial;
-    if (!accessToken || !editedTrainingMaterial || !trainingMaterial || !selectedIntent?.id) {
+  /**
+   * Event handler for edit training material click
+   */
+  const onEditTrainingMaterialClick = () => {
+    if (!editedTrainingMaterial?.type) {
+      return;
+    }
+    setEditingTrainingMaterial(true);
+    setSelectedTrainingMaterialType(editedTrainingMaterial.type);
+  }
+
+  /**
+   * Event handler for delete training material click
+   */
+  const onDeleteTrainingMaterialClick = () => {
+    if (!editedTrainingMaterial?.type || !selectedIntent || !intents) {
       return;
     }
 
-    console.log("editedTrainingMaterial", editedTrainingMaterial);
-    console.log("storyId", storyId);
+    const key = objectKeyConversion(editedTrainingMaterial.type);
 
-    if (action === "update") {
-      // try {
-      //   updatedTrainingMaterial = await Api.getTrainingMaterialApi(accessToken).updateTrainingMaterial({
-      //     trainingMaterialId: editedTrainingMaterial.id,
-      //     trainingMaterial: editedTrainingMaterial
-      //   });
-      // } catch (error) {
-      //   throw error;
-      // }
-      // setStoryData({
-      //   ...storyData,
-      //   trainingMaterial: trainingMaterial.map(item => item.id === updatedTrainingMaterial.id ? updatedTrainingMaterial : item)
-      // });
+    setStoryData({
+      ...storyData,
+      selectedIntent: { ...selectedIntent, trainingMaterials: { ...selectedIntent.trainingMaterials, [key]: undefined } },
+      intents: intents.map(item => item.id === selectedIntent.id ? selectedIntent : item)
+    });
+    setEditingTrainingMaterial(false);
+    setEditedTrainingMaterial(undefined);
+  }
+
+  /**
+   * Event handler for save training material click
+   * 
+   * @param action action type: update / create
+   */
+  const onSaveTrainingMaterialClick = async (action: string) => {
+    let updatedTrainingMaterial: TrainingMaterial;
+    let updatedIntent: Intent;
+    if (!accessToken || !editedTrainingMaterial?.type || !trainingMaterial || !selectedIntent?.id || !intents) {
+      return;
     }
-    if (action === "create") {
-      try {
-        const trainingMaterialApi = Api.getTrainingMaterialApi(accessToken);
-        const list = await trainingMaterialApi.listTrainingMaterials({
-          storyId
-        });
+    const key = objectKeyConversion(editedTrainingMaterial.type);
 
-        console.log(list);
-        const updatedTrainingMaterial = await Api.getTrainingMaterialApi(accessToken).createTrainingMaterial({
+    if (action === "update" && editedTrainingMaterial.id) {
+      try {
+        updatedTrainingMaterial = await Api.getTrainingMaterialApi(accessToken).updateTrainingMaterial({
+          trainingMaterialId: editedTrainingMaterial.id,
           trainingMaterial: editedTrainingMaterial
         });
-        console.log("Updated:", updatedTrainingMaterial);
-
+        updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
+          intentId: selectedIntent.id,
+          intent: { ...selectedIntent, trainingMaterials: { 
+              ...selectedIntent.trainingMaterials,
+              [key]: editedTrainingMaterial.id
+            }
+          },
+          storyId: storyId
+        });
       } catch (error) {
         throw error;
       }
       setStoryData({
         ...storyData,
-        // trainingMaterial: [ ...trainingMaterial, updatedTrainingMaterial ]
+        trainingMaterial: trainingMaterial.map(item => item.id === updatedTrainingMaterial.id ? updatedTrainingMaterial : item),
+        selectedIntent: updatedIntent,
+        intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
       });
     }
-      
+    if (action === "create") {
+      try {
+        updatedTrainingMaterial = await Api.getTrainingMaterialApi(accessToken).createTrainingMaterial({
+          trainingMaterial: editedTrainingMaterial
+        });
+        updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
+          intentId: selectedIntent.id,
+          intent: { ...selectedIntent, trainingMaterials: {
+              ...selectedIntent.trainingMaterials,
+              [key]: editedTrainingMaterial.id
+            }
+          },
+          storyId: storyId
+        });
+      } catch (error) {
+        throw error;
+      }
+      setStoryData({
+        ...storyData,
+        trainingMaterial: [ ...trainingMaterial, updatedTrainingMaterial ],
+        selectedIntent: updatedIntent,
+        intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
+      });
+    }
     setEditingTrainingMaterial(false);
     setSelectedTrainingMaterialType(null);
   }
@@ -343,6 +425,7 @@ const EditorScreen: React.FC<Props> = ({
     if (!accessToken || !intents || !intent?.id) {
       return;
     }
+    console.log(name, value)
 
     const updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
       storyId: storyId,
@@ -352,10 +435,14 @@ const EditorScreen: React.FC<Props> = ({
 
     setStoryData({
       ...storyData,
+      selectedIntent: updatedIntent,
       intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
     });
   }
 
+  /**
+   * Event handler for update edited training material
+   */
   const onUpdateEditedTrainingMaterial = (event: React.ChangeEvent<any>) => {
     const { name, value } = event?.target;
     if (!editedTrainingMaterial) {
@@ -363,6 +450,27 @@ const EditorScreen: React.FC<Props> = ({
     }
 
     setEditedTrainingMaterial({ ...editedTrainingMaterial, [name]: value });
+  }
+
+  /**
+   * Converts a training material type into intent training material key
+   * 
+   * @param name training material type key or value
+   * @returns object key
+   */
+  const objectKeyConversion = (name: string): keyof IntentTrainingMaterials => {
+    switch (name) {
+      case TrainingMaterialType.INTENTOPENNLPDOCCAT :
+        return "intentOpenNlpDoccatId";
+      case TrainingMaterialType.INTENTREGEX :
+        return "intentRegexId";
+      case TrainingMaterialType.VARIABLEOPENNLPNER : 
+        return "variableOpenNlpNerId";
+      case TrainingMaterialType.VARIABLEOPENNLPREGEX : 
+        return "variableOpenNlpRegex";
+      default :
+        return "intentOpenNlpDoccatId";
+    }
   }
 
   /**
@@ -379,8 +487,6 @@ const EditorScreen: React.FC<Props> = ({
       Api.getIntentsApi(accessToken).listIntents({ storyId }),
       Api.getTrainingMaterialApi(accessToken).listTrainingMaterials({ storyId })
     ]);
-
-    console.log(trainingMaterialList);
 
     setStoryData({
       story: story,
@@ -540,7 +646,7 @@ const EditorScreen: React.FC<Props> = ({
           <TextField
             label={ strings.editorScreen.rightBar.intentNameHelper }
             name="name"
-            defaultValue={ selectedIntent.name }
+            defaultValue={ selectedIntent.name ?? "" }
             onChange={ (e: any) => onUpdateIntentInfo(e, selectedIntent) }
           />
         }
@@ -649,88 +755,117 @@ const EditorScreen: React.FC<Props> = ({
     );
   }
 
+  /**
+   * Renders training selection options content cards
+   */
   const renderTrainingSelectionOptions = () => {
     return (
       <>
-        { Object.keys(TrainingMaterialType).map(name =>
-          <div className={ classes.trainingSelectionOption }>
-            <InputLabel className={ classes.buttonLabel }>
-              { strings.editorScreen.rightBar.trainingMaterials[name as keyof object] }
-            </InputLabel>
-            <Card className={ classes.trainingSelectionOptionContent }>
-              <CardContent>
-                <TextField
-                  label={ strings.editorScreen.rightBar.selectExisting }
-                  name="trainingMaterials"
-                  select
-                  defaultValue={ "none" }
-                  onChange={ () => {} }
-                  disabled={ editingTrainingMaterial }
-                >
-                  <MenuItem key={ "none" } value={ "none" }>
-                    { strings.editorScreen.rightBar.selectTrainingMaterial }
-                  </MenuItem>
-                  { trainingMaterial && 
-                    // console.log(storyId, trainingMaterial)
-                    trainingMaterial.filter(item => item.storyId === story?.id).map(item =>
-                      <MenuItem key={ item.name } value={ item.name }>
-                      { item.name }
-                      </MenuItem>
-                    )
-                  }
-                </TextField>
-                { !editingTrainingMaterial &&
-                  <Button
-                    className={ classes.trainingSelectionAddButton }
-                    variant="contained"
-                    onClick={ () => onAddTrainingMaterialClick(name as keyof object) }
+        { Object.keys(TrainingMaterialType).map(name => {
+          const key = objectKeyConversion(name);
+          const foundMaterial = trainingMaterial?.find(item => item.id === selectedIntent?.trainingMaterials[key]);
+
+          return (
+            <div className={ classes.trainingSelectionOption }>
+              <InputLabel className={ classes.buttonLabel }>
+                { strings.editorScreen.rightBar.trainingMaterials[name as keyof object] }
+              </InputLabel>
+              <Card className={ classes.trainingSelectionOptionContent }>
+                <CardContent>
+                  <TextField
+                    label={ strings.editorScreen.rightBar.selectExisting }
+                    name={ name }
+                    select
+                    value={ foundMaterial?.id ?? "none" }
+                    onChange={ onSetActiveTrainingMaterialChange }
+                    disabled={ editingTrainingMaterial }
                   >
-                    { strings.editorScreen.rightBar.createNew }
-                  </Button>
-                }
-                { (editingTrainingMaterial && selectedTrainingMaterialType === name as keyof object) &&
-                  <>
-                    <TextField
-                      className={ classes.trainingSelectionField }
-                      label={ strings.editorScreen.rightBar.name }
-                      name="name"
+                    <MenuItem key={ "none" } value={ "none" }>
+                      { strings.editorScreen.rightBar.selectTrainingMaterial }
+                    </MenuItem>
+                    { trainingMaterial && trainingMaterial
+                      .filter(item => item.type === name as keyof object)
+                      .map(item =>
+                        <MenuItem key={ item.id } value={ item.id }>
+                          { item.name }
+                        </MenuItem>
+                      )
+                    }
+                  </TextField>
+                  { (!editingTrainingMaterial && selectedIntent?.trainingMaterials[key] === undefined && editedTrainingMaterial?.type !== name as keyof object) &&
+                    <Button
+                      className={ classes.trainingSelectionAddButton }
                       variant="outlined"
-                      value={ editedTrainingMaterial?.name ?? "" }
-                      autoFocus
-                      onChange={ onUpdateEditedTrainingMaterial }
-                    />
-                    <TextField
-                      className={ classes.trainingSelectionField }
-                      label={ strings.editorScreen.rightBar.trainingMaterialsHeader }
-                      name="text"
-                      variant="outlined"
-                      value={ editedTrainingMaterial?.text ?? "" }
-                      multiline={ true }
-                      rows={ 3 }
-                      onChange={ onUpdateEditedTrainingMaterial }
-                    />
+                      onClick={ () => onAddTrainingMaterialClick(name as keyof object) }
+                    >
+                      { strings.editorScreen.rightBar.createNew }
+                    </Button>
+                  }
+                  { (!editingTrainingMaterial && selectedIntent?.trainingMaterials[key] !== undefined) &&
                     <div className={ classes.actionButtons }>
                       <Button
-                        className={ `${classes.actionButton} ${classes.removeButton}`}
-                        variant="outlined"
-                        onClick={ () => { setEditingTrainingMaterial(false); setEditedTrainingMaterial(null); } }
-                      >
-                        { strings.generic.remove }
-                      </Button>
-                      <Button
-                        className={ classes.actionButton }
-                        variant="outlined"
-                        onClick={ () => onSaveTrainingMaterialClick("create") }
-                      >
-                        { strings.generic.save }
-                      </Button>
+                          className={ classes.actionButton }
+                          variant="outlined"
+                          onClick={ onEditTrainingMaterialClick }
+                        >
+                          { strings.generic.edit }
+                        </Button>
+                        <Button
+                          className={ classes.actionButton }
+                          variant="outlined"
+                          onClick={ () => onAddTrainingMaterialClick(name as keyof object) }
+                        >
+                          { strings.editorScreen.rightBar.createNew }
+                        </Button>
                     </div>
-                  </>
-                }
-              </CardContent>
-            </Card>
-          </div>
-          )
+                  }
+                  { (editingTrainingMaterial && selectedTrainingMaterialType === name as keyof object) &&
+                    <>
+                      <TextField
+                        className={ classes.trainingSelectionField }
+                        label={ strings.editorScreen.rightBar.name }
+                        name="name"
+                        variant="outlined"
+                        value={ editedTrainingMaterial?.name ?? "" }
+                        autoFocus
+                        onChange={ onUpdateEditedTrainingMaterial }
+                      />
+                      <TextField
+                        className={ classes.trainingSelectionField }
+                        label={ strings.editorScreen.rightBar.trainingMaterialsHeader }
+                        name="text"
+                        variant="outlined"
+                        value={ editedTrainingMaterial?.text ?? "" }
+                        multiline={ true }
+                        rows={ 3 }
+                        onChange={ onUpdateEditedTrainingMaterial }
+                      />
+                      <div className={ classes.actionButtons }>
+                        <Button
+                          className={ `${classes.actionButton} ${classes.removeButton}`}
+                          variant="outlined"
+                          name="delete"
+                          onClick={ onDeleteTrainingMaterialClick }
+                        >
+                          { strings.generic.remove }
+                        </Button>
+                        <Button
+                          className={ classes.actionButton }
+                          variant="outlined"
+                          name="save"
+                          disabled={ !editedTrainingMaterial?.name.length || !editedTrainingMaterial.text.length }
+                          onClick={ () => onSaveTrainingMaterialClick(editedTrainingMaterial?.id ? "update" : "create") }
+                        >
+                          { strings.generic.save }
+                        </Button>
+                      </div>
+                    </>
+                  }
+                </CardContent>
+              </Card>
+            </div>
+          );
+        })
         }
       </>
     );

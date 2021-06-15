@@ -11,6 +11,7 @@ export interface IStrings extends LocalizedStringsMethods {
   generic: {
     save: string;
     cancel: string;
+    edit: string;
     edited: string;
     remove: string;
   };

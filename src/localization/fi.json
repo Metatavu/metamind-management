@@ -2,6 +2,7 @@
   "generic": {
     "save": "Tallenna",
     "cancel": "Peruuta",
+    "edit": "Muokkaa",
     "edited": "Muokattu",
     "remove": "Poista"
   },
