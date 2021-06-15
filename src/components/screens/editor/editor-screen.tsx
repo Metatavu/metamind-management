@@ -59,9 +59,7 @@ const EditorScreen: React.FC<Props> = ({
   const [ rightToolBarIndex, setRightToolBarIndex ] = React.useState(0);
   const [ addingKnots, setAddingKnots ] = React.useState(false);
   const [ dataChanged, setDataChanged ] = React.useState(false);
-  const [ quickResponse, setQuickResponse ] = React.useState(
-    selectedIntent?.quickResponse ? selectedIntent.quickResponse : strings.editorScreen.rightBar.quickResponseButtonDefault
-  );
+  const [ quickResponse, setQuickResponse ] = React.useState(selectedIntent?.quickResponse);
   const [ editingQuickResponse, setEditingQuickResponse ] = React.useState(false);
   const [ editingTrainingMaterial, setEditingTrainingMaterial ] = React.useState(false);
   const [ selectedTrainingMaterialType, setSelectedTrainingMaterialType ] = React.useState<TrainingMaterialType | null>(null);
@@ -237,6 +235,28 @@ const EditorScreen: React.FC<Props> = ({
       selectedIntent: intent,
       selectedKnot: undefined
     });
+  }
+
+  /**
+   * Event handler for save quick response click
+   */
+  const onSaveQuickResponseClick = async () => {
+    if (!accessToken || !selectedIntent?.id || !intents || !quickResponse) {
+      return;
+    }
+
+    const updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
+      storyId: storyId,
+      intentId: selectedIntent.id,
+      intent: { ...selectedIntent, quickResponse: quickResponse }
+    });
+
+    setStoryData({
+      ...storyData,
+      selectedIntent: updatedIntent,
+      intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
+    });
+    setEditingQuickResponse(false);
   }
 
   /**
@@ -425,7 +445,6 @@ const EditorScreen: React.FC<Props> = ({
     if (!accessToken || !intents || !intent?.id) {
       return;
     }
-    console.log(name, value)
 
     const updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
       storyId: storyId,
@@ -725,7 +744,7 @@ const EditorScreen: React.FC<Props> = ({
             className={ classes.button }
             onClick={ () => setEditingQuickResponse(true) }
           >
-            { quickResponse }
+            { selectedIntent?.quickResponse ?? strings.editorScreen.rightBar.quickResponseButtonDefault }
           </Button>
         }
         { editingQuickResponse &&
@@ -736,14 +755,14 @@ const EditorScreen: React.FC<Props> = ({
             >
               <TextField
                 name="quickResponse"
-                value={ quickResponse }
+                value={ selectedIntent?.quickResponse ?? strings.editorScreen.rightBar.quickResponseButtonDefault }
                 InputProps={ { disableUnderline: true } }
                 onChange={ (e: any) => setQuickResponse(e.target.value) }
               />
               <ListItemSecondaryAction>
-              <IconButton
-                  edge="end"
-                  onClick={ () => setEditingQuickResponse(false) }
+                <IconButton
+                    edge="end"
+                    onClick={ () => onSaveQuickResponseClick() }
                 >
                   <HighlightOffIcon className={ classes.buttonIcon }/>
                 </IconButton>
