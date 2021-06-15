@@ -12,6 +12,7 @@ export interface IStrings extends LocalizedStringsMethods {
     save: string;
     cancel: string;
     edited: string;
+    remove: string;
   };
 
   /**
@@ -68,7 +69,19 @@ export interface IStrings extends LocalizedStringsMethods {
         CONFUSED: string;
         REDIRECT: string;
         DEFAULT: string;
-      }
+      },
+      trainingMaterialsHeader: string;
+      trainingMaterials: {
+        INTENTOPENNLPDOCCAT: string;
+        INTENTREGEX: string;
+        VARIABLEOPENNLPNER: string;
+        VARIABLEOPENNLPREGEX: string;
+      },
+      selectExisting: string;
+      none: string;
+      selectTrainingMaterial: string;
+      createNew: string;
+      name: string;
     };
     intents: {
       normalIntents: string;

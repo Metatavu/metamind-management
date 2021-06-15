@@ -2,7 +2,8 @@
   "generic": {
     "save": "Save",
     "cancel": "Cancel",
-    "edited": "Edited"
+    "edited": "Edited",
+    "remove": "Remove"
   },
 
   "header": {
@@ -50,7 +51,19 @@
         "CONFUSED": "Confused",
         "REDIRECT": "Redirect",
         "DEFAULT": "Default"
-      }
+      },
+      "trainingMaterialsHeader": "Training materials",
+      "trainingMaterials": {
+        "INTENTOPENNLPDOCCAT": "Intent OpenNLP Doccat",
+        "INTENTREGEX": "Intent Regex",
+        "VARIABLEOPENNLPNER": "Variable OpenNLP NER",
+        "VARIABLEOPENNLPREGEX": "Variable OpenNLP Regex"
+      },
+      "selectExisting": "Select existing",
+      "none": "None",
+      "selectTrainingMaterial": "Select training material",
+      "createNew": "Create new",
+      "name": "Name"
     },
     "intents": {
       "normalIntents": "Normal intents",

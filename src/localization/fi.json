@@ -2,7 +2,8 @@
   "generic": {
     "save": "Tallenna",
     "cancel": "Peruuta",
-    "edited": "Muokattu"
+    "edited": "Muokattu",
+    "remove": "Poista"
   },
 
   "header": {
@@ -38,11 +39,11 @@
     "rightBar" : {
       "storyRightTab": "Tarina",
       "detailsRightTab": "Tiedot",
-      "linkingRightTab": "Linkit",
+      "linkingRightTab": "Aikeet",
       "storyNameHelper": "Tarinan nimi",
       "knotNameHelper": "Solmun nimi",
-      "intentNameHelper": "Linkin nimi",
-      "intentTypeHelper": "Linkin tyyppi",
+      "intentNameHelper": "Aikeen nimi",
+      "intentTypeHelper": "Aikeen tyyppi",
       "quickResponsesHelper": "Pikavastaus",
       "quickResponseButtonDefault": "Klikkaa lisätäksesi pikavastaus",
       "intentType": {
@@ -50,7 +51,19 @@
         "CONFUSED": "Hämmentynyt",
         "REDIRECT": "Uudelleenohjaus",
         "DEFAULT": "Oletus"
-      }
+      },
+      "trainingMaterialsHeader": "Harjoitusmateriaali",
+      "trainingMaterials": {
+        "INTENTOPENNLPDOCCAT": "Aie OpenNLP Doccat",
+        "INTENTREGEX": "Aie Regex",
+        "VARIABLEOPENNLPNER": "Muuttuja OpenNLP NER",
+        "VARIABLEOPENNLPREGEX": "Muuttuja OpenNLP Regex"
+      },
+      "selectExisting": "Valitse luotu",
+      "none": "Tyhjä",
+      "selectTrainingMaterial": "Valitse harjoitusmateriaali",
+      "createNew": "Luo uusi",
+      "name": "Nimi"
     },
     "intents": {
       "normalIntents": "Normaalit aikomukset",

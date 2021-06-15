@@ -30,8 +30,7 @@ export const useEditorScreenStyles = makeStyles({
     paddingTop: 9.5,
     paddingBottom: 9.5,
     width: "100%",
-    color: "primary",
-    variant: "outlined"
+    color: "primary"
   },
   specialButton: {
     marginTop: theme.spacing(1),
@@ -48,6 +47,45 @@ export const useEditorScreenStyles = makeStyles({
   },
   buttonLabel: {
     fontSize: 11
+  },
+  trainingSelectionOptions: {
+    width: "100%"
+  },
+  trainingSelectionOption: {
+    padding: "10px 0px 10px 0px",
+    width: "100%",
+  },
+  trainingSelectionOptionContent: {
+    marginTop: theme.spacing(1),
+    outline: "1px solid #555",
+    minHeight: 100
+  },
+  trainingSelectionAddButton: {
+    margin: 0,
+    width: "100%",
+    color: "#fff",
+    borderRadius: 18,
+    textTransform: "none",
+    marginTop: theme.spacing(1)
+  },
+  trainingSelectionField: {
+    color: "#fff",
+    padding: 0,
+    marginTop: theme.spacing(1)
+  },
+  actionButtons: {
+    display: "flex",
+    marginTop: theme.spacing(1),
+    justifyContent: "space-between"
+  },
+  actionButton: {
+    width: "48%",
+    margin: 0,
+    borderRadius: 18,
+    textTransform: "none"
+  },
+  removeButton: {
+    color: "red"
   }
 
 }, {

@@ -1,4 +1,4 @@
-import { Box, Drawer, Tab, Tabs, TextField, Button, MenuItem, InputLabel, List, ListItem, ListItemSecondaryAction, IconButton } from "@material-ui/core";
+import { Box, Drawer, Tab, Tabs, TextField, Button, MenuItem, InputLabel, List, ListItem, ListItemSecondaryAction, IconButton, Card, CardContent } from "@material-ui/core";
 import Divider from "@material-ui/core/Divider";
 import Toolbar from "@material-ui/core/Toolbar";
 import { KeycloakInstance } from "keycloak-js";
@@ -6,7 +6,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../../../api/api";
-import { TokenizerType, KnotType, Story, Knot, Intent, IntentType } from "../../../generated/client/models";
+import { TokenizerType, KnotType, Story, Knot, Intent, IntentType, TrainingMaterial, TrainingMaterialType, TrainingMaterialVisibility } from "../../../generated/client/models";
 import strings from "../../../localization/strings";
 import { ReduxActions, ReduxState } from "../../../store";
 import { AccessToken } from "../../../types";
@@ -19,7 +19,8 @@ import { useEditorScreenStyles } from "./editor-screen.styles";
 import { useParams } from "react-router-dom";
 import CustomLinkModel from "../../diagram-components/custom-link/custom-link-model";
 import AccordionItem from "../../generic/accordion-item";
-import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import { v4 as uuid } from "uuid";
 
 /**
  * Component props
@@ -38,6 +39,7 @@ interface StoryData {
   intents?: Intent[];
   selectedKnot?: Knot;
   selectedIntent? : Intent;
+  trainingMaterial?: TrainingMaterial[];
 }
 
 /**
@@ -53,7 +55,7 @@ const EditorScreen: React.FC<Props> = ({
   const classes = useEditorScreenStyles();
 
   const [ storyData, setStoryData ] = React.useState<StoryData>({});
-  const { story, knots, selectedKnot, selectedIntent, intents } = storyData;
+  const { story, knots, selectedKnot, selectedIntent, intents, trainingMaterial } = storyData;
   const [ leftToolBarIndex, setLeftToolBarIndex ] = React.useState(0);
   const [ rightToolBarIndex, setRightToolBarIndex ] = React.useState(0);
   const [ addingKnots, setAddingKnots ] = React.useState(false);
@@ -62,7 +64,10 @@ const EditorScreen: React.FC<Props> = ({
     selectedIntent?.quickResponse ? selectedIntent.quickResponse : strings.editorScreen.rightBar.quickResponseButtonDefault
   );
   const [ editingQuickResponse, setEditingQuickResponse ] = React.useState(false);
-  
+  const [ editingTrainingMaterial, setEditingTrainingMaterial ] = React.useState(false);
+  const [ selectedTrainingMaterialType, setSelectedTrainingMaterialType ] = React.useState<TrainingMaterialType | null>(null);
+  const [ editedTrainingMaterial, setEditedTrainingMaterial ] = React.useState<TrainingMaterial | null>(null);
+
 
   React.useEffect(() => {
     fetchData();
@@ -236,6 +241,76 @@ const EditorScreen: React.FC<Props> = ({
   }
 
   /**
+   * Event handler for add training material click
+   * 
+   * @param name name of the trainig material type
+   */
+  const onAddTrainingMaterialClick = (name: any) => {
+    if (!selectedIntent?.id) {
+      return;
+    }
+
+    setEditingTrainingMaterial(true);
+    setSelectedTrainingMaterialType(name as keyof object);
+    setEditedTrainingMaterial({
+      type: name,
+      storyId: storyId,
+      name: "",
+      text: "",
+      visibility: TrainingMaterialVisibility.STORY
+    });
+  }
+
+  const onSaveTrainingMaterialClick = async (action: string) => {
+    // let updatedTrainingMaterial: TrainingMaterial;
+    if (!accessToken || !editedTrainingMaterial || !trainingMaterial || !selectedIntent?.id) {
+      return;
+    }
+
+    console.log("editedTrainingMaterial", editedTrainingMaterial);
+    console.log("storyId", storyId);
+
+    if (action === "update") {
+      // try {
+      //   updatedTrainingMaterial = await Api.getTrainingMaterialApi(accessToken).updateTrainingMaterial({
+      //     trainingMaterialId: editedTrainingMaterial.id,
+      //     trainingMaterial: editedTrainingMaterial
+      //   });
+      // } catch (error) {
+      //   throw error;
+      // }
+      // setStoryData({
+      //   ...storyData,
+      //   trainingMaterial: trainingMaterial.map(item => item.id === updatedTrainingMaterial.id ? updatedTrainingMaterial : item)
+      // });
+    }
+    if (action === "create") {
+      try {
+        const trainingMaterialApi = Api.getTrainingMaterialApi(accessToken);
+        const list = await trainingMaterialApi.listTrainingMaterials({
+          storyId
+        });
+
+        console.log(list);
+        const updatedTrainingMaterial = await Api.getTrainingMaterialApi(accessToken).createTrainingMaterial({
+          trainingMaterial: editedTrainingMaterial
+        });
+        console.log("Updated:", updatedTrainingMaterial);
+
+      } catch (error) {
+        throw error;
+      }
+      setStoryData({
+        ...storyData,
+        // trainingMaterial: [ ...trainingMaterial, updatedTrainingMaterial ]
+      });
+    }
+      
+    setEditingTrainingMaterial(false);
+    setSelectedTrainingMaterialType(null);
+  }
+
+  /**
    * Event handler for updating knot info
    * 
    * @param knot knot with updated info
@@ -281,6 +356,15 @@ const EditorScreen: React.FC<Props> = ({
     });
   }
 
+  const onUpdateEditedTrainingMaterial = (event: React.ChangeEvent<any>) => {
+    const { name, value } = event?.target;
+    if (!editedTrainingMaterial) {
+      return;
+    }
+
+    setEditedTrainingMaterial({ ...editedTrainingMaterial, [name]: value });
+  }
+
   /**
    * Fetches knots list for the story
    */
@@ -289,16 +373,20 @@ const EditorScreen: React.FC<Props> = ({
       return;
     }
 
-    const [ story, knotList, intentList ] = await Promise.all([
+    const [ story, knotList, intentList, trainingMaterialList ] = await Promise.all([
       Api.getStoriesApi(accessToken).findStory({ storyId }),
       Api.getKnotsApi(accessToken).listKnots({ storyId }),
-      Api.getIntentsApi(accessToken).listIntents({ storyId })
+      Api.getIntentsApi(accessToken).listIntents({ storyId }),
+      Api.getTrainingMaterialApi(accessToken).listTrainingMaterials({ storyId })
     ]);
+
+    console.log(trainingMaterialList);
 
     setStoryData({
       story: story,
       knots: knotList,
-      intents: intentList
+      intents: intentList,
+      trainingMaterial: trainingMaterialList
     });
   }
 
@@ -506,9 +594,26 @@ const EditorScreen: React.FC<Props> = ({
           }
         </TextField>
         <Divider className={ classes.divider }/>
-        <InputLabel className={ classes.buttonLabel }>
-          { strings.editorScreen.rightBar.quickResponsesHelper }
-        </InputLabel>
+          <InputLabel className={ classes.buttonLabel }>
+            { strings.editorScreen.rightBar.quickResponsesHelper }
+          </InputLabel>
+          { renderSpecialButton() }
+        <Divider className={ classes.divider }/>
+        <Box>
+          <AccordionItem title={ strings.editorScreen.rightBar.trainingMaterialsHeader } >
+            <div className={ classes.trainingSelectionOptions }>
+              { renderTrainingSelectionOptions() }
+            </div>
+          </AccordionItem>
+        </Box>
+        <Divider className={ classes.divider }/>
+      </>
+    );
+  }
+
+  const renderSpecialButton = () => {
+    return (
+      <>
         { !editingQuickResponse && 
           <Button
             className={ classes.button }
@@ -540,17 +645,93 @@ const EditorScreen: React.FC<Props> = ({
             </ListItem>
           </List>
         }
-        <Divider className={ classes.divider }/>
-        <Box>
-          <AccordionItem title={ "Training materials" } >
-          <List>
-            <Box>
-              Hello
-            </Box>
-          </List>
-        </AccordionItem>
-        </Box>
-        <Divider className={ classes.divider }/>
+      </>
+    );
+  }
+
+  const renderTrainingSelectionOptions = () => {
+    return (
+      <>
+        { Object.keys(TrainingMaterialType).map(name =>
+          <div className={ classes.trainingSelectionOption }>
+            <InputLabel className={ classes.buttonLabel }>
+              { strings.editorScreen.rightBar.trainingMaterials[name as keyof object] }
+            </InputLabel>
+            <Card className={ classes.trainingSelectionOptionContent }>
+              <CardContent>
+                <TextField
+                  label={ strings.editorScreen.rightBar.selectExisting }
+                  name="trainingMaterials"
+                  select
+                  defaultValue={ "none" }
+                  onChange={ () => {} }
+                  disabled={ editingTrainingMaterial }
+                >
+                  <MenuItem key={ "none" } value={ "none" }>
+                    { strings.editorScreen.rightBar.selectTrainingMaterial }
+                  </MenuItem>
+                  { trainingMaterial && 
+                    // console.log(storyId, trainingMaterial)
+                    trainingMaterial.filter(item => item.storyId === story?.id).map(item =>
+                      <MenuItem key={ item.name } value={ item.name }>
+                      { item.name }
+                      </MenuItem>
+                    )
+                  }
+                </TextField>
+                { !editingTrainingMaterial &&
+                  <Button
+                    className={ classes.trainingSelectionAddButton }
+                    variant="contained"
+                    onClick={ () => onAddTrainingMaterialClick(name as keyof object) }
+                  >
+                    { strings.editorScreen.rightBar.createNew }
+                  </Button>
+                }
+                { (editingTrainingMaterial && selectedTrainingMaterialType === name as keyof object) &&
+                  <>
+                    <TextField
+                      className={ classes.trainingSelectionField }
+                      label={ strings.editorScreen.rightBar.name }
+                      name="name"
+                      variant="outlined"
+                      value={ editedTrainingMaterial?.name ?? "" }
+                      autoFocus
+                      onChange={ onUpdateEditedTrainingMaterial }
+                    />
+                    <TextField
+                      className={ classes.trainingSelectionField }
+                      label={ strings.editorScreen.rightBar.trainingMaterialsHeader }
+                      name="text"
+                      variant="outlined"
+                      value={ editedTrainingMaterial?.text ?? "" }
+                      multiline={ true }
+                      rows={ 3 }
+                      onChange={ onUpdateEditedTrainingMaterial }
+                    />
+                    <div className={ classes.actionButtons }>
+                      <Button
+                        className={ `${classes.actionButton} ${classes.removeButton}`}
+                        variant="outlined"
+                        onClick={ () => { setEditingTrainingMaterial(false); setEditedTrainingMaterial(null); } }
+                      >
+                        { strings.generic.remove }
+                      </Button>
+                      <Button
+                        className={ classes.actionButton }
+                        variant="outlined"
+                        onClick={ () => onSaveTrainingMaterialClick("create") }
+                      >
+                        { strings.generic.save }
+                      </Button>
+                    </div>
+                  </>
+                }
+              </CardContent>
+            </Card>
+          </div>
+          )
+        }
       </>
     );
   }
