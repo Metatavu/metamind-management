@@ -722,7 +722,10 @@ const EditorScreen: React.FC<Props> = ({
             className={ classes.button }
             onClick={ () => setEditingQuickResponse(true) }
           >
-            { selectedIntent?.quickResponse ?? strings.editorScreen.rightBar.quickResponseButtonDefault }
+            { (selectedIntent?.quickResponse && selectedIntent?.quickResponse.trim().length > 0) ?
+              selectedIntent?.quickResponse :
+              strings.editorScreen.rightBar.quickResponseButtonDefault
+            }
           </Button>
         }
         { editingQuickResponse &&
@@ -733,7 +736,10 @@ const EditorScreen: React.FC<Props> = ({
             >
               <TextField
                 name="quickResponse"
-                value={ selectedIntent?.quickResponse ?? strings.editorScreen.rightBar.quickResponseButtonDefault }
+                value={ (selectedIntent?.quickResponse && selectedIntent?.quickResponse.trim().length > 0) ?
+                  selectedIntent?.quickResponse : ""
+                }
+                placeholder={ strings.editorScreen.rightBar.quickResponseButtonDefault }
                 InputProps={ { disableUnderline: true } }
                 onChange={ (e: any) => onUpdateIntentInfo(e) }
               />
