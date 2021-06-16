@@ -1,11 +1,13 @@
 import * as React from "react";
 import { useStoryEditorViewStyles } from "./story-editor-view";
-import createEngine, { DiagramModel } from '@projectstorm/react-diagrams';
+import createEngine, { DiagramEngine, DiagramModel, NodeModel, NodeModelGenerics } from '@projectstorm/react-diagrams';
 import { DefaultState } from "../../diagram-components/custom-state-machine/default-state";
 import { CustomNodeFactory } from "../../diagram-components/custom-node/custom-node-factory";
 import { HomeNodeFactory } from "../../diagram-components/home-node/home-node-factory";
 import { CustomNodeModel } from "../../diagram-components/custom-node/custom-node-model";
 import { HomeNodeModel } from "../../diagram-components/home-node/home-node-model";
+import { GlobalNodeFactory } from "../../diagram-components/global-node/global-node-factory";
+import { GlobalNodeModel} from "../../diagram-components/global-node/global-node-model";
 import { Action, CanvasWidget, InputType } from '@projectstorm/react-canvas-core';
 import CustomLinkFactory from "../../diagram-components/custom-link/custom-link-factory";
 import { CustomLabelFactory } from "../../diagram-components/custom-label/custom-label-factory";
@@ -44,7 +46,7 @@ const StoryEditorView: React.FC<Props> = ({
 }) => {
   const classes = useStoryEditorViewStyles();
   const [ newPoint, setNewPoint ] = React.useState<Point>();
-  const [ movedNode, setMovedNode ] = React.useState<CustomNodeModel | HomeNodeModel>();
+  const [ movedNode, setMovedNode ] = React.useState<CustomNodeModel | HomeNodeModel | GlobalNodeModel>();
   const [ initialized, setInitialized ] = React.useState(false);
 
   const engineRef = React.useRef(createEngine());
@@ -67,7 +69,7 @@ const StoryEditorView: React.FC<Props> = ({
     const nodes = engine.getModel().getNodes();
 
     nodes.forEach(node => knots.every(knot => knot.id !== node.getID()) && engine.getModel().removeNode(node));
-    knots.forEach(knot => nodes.every(node => node.getID() !== knot.id) && engine.getModel().addNode(translateToNode(knot)));
+    knots.forEach(knot => nodes.every(node => (node.getID() !== knot.id) && nodeTranslateSwitch(node, knot, engine)));
 
     engine.repaintCanvas();
     // eslint-disable-next-line
@@ -135,6 +137,7 @@ const StoryEditorView: React.FC<Props> = ({
     engineRef.current.getStateMachine().pushState(engineState);
     engineRef.current.getNodeFactories().registerFactory(new CustomNodeFactory());
     engineRef.current.getNodeFactories().registerFactory(new HomeNodeFactory());
+    engineRef.current.getNodeFactories().registerFactory(new GlobalNodeFactory());
     engineRef.current.getLinkFactories().registerFactory(new CustomLinkFactory());
     engineRef.current.getLabelFactories().registerFactory(new CustomLabelFactory());
     engineRef.current.setModel(diagramModel);
@@ -149,9 +152,59 @@ const StoryEditorView: React.FC<Props> = ({
    * @returns node model
    */
   const translateToNode = (knot: Knot) => {
-    const node = new CustomNodeModel({ name: knot.name, id: knot.id });
+    const node = new CustomNodeModel({ name: knot.name, id: knot.id, type: "custom-node" });
     node.setPosition(knot.coordinates?.x || 200, knot.coordinates?.y || 200);
     return addNodeListeners(node);
+  }
+
+  /**
+   * Translates knot to home node
+   *
+   * @param knot knot
+   * @returns node model
+   */
+  const translateToHomeNode = (knot: Knot) => {
+    const node = new HomeNodeModel({ name: knot.name, id: knot.id, type: "home-node" });
+    node.setPosition(knot.coordinates?.x || 200, knot.coordinates?.y || 200);
+    return addNodeListeners(node);
+  }
+
+  /**
+   * Translates knot to home node
+   *
+   * @param knot knot
+   * @returns node model
+   */
+  const translateToGlobalNode = (knot: Knot) => {
+    const node = new GlobalNodeModel({ name: knot.name, id: knot.id, type: "global-node" });
+    node.setPosition(knot.coordinates?.x || 200, knot.coordinates?.y || 200);
+    return addNodeListeners(node);
+  }
+
+  /**
+   * Three-way switch for helping the conversion of different node types
+   * 
+   * @param node node for comparison
+   * @param knot knot to convert
+   * @param engine diagram engine
+   */
+  const nodeTranslateSwitch = (node: NodeModel<NodeModelGenerics>, knot: Knot, engine: DiagramEngine) => {
+    console.log("Incoming object: ", node.getType(), node.getOptions());
+
+    switch (node.getType()) {
+      case "global-node" :
+        engine.getModel().addNode(translateToGlobalNode(knot));
+        break;
+      case "home-node" :
+        engine.getModel().addNode(translateToHomeNode(knot));
+        break;
+      case "custom-node" :
+        engine.getModel().addNode(translateToNode(knot));
+        break;
+      default :
+        engine.getModel().addNode(translateToNode(knot));
+        break;
+    }
   }
 
   /**
@@ -160,13 +213,13 @@ const StoryEditorView: React.FC<Props> = ({
    * @param node node
    * @returns node with event handlers
    */
-  const addNodeListeners = (node: CustomNodeModel) => {
+  const addNodeListeners = (node: CustomNodeModel | HomeNodeModel | GlobalNodeModel) => {
     node.registerListener({
       selectionChanged: (selectionChangedEvent: any) => {
         console.log("TODO");
       },
       positionChanged: ({ entity }: any) => {
-        setMovedNode(entity as CustomNodeModel);
+        setMovedNode(entity);
       },
       entityRemoved: ({ entity }: any) => {
         onRemoveNode(entity.getID() as string);
@@ -183,7 +236,7 @@ const StoryEditorView: React.FC<Props> = ({
    * @param nodes list of nodes
    * @returns custom link model
    */
-  const translateToLink = (intent: Intent, nodes: CustomNodeModel[]) => {
+  const translateToLink = (intent: Intent, nodes: any[]) => {
     const sourceNode = nodes.find(node => node.getID() === intent.sourceKnotId);
     const targetNode = nodes.find(node => node.getID() === intent.targetKnotId);
 

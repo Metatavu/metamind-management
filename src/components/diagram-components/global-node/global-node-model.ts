@@ -4,12 +4,12 @@ import { DefaultNodeModel, DefaultNodeModelOptions } from '@projectstorm/react-d
 /**
  * Class for custom node model
  */
-export class HomeNodeModel extends DefaultNodeModel {
+export class GlobalNodeModel extends DefaultNodeModel {
 
 	constructor(options?: DefaultNodeModelOptions) {
 		super({
 			id: options?.id,
-			type: "home-node",
+			type: "global-node",
       name: options?.name
 		});
     this.addPort(new CustomPortModel({ name: "out" }));
