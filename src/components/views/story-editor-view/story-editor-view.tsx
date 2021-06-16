@@ -23,6 +23,7 @@ interface Props {
   onRemoveNode: (nodeId: string) => void;
   onAddLink: (sourceNodeId: string, targetNodeId: string) => void;
   onRemoveLink: (linkId: string) => void;
+  editingEntityInfo: boolean;
 }
 
 /**
@@ -38,7 +39,8 @@ const StoryEditorView: React.FC<Props> = ({
   onMoveNode,
   onRemoveNode,
   onAddLink,
-  onRemoveLink
+  onRemoveLink,
+  editingEntityInfo
 }) => {
   const classes = useStoryEditorViewStyles();
   const [ newPoint, setNewPoint ] = React.useState<Point>();
@@ -89,6 +91,10 @@ const StoryEditorView: React.FC<Props> = ({
       onAddNode(node);
     }
   }, [ addingKnots, newPoint, onAddNode ]);
+
+  React.useEffect(() => {
+    editingEntityInfo ? engineRef.current.getModel().setLocked(true) : engineRef.current.getModel().setLocked(false);
+  }, [editingEntityInfo]);
 
   /**
    * Effect that delays actual update of coordinates in knot when corresponding node is moved in diagram

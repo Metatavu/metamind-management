@@ -54,6 +54,7 @@ const EditorScreen: React.FC<Props> = ({
   const [ rightToolBarIndex, setRightToolBarIndex ] = React.useState(0);
   const [ addingKnots, setAddingKnots ] = React.useState(false);
   const [ dataChanged, setDataChanged ] = React.useState(false);
+  const [ editingEntityInfo, setEditingEntityInfo ] = React.useState(false);
 
   React.useEffect(() => {
     fetchData();
@@ -265,6 +266,7 @@ const EditorScreen: React.FC<Props> = ({
             onRemoveNode={ onRemoveNode }
             onAddLink={ onAddLink }
             onRemoveLink={ onRemoveLink }
+            editingEntityInfo={ editingEntityInfo }
           />
         </Box>
       </Box>
@@ -342,6 +344,8 @@ const EditorScreen: React.FC<Props> = ({
         <TextField
           label={ strings.editorScreen.rightBar.knotNameHelper }
           defaultValue={ selectedKnot?.name }
+          onFocus={ () => setEditingEntityInfo(true) }
+          onBlur={ () => setEditingEntityInfo(false) }
         />
         <Divider/>
         { renderKnotDetails(selectedKnot?.name) }
