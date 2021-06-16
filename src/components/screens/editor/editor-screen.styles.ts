@@ -62,7 +62,7 @@ export const useEditorScreenStyles = makeStyles({
   },
   trainingSelectionOptionContent: {
     marginTop: theme.spacing(1),
-    outline: "1px solid #555",
+    border: "1px solid #555",
     minHeight: 100
   },
   trainingSelectionAddButton: {
