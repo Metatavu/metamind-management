@@ -59,7 +59,7 @@ const EditorScreen: React.FC<Props> = ({
   const [ rightToolBarIndex, setRightToolBarIndex ] = React.useState(0);
   const [ addingKnots, setAddingKnots ] = React.useState(false);
   const [ dataChanged, setDataChanged ] = React.useState(false);
-  const [ quickResponse, setQuickResponse ] = React.useState(selectedIntent?.quickResponse);
+  const [ quickResponse, setQuickResponse ] = React.useState<string | undefined>("");
   const [ editingQuickResponse, setEditingQuickResponse ] = React.useState(false);
   const [ editingTrainingMaterial, setEditingTrainingMaterial ] = React.useState(false);
   const [ selectedTrainingMaterialType, setSelectedTrainingMaterialType ] = React.useState<TrainingMaterialType | null>(null);
@@ -235,28 +235,6 @@ const EditorScreen: React.FC<Props> = ({
       selectedIntent: intent,
       selectedKnot: undefined
     });
-  }
-
-  /**
-   * Event handler for save quick response click
-   */
-  const onSaveQuickResponseClick = async () => {
-    if (!accessToken || !selectedIntent?.id || !intents || !quickResponse) {
-      return;
-    }
-
-    const updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
-      storyId: storyId,
-      intentId: selectedIntent.id,
-      intent: { ...selectedIntent, quickResponse: quickResponse }
-    });
-
-    setStoryData({
-      ...storyData,
-      selectedIntent: updatedIntent,
-      intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
-    });
-    setEditingQuickResponse(false);
   }
 
   /**
@@ -440,16 +418,16 @@ const EditorScreen: React.FC<Props> = ({
    * 
    * @param knot knot with updated info
    */
-  const onUpdateIntentInfo = async (event: React.ChangeEvent<any>, intent: Intent) => {
-    let { name, value } = event?.target;
-    if (!accessToken || !intents || !intent?.id) {
+  const onUpdateIntentInfo = async (event: React.ChangeEvent<any>) => {
+    const { name, value } = event?.target;
+    if (!accessToken || !intents || !selectedIntent?.id) {
       return;
     }
 
     const updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
       storyId: storyId,
-      intentId: intent.id,
-      intent: { ...intent, [name]: value }
+      intentId: selectedIntent.id,
+      intent: { ...selectedIntent, [name]: value }
     });
 
     setStoryData({
@@ -666,7 +644,7 @@ const EditorScreen: React.FC<Props> = ({
             label={ strings.editorScreen.rightBar.intentNameHelper }
             name="name"
             defaultValue={ selectedIntent.name ?? "" }
-            onChange={ (e: any) => onUpdateIntentInfo(e, selectedIntent) }
+            onChange={ (e: any) => onUpdateIntentInfo(e) }
           />
         }
         <Divider className={ classes.divider }/>
@@ -709,7 +687,7 @@ const EditorScreen: React.FC<Props> = ({
           name="type"
           select
           defaultValue={ selectedIntent.type }
-          onChange={ (e: any) => onUpdateIntentInfo(e, selectedIntent) }
+          onChange={ (e: any) => onUpdateIntentInfo(e) }
         >
           { intentTypes.map(name => 
             <MenuItem key={ name } value={ name }>
@@ -757,12 +735,12 @@ const EditorScreen: React.FC<Props> = ({
                 name="quickResponse"
                 value={ selectedIntent?.quickResponse ?? strings.editorScreen.rightBar.quickResponseButtonDefault }
                 InputProps={ { disableUnderline: true } }
-                onChange={ (e: any) => setQuickResponse(e.target.value) }
+                onChange={ (e: any) => onUpdateIntentInfo(e) }
               />
               <ListItemSecondaryAction>
                 <IconButton
                     edge="end"
-                    onClick={ () => onSaveQuickResponseClick() }
+                    onClick={ () => setEditingQuickResponse(false) }
                 >
                   <HighlightOffIcon className={ classes.buttonIcon }/>
                 </IconButton>

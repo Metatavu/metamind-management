@@ -24,13 +24,12 @@ export const useEditorScreenStyles = makeStyles({
   },
   button: {
     marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(1),
+    marginBottom: theme.spacing(2),
     marginLeft: 0,
     marginRight: 0,
     paddingTop: 9.5,
     paddingBottom: 9.5,
-    width: "100%",
-    color: "primary"
+    width: "100%"
   },
   specialButton: {
     marginTop: theme.spacing(1),
@@ -84,7 +83,7 @@ export const useEditorScreenStyles = makeStyles({
     textTransform: "none"
   },
   removeButton: {
-    color: "red"
+    color: theme.palette.error.main
   }
 
 }, {
