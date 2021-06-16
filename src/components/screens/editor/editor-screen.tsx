@@ -331,6 +331,8 @@ const EditorScreen: React.FC<Props> = ({
       <TextField
         label={ strings.editorScreen.rightBar.storyNameHelper }
         defaultValue={ story?.name }
+        onFocus={ () => setEditingEntityInfo(true) }
+        onBlur={ () => setEditingEntityInfo(false) }
       />
     );
   }
