@@ -3,7 +3,9 @@ import { useStoryEditorViewStyles } from "./story-editor-view";
 import createEngine, { DiagramModel } from '@projectstorm/react-diagrams';
 import { DefaultState } from "../../diagram-components/custom-state-machine/default-state";
 import { CustomNodeFactory } from "../../diagram-components/custom-node/custom-node-factory";
+import { HomeNodeFactory } from "../../diagram-components/home-node/home-node-factory";
 import { CustomNodeModel } from "../../diagram-components/custom-node/custom-node-model";
+import { HomeNodeModel } from "../../diagram-components/home-node/home-node-model";
 import { Action, CanvasWidget, InputType } from '@projectstorm/react-canvas-core';
 import CustomLinkFactory from "../../diagram-components/custom-link/custom-link-factory";
 import { CustomLabelFactory } from "../../diagram-components/custom-label/custom-label-factory";
@@ -42,7 +44,7 @@ const StoryEditorView: React.FC<Props> = ({
 }) => {
   const classes = useStoryEditorViewStyles();
   const [ newPoint, setNewPoint ] = React.useState<Point>();
-  const [ movedNode, setMovedNode ] = React.useState<CustomNodeModel>();
+  const [ movedNode, setMovedNode ] = React.useState<CustomNodeModel | HomeNodeModel>();
   const [ initialized, setInitialized ] = React.useState(false);
 
   const engineRef = React.useRef(createEngine());
@@ -132,6 +134,7 @@ const StoryEditorView: React.FC<Props> = ({
 
     engineRef.current.getStateMachine().pushState(engineState);
     engineRef.current.getNodeFactories().registerFactory(new CustomNodeFactory());
+    engineRef.current.getNodeFactories().registerFactory(new HomeNodeFactory());
     engineRef.current.getLinkFactories().registerFactory(new CustomLinkFactory());
     engineRef.current.getLabelFactories().registerFactory(new CustomLabelFactory());
     engineRef.current.setModel(diagramModel);
