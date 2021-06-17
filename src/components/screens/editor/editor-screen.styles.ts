@@ -34,7 +34,7 @@ export const useEditorScreenStyles = makeStyles({
     color: "#555",
     transition: "border-color 0.2s ease-out, color 0.2s ease-out",
     "&:hover": {
-      border-color: "#36B0F4",
+      borderColor: "#36B0F4",
       color: "#36B0F4"
     },
   },
