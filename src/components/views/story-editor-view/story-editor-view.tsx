@@ -18,6 +18,8 @@ interface Props {
   knots: Knot[];
   intents: Intent[];
   addingKnots: boolean;
+  centeredKnot?: Knot;
+  centeredIntent?: Intent;
   onAddNode: (node: CustomNodeModel) => void;
   onMoveNode: (node: CustomNodeModel, knot?: Knot) => void;
   onRemoveNode: (nodeId: string) => void;
@@ -34,6 +36,8 @@ const StoryEditorView: React.FC<Props> = ({
   knots,
   intents,
   addingKnots,
+  centeredKnot,
+  centeredIntent,
   onAddNode,
   onMoveNode,
   onRemoveNode,
@@ -56,6 +60,44 @@ const StoryEditorView: React.FC<Props> = ({
     addInitialData();
     // eslint-disable-next-line
   }, []);
+
+  /**
+   * Effect that centers the canvas to certain coordinates and selects a knot
+   */
+  React.useEffect(() => {
+    if(!centeredKnot?.id) {
+      return;
+    }
+    
+    const node = engineRef.current.getModel().getNodes().find(item => item.getID() === centeredKnot.id);
+
+    if (node?.getID()) {
+      engineRef.current.zoomToFitNodes({margin: 0, nodes: [node], maxZoom: 1});
+      engineRef.current.getModel().getNodes().forEach(item => item.setSelected(false));
+      engineRef.current.getModel().getLinks().forEach(item => item.setSelected(false));
+      engineRef.current.getModel().getNode(node.getID()).setSelected(true);
+    } 
+  }, [ centeredKnot ]);
+
+  /**
+   * Effect that centers the canvas to certain coordinates and selects an intent
+   */
+  React.useEffect(() => {
+    if(!centeredIntent?.id) {
+      return;
+    }
+    const link = engineRef.current.getModel().getLinks().find(item => item.getID() === centeredIntent.id);
+
+    if (link) {
+      const [ sourceNode, targetNode ] = [ link?.getSourcePort().getNode(), link?.getTargetPort().getNode() ];
+      if (sourceNode && targetNode) {
+        engineRef.current.zoomToFitNodes({margin: 1, nodes: [ sourceNode, targetNode ], maxZoom: 1});
+        engineRef.current.getModel().getNodes().forEach(item => item.setSelected(false));
+        engineRef.current.getModel().getLinks().forEach(item => item.setSelected(false));
+        engineRef.current.getModel().getLink(link.getID()).setSelected(true);
+      } 
+    }
+  }, [ centeredIntent ]);
 
   /**
    * Effect that syncs knots to diagram nodes when length of knots list is changed
