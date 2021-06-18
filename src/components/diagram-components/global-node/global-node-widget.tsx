@@ -7,7 +7,7 @@ import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 import { CustomPortWidget } from '../custom-port/custom-port-widget';
 import { withStyles, WithStyles } from '@material-ui/core';
 import { DefaultNodeModelOptions } from '@projectstorm/react-diagrams';
-import RoomServiceIcon from '@material-ui/icons/RoomService';
+import GlobalKnot from "../../../resources/svg/global-knot-icon";
 
 /**
  * Interface describing component properties
@@ -58,7 +58,7 @@ class GlobalNodeWidget extends React.Component<Props, State> {
         className={ classes.globalNode }
         style={ this.getDynamicStyles(options) }
       >
-        <RoomServiceIcon className={ classes.globalIcon } />
+        <GlobalKnot className={ classes.globalIcon } htmlColor="#000" />
         { this.outPort &&
           <CustomPortWidget
             engine={ engine }

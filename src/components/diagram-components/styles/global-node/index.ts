@@ -14,10 +14,10 @@ export default createStyles({
   },
 
   globalIcon: {
-    width: "50%",
     height: "50%",
+    width: "auto",
     alignSelf: "center",
-    transform: "translate(20px, 0px)"
+    transform: "translate(25px, 0px)"
   },
 
   globalLinkAction: {
