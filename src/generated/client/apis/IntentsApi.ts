@@ -81,7 +81,7 @@ export class IntentsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/stories/{storyId}/intents`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))),
+            path: `/v2/stories/{storyId}/intents`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -126,7 +126,7 @@ export class IntentsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/stories/{storyId}/intents/{intentId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))).replace(`{${"intentId"}}`, encodeURIComponent(String(requestParameters.intentId))),
+            path: `/v2/stories/{storyId}/intents/{intentId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))).replace(`{${"intentId"}}`, encodeURIComponent(String(requestParameters.intentId))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -169,7 +169,7 @@ export class IntentsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/stories/{storyId}/intents/{intentId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))).replace(`{${"intentId"}}`, encodeURIComponent(String(requestParameters.intentId))),
+            path: `/v2/stories/{storyId}/intents/{intentId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))).replace(`{${"intentId"}}`, encodeURIComponent(String(requestParameters.intentId))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -209,7 +209,7 @@ export class IntentsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/stories/{storyId}/intents`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))),
+            path: `/v2/stories/{storyId}/intents`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -259,7 +259,7 @@ export class IntentsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/stories/{storyId}/intents/{intentId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))).replace(`{${"intentId"}}`, encodeURIComponent(String(requestParameters.intentId))),
+            path: `/v2/stories/{storyId}/intents/{intentId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))).replace(`{${"intentId"}}`, encodeURIComponent(String(requestParameters.intentId))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,

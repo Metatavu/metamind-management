@@ -84,7 +84,7 @@ export class VariablesApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/stories/{storyId}/variables`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))),
+            path: `/v2/stories/{storyId}/variables`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -129,7 +129,7 @@ export class VariablesApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/stories/{storyId}/variables/{variableId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))).replace(`{${"variableId"}}`, encodeURIComponent(String(requestParameters.variableId))),
+            path: `/v2/stories/{storyId}/variables/{variableId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))).replace(`{${"variableId"}}`, encodeURIComponent(String(requestParameters.variableId))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -172,7 +172,7 @@ export class VariablesApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/stories/{storyId}/variables/{variableId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))).replace(`{${"variableId"}}`, encodeURIComponent(String(requestParameters.variableId))),
+            path: `/v2/stories/{storyId}/variables/{variableId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))).replace(`{${"variableId"}}`, encodeURIComponent(String(requestParameters.variableId))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -212,7 +212,7 @@ export class VariablesApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/stories/{storyId}/variables`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))),
+            path: `/v2/stories/{storyId}/variables`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -262,7 +262,7 @@ export class VariablesApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/stories/{storyId}/variables/{variableId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))).replace(`{${"variableId"}}`, encodeURIComponent(String(requestParameters.variableId))),
+            path: `/v2/stories/{storyId}/variables/{variableId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))).replace(`{${"variableId"}}`, encodeURIComponent(String(requestParameters.variableId))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,

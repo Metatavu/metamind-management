@@ -61,7 +61,7 @@ export class SessionsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/stories/{storyId}/sessions`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))),
+            path: `/v2/stories/{storyId}/sessions`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
