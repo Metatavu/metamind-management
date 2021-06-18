@@ -32,13 +32,13 @@
     "storyEditor": "Tarinaeditori",
     "globalEditor": "Globaalieditori",
     "leftBar" : {
+      "storyLeftTab": "Tarina",
       "knotsLeftTab": "Solmut",
       "intentsLeftTab": "Aikomukset",
       "knotSearchHelper": "Solmujen haku",
       "intentSearchHelper": "Hae aikomuksia"
     },
     "rightBar" : {
-      "storyRightTab": "Tarina",
       "detailsRightTab": "Tiedot",
       "linkingRightTab": "Aikeet",
       "storyNameHelper": "Tarinan nimi",

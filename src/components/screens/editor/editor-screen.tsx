@@ -1,4 +1,4 @@
-import { Box, Drawer, Tab, Tabs, TextField, Button, MenuItem, InputLabel, List, ListItem, ListItemSecondaryAction, IconButton, Card, CardContent } from "@material-ui/core";
+import { Box, Drawer, Tab, Tabs, TextField, Button, MenuItem, InputLabel } from "@material-ui/core";
 import Divider from "@material-ui/core/Divider";
 import Toolbar from "@material-ui/core/Toolbar";
 import { KeycloakInstance } from "keycloak-js";
@@ -11,15 +11,16 @@ import strings from "../../../localization/strings";
 import { ReduxActions, ReduxState } from "../../../store";
 import { AccessToken } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
-import IntentPanel from "../../panels/intent-panel";
-import KnotPanel from "../../panels/knot-panel";
+import IntentPanel from "../../intent-components/intent-list/intent-list";
+import KnotPanel from "../../knot-components/knot-list/knot-list";
 import StoryEditorView from "../../views/story-editor-view";
 import { CustomNodeModel } from "../../diagram-components/custom-node/custom-node-model";
 import { useEditorScreenStyles } from "./editor-screen.styles";
 import { useParams } from "react-router-dom";
 import CustomLinkModel from "../../diagram-components/custom-link/custom-link-model";
 import AccordionItem from "../../generic/accordion-item";
-import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import TrainingSelectionOptions from "../../intent-components/training-selection-options/training-selection-options";
+import QuickResponseButton from "../../intent-components/quick-response-button/quick-response-button";
 
 /**
  * Component props
@@ -59,7 +60,6 @@ const EditorScreen: React.FC<Props> = ({
   const [ rightToolBarIndex, setRightToolBarIndex ] = React.useState(0);
   const [ addingKnots, setAddingKnots ] = React.useState(false);
   const [ dataChanged, setDataChanged ] = React.useState(false);
-  const [ quickResponse, setQuickResponse ] = React.useState<string | undefined>("");
   const [ editingQuickResponse, setEditingQuickResponse ] = React.useState(false);
   const [ editingTrainingMaterial, setEditingTrainingMaterial ] = React.useState(false);
   const [ selectedTrainingMaterialType, setSelectedTrainingMaterialType ] = React.useState<TrainingMaterialType | null>(null);
@@ -510,17 +510,23 @@ const EditorScreen: React.FC<Props> = ({
           <Tab
             fullWidth
             value={ 0 }
-            label={ strings.editorScreen.leftBar.knotsLeftTab }
+            label={ strings.editorScreen.leftBar.storyLeftTab }
           />
           <Tab
             fullWidth
             value={ 1 }
+            label={ strings.editorScreen.leftBar.knotsLeftTab }
+          />
+          <Tab
+            fullWidth
+            value={ 2 }
             label={ strings.editorScreen.leftBar.intentsLeftTab }
           />
         </Tabs>
         <Box>
-          { leftToolBarIndex === 0 && <KnotPanel knots={ knots ?? [] }/> }
-          { leftToolBarIndex === 1 && <IntentPanel intents={ intents ?? [] }/> }
+          { leftToolBarIndex === 0 && renderStoryTab() }
+          { leftToolBarIndex === 1 && <KnotPanel knots={ knots ?? [] }/> }
+          { leftToolBarIndex === 2 && <IntentPanel intents={ intents ?? [] }/> }
         </Box>
       </Drawer>
     );
@@ -593,21 +599,16 @@ const EditorScreen: React.FC<Props> = ({
         >
           <Tab
             value={ 0 }
-            label={ strings.editorScreen.rightBar.storyRightTab }
-          />
-          <Tab
-            value={ 1 }
             label={ strings.editorScreen.rightBar.detailsRightTab }
           />
           <Tab
-            value={ 2 }
+            value={ 1 }
             label={ strings.editorScreen.rightBar.linkingRightTab }
           />
         </Tabs>
         <Box p={ 2 }>
-          { rightToolBarIndex === 0 && renderStoryTab() }
-          { rightToolBarIndex === 1 && renderDetailsTab() }
-          { rightToolBarIndex === 2 && renderLinkingTab() }
+          { rightToolBarIndex === 0 && renderDetailsTab() }
+          { rightToolBarIndex === 1 && renderLinkingTab() }
         </Box>
       </Drawer>
     );
@@ -704,9 +705,7 @@ const EditorScreen: React.FC<Props> = ({
         <Divider className={ classes.divider }/>
         <Box>
           <AccordionItem title={ strings.editorScreen.rightBar.trainingMaterialsHeader } >
-            <div className={ classes.trainingSelectionOptions }>
-              { renderTrainingSelectionOptions() }
-            </div>
+            { renderTrainingSelectionOptions() }
           </AccordionItem>
         </Box>
         <Divider className={ classes.divider }/>
@@ -716,45 +715,12 @@ const EditorScreen: React.FC<Props> = ({
 
   const renderSpecialButton = () => {
     return (
-      <>
-        { !editingQuickResponse && 
-          <Button
-            className={ classes.button }
-            onClick={ () => setEditingQuickResponse(true) }
-          >
-            { (selectedIntent?.quickResponse && selectedIntent?.quickResponse.trim().length > 0) ?
-              selectedIntent?.quickResponse :
-              strings.editorScreen.rightBar.quickResponseButtonDefault
-            }
-          </Button>
-        }
-        { editingQuickResponse &&
-          <List>
-            <ListItem
-              className={ classes.specialButton }
-              button={ false }
-            >
-              <TextField
-                name="quickResponse"
-                value={ (selectedIntent?.quickResponse && selectedIntent?.quickResponse.trim().length > 0) ?
-                  selectedIntent?.quickResponse : ""
-                }
-                placeholder={ strings.editorScreen.rightBar.quickResponseButtonDefault }
-                InputProps={ { disableUnderline: true } }
-                onChange={ (e: any) => onUpdateIntentInfo(e) }
-              />
-              <ListItemSecondaryAction>
-                <IconButton
-                    edge="end"
-                    onClick={ () => setEditingQuickResponse(false) }
-                >
-                  <HighlightOffIcon className={ classes.buttonIcon }/>
-                </IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
-          </List>
-        }
-      </>
+      <QuickResponseButton
+        editing={ editingQuickResponse }
+        selectedIntent={ selectedIntent }
+        setEditingButtonFieldValue={ setEditingQuickResponse }
+        onUpdateFieldInfo={ onUpdateIntentInfo }
+      />
     );
   }
 
@@ -763,114 +729,20 @@ const EditorScreen: React.FC<Props> = ({
    */
   const renderTrainingSelectionOptions = () => {
     return (
-      <>
-        { Object.keys(TrainingMaterialType).map(name => {
-          const key = objectKeyConversion(name);
-          const foundMaterial = trainingMaterial?.find(item => item.id === selectedIntent?.trainingMaterials[key]);
-
-          return (
-            <div className={ classes.trainingSelectionOption }>
-              <InputLabel className={ classes.buttonLabel }>
-                { strings.editorScreen.rightBar.trainingMaterials[name as keyof object] }
-              </InputLabel>
-              <Card className={ classes.trainingSelectionOptionContent }>
-                <CardContent>
-                  <TextField
-                    label={ strings.editorScreen.rightBar.selectExisting }
-                    name={ name }
-                    select
-                    value={ foundMaterial?.id ?? "none" }
-                    onChange={ onSetActiveTrainingMaterialChange }
-                    disabled={ editingTrainingMaterial }
-                  >
-                    <MenuItem key={ "none" } value={ "none" }>
-                      { strings.editorScreen.rightBar.selectTrainingMaterial }
-                    </MenuItem>
-                    { trainingMaterial && trainingMaterial
-                      .filter(item => item.type === name as keyof object)
-                      .map(item =>
-                        <MenuItem key={ item.id } value={ item.id }>
-                          { item.name }
-                        </MenuItem>
-                      )
-                    }
-                  </TextField>
-                  { (!editingTrainingMaterial && selectedIntent?.trainingMaterials[key] === undefined && editedTrainingMaterial?.type !== name as keyof object) &&
-                    <Button
-                      className={ classes.trainingSelectionAddButton }
-                      variant="outlined"
-                      onClick={ () => onAddTrainingMaterialClick(name as keyof object) }
-                    >
-                      { strings.editorScreen.rightBar.createNew }
-                    </Button>
-                  }
-                  { (!editingTrainingMaterial && selectedIntent?.trainingMaterials[key] !== undefined) &&
-                    <div className={ classes.actionButtons }>
-                      <Button
-                          className={ classes.actionButton }
-                          variant="outlined"
-                          onClick={ onEditTrainingMaterialClick }
-                        >
-                          { strings.generic.edit }
-                        </Button>
-                        <Button
-                          className={ classes.actionButton }
-                          variant="outlined"
-                          onClick={ () => onAddTrainingMaterialClick(name as keyof object) }
-                        >
-                          { strings.editorScreen.rightBar.createNew }
-                        </Button>
-                    </div>
-                  }
-                  { (editingTrainingMaterial && selectedTrainingMaterialType === name as keyof object) &&
-                    <>
-                      <TextField
-                        className={ classes.trainingSelectionField }
-                        label={ strings.editorScreen.rightBar.name }
-                        name="name"
-                        variant="outlined"
-                        value={ editedTrainingMaterial?.name ?? "" }
-                        autoFocus
-                        onChange={ onUpdateEditedTrainingMaterial }
-                      />
-                      <TextField
-                        className={ classes.trainingSelectionField }
-                        label={ strings.editorScreen.rightBar.trainingMaterialsHeader }
-                        name="text"
-                        variant="outlined"
-                        value={ editedTrainingMaterial?.text ?? "" }
-                        multiline={ true }
-                        rows={ 3 }
-                        onChange={ onUpdateEditedTrainingMaterial }
-                      />
-                      <div className={ classes.actionButtons }>
-                        <Button
-                          className={ `${classes.actionButton} ${classes.removeButton}`}
-                          variant="outlined"
-                          name="delete"
-                          onClick={ onDeleteTrainingMaterialClick }
-                        >
-                          { strings.generic.remove }
-                        </Button>
-                        <Button
-                          className={ classes.actionButton }
-                          variant="outlined"
-                          name="save"
-                          disabled={ !editedTrainingMaterial?.name.length || !editedTrainingMaterial.text.length }
-                          onClick={ () => onSaveTrainingMaterialClick(editedTrainingMaterial?.id ? "update" : "create") }
-                        >
-                          { strings.generic.save }
-                        </Button>
-                      </div>
-                    </>
-                  }
-                </CardContent>
-              </Card>
-            </div>
-          );
-        })
-        }
-      </>
+      <TrainingSelectionOptions
+        selectedIntent={ selectedIntent }
+        objectKeyConversion={ objectKeyConversion }
+        trainingMaterial={ trainingMaterial }
+        onSetActiveTrainingMaterialChange={ onSetActiveTrainingMaterialChange }
+        editingTrainingMaterial={ editingTrainingMaterial }
+        onAddTrainingMaterialClick={ onAddTrainingMaterialClick }
+        onEditTrainingMaterialClick={ onEditTrainingMaterialClick }
+        selectedTrainingMaterialType={ selectedTrainingMaterialType }
+        editedTrainingMaterial={ editedTrainingMaterial }
+        onUpdateEditedTrainingMaterial={ onUpdateEditedTrainingMaterial }
+        onDeleteTrainingMaterialClick={ onDeleteTrainingMaterialClick }
+        onSaveTrainingMaterialClick={ onSaveTrainingMaterialClick }
+      />
     );
   }
 

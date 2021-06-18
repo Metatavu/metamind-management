@@ -50,13 +50,13 @@ export interface IStrings extends LocalizedStringsMethods {
     storyEditor: string;
     globalEditor: string;
     leftBar: {
+      storyLeftTab: string;
       knotsLeftTab: string;
       intentsLeftTab: string;
       knotSearchHelper: string;
       intentSearchHelper: string;
     };
     rightBar: {
-      storyRightTab: string;
       detailsRightTab: string;
       linkingRightTab: string;
       knotNameHelper: string;
