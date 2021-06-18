@@ -888,7 +888,7 @@ const EditorScreen: React.FC<Props> = ({
   return (
     <AppLayout
       keycloak={ keycloak }
-      pageTitle="Story name here"
+      pageTitle={ storyData.story?.name ?? "" }
       dataChanged={ dataChanged }
       storySelected
     >
