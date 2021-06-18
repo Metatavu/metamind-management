@@ -5,7 +5,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../../../api/api";
-import { Story, KnotType,TokenizerType } from "../../../generated/client";
+import { Story, KnotType,TokenizerType, KnotScope } from "../../../generated/client";
 import strings from "../../../localization/strings";
 import { ReduxActions, ReduxState } from "../../../store";
 import { AccessToken } from "../../../types";
@@ -185,11 +185,13 @@ class HomeScreen extends React.Component<Props, State> {
       }
     });
     if (story.id) {
+      
       const globalKnot = await Api.getKnotsApi(accessToken).createKnot({
         storyId: story.id,
         knot: {
           name: "Global",
           type: KnotType.TEXT,
+          scope: KnotScope.Global,
           tokenizer: TokenizerType.UNTOKENIZED,
           content: ""
         }
@@ -199,10 +201,12 @@ class HomeScreen extends React.Component<Props, State> {
         knot: {
           name: "Home",
           type: KnotType.TEXT,
+          scope: KnotScope.Home,
           tokenizer: TokenizerType.UNTOKENIZED,
           content: ""
         }
       });
+      this.setState({ selectedStoryId: story.id });
     }
   }
 

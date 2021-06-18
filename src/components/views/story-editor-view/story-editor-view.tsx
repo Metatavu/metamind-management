@@ -12,7 +12,7 @@ import { Action, CanvasWidget, InputType } from '@projectstorm/react-canvas-core
 import CustomLinkFactory from "../../diagram-components/custom-link/custom-link-factory";
 import { CustomLabelFactory } from "../../diagram-components/custom-label/custom-label-factory";
 import CustomLinkModel from "../../diagram-components/custom-link/custom-link-model";
-import { Intent, Knot } from "../../../generated/client";
+import { Intent, Knot, KnotScope } from "../../../generated/client";
 import { Point } from "@projectstorm/geometry";
 
 /**
@@ -67,9 +67,17 @@ const StoryEditorView: React.FC<Props> = ({
   React.useEffect(() => {
     const engine = engineRef.current;
     const nodes = engine.getModel().getNodes();
+    console.log(knots);
+
+    if(knots[0] && knots[0].scope !== KnotScope.Global) {
+      knots[0].scope = KnotScope.Global;
+    }
+    if (knots[1] && knots[1].scope !== KnotScope.Home) {
+      knots[1].scope = KnotScope.Home;
+    }
 
     nodes.forEach(node => knots.every(knot => knot.id !== node.getID()) && engine.getModel().removeNode(node));
-    knots.forEach(knot => nodes.every(node => (node.getID() !== knot.id) && nodeTranslateSwitch(node, knot, engine)));
+    knots.forEach(knot => nodeTranslateSwitch(knot, engine));
 
     engine.repaintCanvas();
     // eslint-disable-next-line
@@ -188,17 +196,17 @@ const StoryEditorView: React.FC<Props> = ({
    * @param knot knot to convert
    * @param engine diagram engine
    */
-  const nodeTranslateSwitch = (node: NodeModel<NodeModelGenerics>, knot: Knot, engine: DiagramEngine) => {
-    console.log("Incoming object: ", node.getType(), node.getOptions());
+  const nodeTranslateSwitch = (knot: Knot, engine: DiagramEngine) => {
+    console.log(knot.scope);
 
-    switch (node.getType()) {
-      case "global-node" :
+    switch (knot.scope) {
+      case KnotScope.Global :
         engine.getModel().addNode(translateToGlobalNode(knot));
         break;
-      case "home-node" :
+      case KnotScope.Home :
         engine.getModel().addNode(translateToHomeNode(knot));
         break;
-      case "custom-node" :
+      case KnotScope.Basic :
         engine.getModel().addNode(translateToNode(knot));
         break;
       default :
