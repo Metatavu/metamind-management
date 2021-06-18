@@ -67,7 +67,6 @@ const StoryEditorView: React.FC<Props> = ({
   React.useEffect(() => {
     const engine = engineRef.current;
     const nodes = engine.getModel().getNodes();
-    console.log(knots);
 
     if(knots[0] && knots[0].scope !== KnotScope.Global) {
       knots[0].scope = KnotScope.Global;
@@ -77,7 +76,7 @@ const StoryEditorView: React.FC<Props> = ({
     }
 
     nodes.forEach(node => knots.every(knot => knot.id !== node.getID()) && engine.getModel().removeNode(node));
-    knots.forEach(knot => nodeTranslateSwitch(knot, engine));
+    knots.forEach(knot => translateToNode(knot));
 
     engine.repaintCanvas();
     // eslint-disable-next-line
@@ -190,32 +189,6 @@ const StoryEditorView: React.FC<Props> = ({
   }
 
   /**
-   * Three-way switch for helping the conversion of different node types
-   * 
-   * @param node node for comparison
-   * @param knot knot to convert
-   * @param engine diagram engine
-   */
-  const nodeTranslateSwitch = (knot: Knot, engine: DiagramEngine) => {
-    console.log(knot.scope);
-
-    switch (knot.scope) {
-      case KnotScope.Global :
-        engine.getModel().addNode(translateToGlobalNode(knot));
-        break;
-      case KnotScope.Home :
-        engine.getModel().addNode(translateToHomeNode(knot));
-        break;
-      case KnotScope.Basic :
-        engine.getModel().addNode(translateToNode(knot));
-        break;
-      default :
-        engine.getModel().addNode(translateToNode(knot));
-        break;
-    }
-  }
-
-  /**
    * Adds node listeners
    *
    * @param node node
@@ -244,7 +217,7 @@ const StoryEditorView: React.FC<Props> = ({
    * @param nodes list of nodes
    * @returns custom link model
    */
-  const translateToLink = (intent: Intent, nodes: any[]) => {
+  const translateToLink = (intent: Intent, nodes: Array<CustomNodeModel | HomeNodeModel | GlobalNodeModel>) => {
     const sourceNode = nodes.find(node => node.getID() === intent.sourceKnotId);
     const targetNode = nodes.find(node => node.getID() === intent.targetKnotId);
 
@@ -264,7 +237,25 @@ const StoryEditorView: React.FC<Props> = ({
    * Adds initial knot data
    */
   const addInitialData = () => {
-    const nodes = knots.map(translateToNode);
+    if(knots[0] && knots[0].scope !== KnotScope.Global) {
+      knots[0].scope = KnotScope.Global;
+    }
+    if (knots[1] && knots[1].scope !== KnotScope.Home) {
+      knots[1].scope = KnotScope.Home;
+    }
+    const nodes = knots.map(knot => {
+      switch (knot.scope) {
+        case KnotScope.Global :
+          return translateToGlobalNode(knot);
+        case KnotScope.Home :
+          return translateToHomeNode(knot);
+        case KnotScope.Basic :
+          return translateToNode(knot);
+        default : 
+          return translateToNode(knot);
+      }
+    });
+    
     const links = intents.reduce<CustomLinkModel[]>((links, intent) => {
       const translatedLink = translateToLink(intent, nodes);
       return translatedLink ? [ ...links, translatedLink ] : links
