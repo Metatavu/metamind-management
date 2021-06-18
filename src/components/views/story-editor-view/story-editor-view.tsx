@@ -68,14 +68,15 @@ const StoryEditorView: React.FC<Props> = ({
     if(!centeredKnot?.id) {
       return;
     }
-    
-    const node = engineRef.current.getModel().getNodes().find(item => item.getID() === centeredKnot.id);
+
+    const model = engineRef.current.getModel();
+    const node = model.getNodes().find(item => item.getID() === centeredKnot.id);
 
     if (node?.getID()) {
       engineRef.current.zoomToFitNodes({margin: 0, nodes: [node], maxZoom: 1});
-      engineRef.current.getModel().getNodes().forEach(item => item.setSelected(false));
-      engineRef.current.getModel().getLinks().forEach(item => item.setSelected(false));
-      engineRef.current.getModel().getNode(node.getID()).setSelected(true);
+      model.getNodes().forEach(item => item.setSelected(false));
+      model.getLinks().forEach(item => item.setSelected(false));
+      model.getNode(node.getID()).setSelected(true);
     } 
   }, [ centeredKnot ]);
 

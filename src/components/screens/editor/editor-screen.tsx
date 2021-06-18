@@ -63,6 +63,11 @@ const EditorScreen: React.FC<Props> = ({
     // eslint-disable-next-line
   }, []);
 
+  /**
+   * Event handler for on knot click
+   * 
+   * @param knot knot
+   */
   const onKnotClick = (knot: Knot) => {
     if (!knot?.coordinates?.x || !knot?.coordinates?.y) {
       return;
@@ -71,6 +76,11 @@ const EditorScreen: React.FC<Props> = ({
     setStoryData({ ...storyData, selectedKnot: knot });
   }
 
+  /**
+   * Event handler for on intent click
+   * 
+   * @param intent intent
+   */
   const onIntentClick = (intent: Intent) => {
     if (!intent?.sourceKnotId || !intent?.targetKnotId) {
       return;
