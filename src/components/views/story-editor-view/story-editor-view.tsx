@@ -73,7 +73,7 @@ const StoryEditorView: React.FC<Props> = ({
     const node = model.getNodes().find(item => item.getID() === centeredKnot.id);
 
     if (node?.getID()) {
-      engineRef.current.zoomToFitNodes({margin: 0, nodes: [node], maxZoom: 1});
+      engineRef.current.zoomToFitNodes({ margin: 0, nodes: [node], maxZoom: 1 });
       model.getNodes().forEach(item => item.setSelected(false));
       model.getLinks().forEach(item => item.setSelected(false));
       model.getNode(node.getID()).setSelected(true);
