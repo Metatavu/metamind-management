@@ -53,7 +53,7 @@ const EditorScreen: React.FC<Props> = ({
   const [ leftToolBarIndex, setLeftToolBarIndex ] = React.useState(0);
   const [ rightToolBarIndex, setRightToolBarIndex ] = React.useState(0);
   const [ addingKnots, setAddingKnots ] = React.useState(false);
-  const [ dataChanged, setDataChanged ] = React.useState(false);
+  const [ dataChanged, /* setDataChanged */ ] = React.useState(false);
   const [ editingEntityInfo, setEditingEntityInfo ] = React.useState(false);
 
   React.useEffect(() => {
