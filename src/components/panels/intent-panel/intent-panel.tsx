@@ -16,7 +16,9 @@ interface Props {
 }
 
 /**
- * Functional intent panel component
+ * Intent panel component
+ *
+ * @param props component properties
  */
 const IntentPanel: React.FC<Props> = ({ intents, onIntentClick }) => {
 
