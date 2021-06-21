@@ -300,11 +300,10 @@ const EditorScreen: React.FC<Props> = ({
    * Event handler for edit training material click
    */
   const onEditTrainingMaterialClick = () => {
-    if (!editedTrainingMaterial?.type) {
-      return;
+    if (editedTrainingMaterial?.type) {
+      setEditingTrainingMaterial(true);
+      setSelectedTrainingMaterialType(editedTrainingMaterial.type);
     }
-    setEditingTrainingMaterial(true);
-    setSelectedTrainingMaterialType(editedTrainingMaterial.type);
   }
 
   /**
