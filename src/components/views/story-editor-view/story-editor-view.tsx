@@ -93,8 +93,8 @@ const StoryEditorView: React.FC<Props> = ({
   }, [ addingKnots, newPoint, onAddNode ]);
 
   React.useEffect(() => {
-    editingEntityInfo ? engineRef.current.getModel().setLocked(true) : engineRef.current.getModel().setLocked(false);
-  }, [editingEntityInfo]);
+    engineRef.current.getModel().setLocked(editingEntityInfo);
+  }, [ editingEntityInfo ]);
 
   /**
    * Effect that delays actual update of coordinates in knot when corresponding node is moved in diagram
