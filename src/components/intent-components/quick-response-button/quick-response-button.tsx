@@ -5,6 +5,9 @@ import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import { Intent } from "../../../generated/client/models";
 import strings from "../../../localization/strings";
 
+/**
+ * Interface describing component properties
+ */
 interface Props extends WithStyles<typeof styles> {
   editing: boolean;
   selectedIntent?: Intent;
