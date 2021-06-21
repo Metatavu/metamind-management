@@ -695,7 +695,7 @@ const EditorScreen: React.FC<Props> = ({
           { renderSpecialButton() }
         <Divider className={ classes.divider }/>
         <Box>
-          <AccordionItem title={ strings.editorScreen.rightBar.trainingMaterialsHeader } >
+          <AccordionItem title={ strings.editorScreen.rightBar.trainingMaterialsHeader }>
             { renderTrainingSelectionOptions() }
           </AccordionItem>
         </Box>
