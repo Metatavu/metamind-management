@@ -208,6 +208,7 @@ class HomeScreen extends React.Component<Props, State> {
           content: ""
         }
       });
+
       this.setState({ selectedStoryId: story.id });
     }
   }
