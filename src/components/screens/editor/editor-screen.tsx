@@ -686,8 +686,7 @@ const EditorScreen: React.FC<Props> = ({
             <MenuItem key={ name } value={ name }>
               { strings.editorScreen.rightBar.intentType[name as keyof object] }
             </MenuItem>
-            )
-          }
+          )}
         </TextField>
         <Divider className={ classes.divider }/>
           <InputLabel className={ classes.buttonLabel }>
