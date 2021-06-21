@@ -243,18 +243,11 @@ const StoryEditorView: React.FC<Props> = ({
     if (knots[1] && knots[1].scope !== KnotScope.Home) {
       knots[1].scope = KnotScope.Home;
     }
-    const nodes = knots.map(knot => {
-      switch (knot.scope) {
-        case KnotScope.Global :
-          return translateToGlobalNode(knot);
-        case KnotScope.Home :
-          return translateToHomeNode(knot);
-        case KnotScope.Basic :
-          return translateToNode(knot);
-        default : 
-          return translateToNode(knot);
-      }
-    });
+    const nodes = knots.map(knot => ({
+      KnotScope.Global: translateToGlobalNode,
+      KnotScope.Home: translateToHomeNode,
+      KnotScope.Basic: translateToNode
+    })[knot.scope](knot));
     
     const links = intents.reduce<CustomLinkModel[]>((links, intent) => {
       const translatedLink = translateToLink(intent, nodes);
