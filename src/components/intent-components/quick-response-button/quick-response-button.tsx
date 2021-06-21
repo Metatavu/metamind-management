@@ -15,6 +15,11 @@ interface Props extends WithStyles<typeof styles> {
   onUpdateFieldInfo: (event: React.ChangeEvent<any>) => void;
 }
 
+/**
+ * Quick response button
+ *
+ * @param props component properties
+ */
 const QuickResponseButton: React.FC<Props> = ({
   classes,
   editing,
