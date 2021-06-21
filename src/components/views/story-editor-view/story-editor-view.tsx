@@ -237,17 +237,11 @@ const StoryEditorView: React.FC<Props> = ({
    * Adds initial knot data
    */
   const addInitialData = () => {
-    if(knots[0] && knots[0].scope !== KnotScope.Global) {
-      knots[0].scope = KnotScope.Global;
-    }
-    if (knots[1] && knots[1].scope !== KnotScope.Home) {
-      knots[1].scope = KnotScope.Home;
-    }
     const nodes = knots.map(knot => ({
-      KnotScope.Global: translateToGlobalNode,
-      KnotScope.Home: translateToHomeNode,
-      KnotScope.Basic: translateToNode
-    })[knot.scope](knot));
+      [KnotScope.Global]: translateToGlobalNode,
+      [KnotScope.Home]: translateToHomeNode,
+      [KnotScope.Basic]: translateToNode
+    })[knot.scope ?? KnotScope.Basic](knot));
     
     const links = intents.reduce<CustomLinkModel[]>((links, intent) => {
       const translatedLink = translateToLink(intent, nodes);
