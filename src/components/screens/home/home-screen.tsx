@@ -186,7 +186,8 @@ class HomeScreen extends React.Component<Props, State> {
     });
     if (story.id) {
       
-      const globalKnot = await Api.getKnotsApi(accessToken).createKnot({
+      const knotsApi = Api.getKnotsApi(accessToken);
+      const globalKnot = await knotsApi.createKnot({
         storyId: story.id,
         knot: {
           name: "Global",
@@ -196,7 +197,8 @@ class HomeScreen extends React.Component<Props, State> {
           content: ""
         }
       });
-      const homeKnot = await Api.getKnotsApi(accessToken).createKnot({
+
+      const homeKnot = await knotsApi.createKnot({
         storyId: story.id,
         knot: {
           name: "Home",
