@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useStoryEditorViewStyles } from "./story-editor-view";
-import createEngine, { DiagramEngine, DiagramModel, NodeModel, NodeModelGenerics } from '@projectstorm/react-diagrams';
+import createEngine, { DiagramModel } from '@projectstorm/react-diagrams';
 import { DefaultState } from "../../diagram-components/custom-state-machine/default-state";
 import { CustomNodeFactory } from "../../diagram-components/custom-node/custom-node-factory";
 import { HomeNodeFactory } from "../../diagram-components/home-node/home-node-factory";
