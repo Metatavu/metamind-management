@@ -22,7 +22,6 @@ const QuickResponseButton: React.FC<Props> = ({
   setEditingButtonFieldValue,
   onUpdateFieldInfo
 }) => {
-
   return (
     <>
       { !editing && 
