@@ -244,32 +244,34 @@ const EditorScreen: React.FC<Props> = ({
    */
   const onSetActiveTrainingMaterialChange = (event: any) => {
     const { name, value } = event.target;
+
     if (!name || !value || !trainingMaterial || !selectedIntent || !intents) {
       return;
     }
-    let foundMaterial: TrainingMaterial | undefined;
-    if (value === "none") {
-      setEditedTrainingMaterial(undefined);
-    } else {
-      foundMaterial = trainingMaterial.find(item => item.id === value);
-      foundMaterial && setEditedTrainingMaterial(foundMaterial);
-    }
-    const key = objectKeyConversion(name);
-    selectedIntent.trainingMaterials = { ...selectedIntent.trainingMaterials, [key]: foundMaterial?.id ?? undefined };
 
-    if (accessToken && selectedIntent.id) {
+    const foundMaterial = trainingMaterial.find(item => item.id === value);
+    setEditedTrainingMaterial(foundMaterial);
+
+    const updatedIntent: Intent = {
+      ...selectedIntent,
+      trainingMaterials: {
+        ...selectedIntent.trainingMaterials,
+        [objectKeyConversion(name)]: foundMaterial?.id
+      }
+    };
+
+    if (accessToken && updatedIntent.id) {
       Api.getIntentsApi(accessToken).updateIntent({
-        intentId: selectedIntent.id,
-        intent: selectedIntent,
+        intentId: updatedIntent.id,
+        intent: updatedIntent,
         storyId: storyId
       });
-    }
-    
+    }    
     
     setStoryData({
       ...storyData,
-      selectedIntent: selectedIntent,
-      intents: [ ...intents.filter(item => item.id !== selectedIntent.id), selectedIntent ]
+      selectedIntent: updatedIntent,
+      intents: intents.map(intent => intent.id === updatedIntent.id ? updatedIntent : intent)
     });
   }
 
