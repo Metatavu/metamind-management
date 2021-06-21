@@ -240,9 +240,9 @@ const EditorScreen: React.FC<Props> = ({
   /**
    * Event handler for set active training material change 
    * 
-   * @param event event
+   * @param event event from input change
    */
-  const onSetActiveTrainingMaterialChange = (event: any) => {
+  const onSetActiveTrainingMaterialChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
 
     if (!name || !value || !trainingMaterial || !selectedIntent || !intents) {
@@ -330,7 +330,55 @@ const EditorScreen: React.FC<Props> = ({
    * 
    * @param action action type: update / create
    */
-  const onSaveTrainingMaterialClick = async (action: string) => {
+  const onSaveTrainingMaterialClick = async () => {
+    if(!editedTrainingMaterial) {
+      return;
+    }
+
+    editedTrainingMaterial.id ? await updateTrainingMaterial() : await createTrainingMaterial();
+    setEditingTrainingMaterial(false);
+    setSelectedTrainingMaterialType(null);
+  }
+
+  /**
+   * Updates training material
+   */
+  const updateTrainingMaterial = async () => {
+    let updatedTrainingMaterial: TrainingMaterial;
+    let updatedIntent: Intent;
+    if (!accessToken || !editedTrainingMaterial?.type || !trainingMaterial || !selectedIntent?.id || !intents) {
+      return;
+    }
+    const key = objectKeyConversion(editedTrainingMaterial.type);
+    try {
+      updatedTrainingMaterial = await Api.getTrainingMaterialApi(accessToken).updateTrainingMaterial({
+        trainingMaterialId: editedTrainingMaterial.id ?? "",
+        trainingMaterial: editedTrainingMaterial
+      });
+      updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
+        intentId: selectedIntent.id,
+        intent: { ...selectedIntent, trainingMaterials: { 
+            ...selectedIntent.trainingMaterials,
+            [key]: editedTrainingMaterial.id
+          }
+        },
+        storyId: storyId
+      });
+    } catch (error) {
+      throw error;
+    }
+    setStoryData({
+      ...storyData,
+      trainingMaterial: trainingMaterial.map(item => item.id === updatedTrainingMaterial.id ? updatedTrainingMaterial : item),
+      selectedIntent: updatedIntent,
+      intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
+    });
+  }
+
+  /**
+   * Creates training material
+   */
+  const createTrainingMaterial = async () => {
     let updatedTrainingMaterial: TrainingMaterial;
     let updatedIntent: Intent;
     if (!accessToken || !editedTrainingMaterial?.type || !trainingMaterial || !selectedIntent?.id || !intents) {
@@ -338,74 +386,45 @@ const EditorScreen: React.FC<Props> = ({
     }
     const key = objectKeyConversion(editedTrainingMaterial.type);
 
-    if (action === "update" && editedTrainingMaterial.id) {
-      try {
-        updatedTrainingMaterial = await Api.getTrainingMaterialApi(accessToken).updateTrainingMaterial({
-          trainingMaterialId: editedTrainingMaterial.id,
-          trainingMaterial: editedTrainingMaterial
-        });
-        updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
-          intentId: selectedIntent.id,
-          intent: { ...selectedIntent, trainingMaterials: { 
-              ...selectedIntent.trainingMaterials,
-              [key]: editedTrainingMaterial.id
-            }
-          },
-          storyId: storyId
-        });
-      } catch (error) {
-        throw error;
-      }
-      setStoryData({
-        ...storyData,
-        trainingMaterial: trainingMaterial.map(item => item.id === updatedTrainingMaterial.id ? updatedTrainingMaterial : item),
-        selectedIntent: updatedIntent,
-        intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
+    try {
+      updatedTrainingMaterial = await Api.getTrainingMaterialApi(accessToken).createTrainingMaterial({
+        trainingMaterial: editedTrainingMaterial
       });
-    }
-    if (action === "create") {
-      try {
-        updatedTrainingMaterial = await Api.getTrainingMaterialApi(accessToken).createTrainingMaterial({
-          trainingMaterial: editedTrainingMaterial
-        });
-        updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
-          intentId: selectedIntent.id,
-          intent: { ...selectedIntent, trainingMaterials: {
-              ...selectedIntent.trainingMaterials,
-              [key]: editedTrainingMaterial.id
-            }
-          },
-          storyId: storyId
-        });
-      } catch (error) {
-        throw error;
-      }
-      setStoryData({
-        ...storyData,
-        trainingMaterial: [ ...trainingMaterial, updatedTrainingMaterial ],
-        selectedIntent: updatedIntent,
-        intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
+      updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
+        intentId: selectedIntent.id,
+        intent: { ...selectedIntent, trainingMaterials: {
+            ...selectedIntent.trainingMaterials,
+            [key]: editedTrainingMaterial.id
+          }
+        },
+        storyId: storyId
       });
+    } catch (error) {
+      throw error;
     }
-    setEditingTrainingMaterial(false);
-    setSelectedTrainingMaterialType(null);
+    setStoryData({
+      ...storyData,
+      trainingMaterial: [ ...trainingMaterial, updatedTrainingMaterial ],
+      selectedIntent: updatedIntent,
+      intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
+    });
   }
 
   /**
    * Event handler for updating knot info
    * 
-   * @param knot knot with updated info
+   * @param event event from input change
    */
-  const onUpdateKnotInfo = async (event: React.ChangeEvent<any>, knot: Knot) => {
+  const onUpdateKnotInfo = async (event: React.ChangeEvent<HTMLInputElement>) => {
     let { name, value } = event?.target;
-    if (!accessToken || !knots || !knot?.id) {
+    if (!accessToken || !knots || !selectedKnot?.id) {
       return;
     }
 
     const updatedKnot = await Api.getKnotsApi(accessToken).updateKnot({
       storyId: storyId,
-      knotId: knot.id,
-      knot: { ...knot, [name]: value }
+      knotId: selectedKnot.id,
+      knot: { ...selectedKnot, [name]: value }
     });
 
     setStoryData({
@@ -417,9 +436,9 @@ const EditorScreen: React.FC<Props> = ({
   /**
    * Event handler for updating knot info
    * 
-   * @param knot knot with updated info
+   * @param event event from input change
    */
-  const onUpdateIntentInfo = async (event: React.ChangeEvent<any>) => {
+  const onUpdateIntentInfo = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event?.target;
     if (!accessToken || !intents || !selectedIntent?.id) {
       return;
@@ -440,8 +459,10 @@ const EditorScreen: React.FC<Props> = ({
 
   /**
    * Event handler for update edited training material
+   * 
+   * @param event event of input change
    */
-  const onUpdateEditedTrainingMaterial = (event: React.ChangeEvent<any>) => {
+  const onUpdateEditedTrainingMaterial = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event?.target;
     if (!editedTrainingMaterial) {
       return;
@@ -457,11 +478,11 @@ const EditorScreen: React.FC<Props> = ({
    * @returns object key
    */
   const objectKeyConversion = (name: string): keyof IntentTrainingMaterials => ({
-    [TrainingMaterialType.INTENTOPENNLPDOCCAT]: "intentOpenNlpDoccatId",
-    [TrainingMaterialType.INTENTREGEX]: "intentRegexId",
-    [TrainingMaterialType.VARIABLEOPENNLPNER]: "variableOpenNlpNerId",
-    [TrainingMaterialType.VARIABLEOPENNLPREGEX]: "variableOpenNlpRegex",
-  })[name] ?? "intentOpenNlpDoccatId";
+    [TrainingMaterialType.INTENTOPENNLPDOCCAT]: "intentOpenNlpDoccatId" as keyof IntentTrainingMaterials,
+    [TrainingMaterialType.INTENTREGEX]: "intentRegexId" as keyof IntentTrainingMaterials,
+    [TrainingMaterialType.VARIABLEOPENNLPNER]: "variableOpenNlpNerId" as keyof IntentTrainingMaterials,
+    [TrainingMaterialType.VARIABLEOPENNLPREGEX]: "variableOpenNlpRegex" as keyof IntentTrainingMaterials,
+  })[name as unknown as TrainingMaterialType] ?? "intentOpenNlpDoccatId" as keyof IntentTrainingMaterials;
 
   /**
    * Fetches knots list for the story
@@ -630,7 +651,7 @@ const EditorScreen: React.FC<Props> = ({
             label={ strings.editorScreen.rightBar.knotNameHelper }
             name="name"
             defaultValue={ selectedKnot.name ?? "" }
-            onChange={ (e: any) => onUpdateKnotInfo(e, selectedKnot) }
+            onChange={ onUpdateKnotInfo }
           />
         }
         { selectedIntent &&
