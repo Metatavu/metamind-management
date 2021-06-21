@@ -19,8 +19,10 @@
     "selectStoryText": "Valitse tarina tai luo uusi.",
     "createNewStory": "Luo uusi tarina",
     "lastEditedStories": "Viimeksi muokatut tarinat",
+    "nameTheStory": "Nimeä tarina",
     "selectStory": "Valitse tarina",
     "selectStoryToEdit": "Valitse jo olemassaoleva tarina editoitavaksi",
+    "storyName": "Tarinan nimi",
     "open": "Avaa"
   },
 

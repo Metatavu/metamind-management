@@ -1,4 +1,4 @@
-import { Box, Button, List, ListItem, ListItemText, Typography, WithStyles, withStyles, TextField, Divider, MenuItem } from "@material-ui/core";
+import { Box, Button, Fade, IconButton, List, ListItem, ListItemText, Typography, WithStyles, withStyles, TextField, Divider, MenuItem, Toolbar } from "@material-ui/core";
 import { History } from "history";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
@@ -11,6 +11,7 @@ import { ReduxActions, ReduxState } from "../../../store";
 import { AccessToken } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
 import { styles } from "./home-screen.styles";
+import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 
 /**
  * Interface describing component props
@@ -27,6 +28,7 @@ interface Props extends WithStyles<typeof styles> {
 interface State {
   stories: Story[];
   selectedStoryId?: string;
+  viewIndex: number;
 }
 
 /**
@@ -43,7 +45,8 @@ class HomeScreen extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      stories: []
+      stories: [],
+      viewIndex: 0
     }
   }
 
@@ -59,6 +62,7 @@ class HomeScreen extends React.Component<Props, State> {
    */
   public render = () => {
     const { classes, keycloak } = this.props;
+    const { viewIndex } = this.state;
 
     if (!keycloak) {
       return null;
@@ -70,9 +74,58 @@ class HomeScreen extends React.Component<Props, State> {
         keycloak={ keycloak }
       >
         <Box className={ classes.root }>
-          { this.renderSelectStoryCard() }
+          <Toolbar />
+          <Box className={ classes.cardWrapper }>
+            <Fade in={ viewIndex === 0 } >
+              { this.renderSelectStoryCard() }
+            </Fade>
+            <Fade in={ viewIndex === 1 } >
+              { this.renderCreateStory() }
+            </Fade>
+            <Fade in={ viewIndex === 2 } >
+              <></>
+            </Fade>
+          </Box>
         </Box>
       </AppLayout>
+    );
+  }
+
+  private renderCreateStory = () => {
+    const { classes } = this.props;
+    return (
+      <Box className={ classes.storySelectCard }>
+        <Box className={ classes.cardHeader }>
+          <Box className={ classes.backButtonContainer }>
+            <IconButton
+              title={ strings.header.settings }
+              color="secondary"
+              onClick={ () => this.setState({ viewIndex: 0 }) }
+            >
+              <NavigateBeforeIcon/>
+            </IconButton>
+          </Box>
+          <Typography color="textSecondary" variant="h1">
+            { strings.homeScreen.nameTheStory }
+          </Typography>
+        </Box>
+        <Box p={ 2 } mb={ 2 }>
+          <TextField
+            className={ classes.field }
+            label={ strings.homeScreen.storyName }
+            title={ strings.homeScreen.storyName }
+            variant="outlined"
+            color="primary"
+          />
+        </Box>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={ () => {} }
+        >
+          { strings.homeScreen.createNewStory }
+        </Button>
+      </Box>
     );
   }
 
@@ -172,7 +225,7 @@ class HomeScreen extends React.Component<Props, State> {
    * Event handler for create new story click
    */
   private onCreateNewStoryClick = () => {
-    // TODO: add functionality
+    this.setState({ viewIndex: 1 });
   }
 
   /**

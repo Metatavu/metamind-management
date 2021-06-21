@@ -19,8 +19,10 @@
     "selectStoryText": "Select a Story or create a new one.",
     "createNewStory": "Create a new story",
     "lastEditedStories": "Last edited",
+    "nameTheStory": "Name the story",
     "selectStory": "Select a story",
     "selectStoryToEdit": "Edit existing story",
+    "storyName": "Story name",
     "open": "Open"
   },
 
