@@ -37,10 +37,7 @@ const QuickResponseButton: React.FC<Props> = ({
       }
       { editing &&
         <List>
-          <ListItem
-            className={ classes.specialButton }
-            button={ false }
-          >
+          <ListItem className={ classes.specialButton }>
             <TextField
               name="quickResponse"
               value={ (selectedIntent?.quickResponse && selectedIntent?.quickResponse.trim().length > 0) ?
