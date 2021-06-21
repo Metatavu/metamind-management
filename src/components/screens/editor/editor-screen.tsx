@@ -63,7 +63,7 @@ const EditorScreen: React.FC<Props> = ({
   const [ editingQuickResponse, setEditingQuickResponse ] = React.useState(false);
   const [ editingTrainingMaterial, setEditingTrainingMaterial ] = React.useState(false);
   const [ selectedTrainingMaterialType, setSelectedTrainingMaterialType ] = React.useState<TrainingMaterialType | null>(null);
-  const [ editedTrainingMaterial, setEditedTrainingMaterial ] = React.useState<TrainingMaterial | undefined>(undefined);
+  const [ editedTrainingMaterial, setEditedTrainingMaterial ] = React.useState<TrainingMaterial>();
 
 
   React.useEffect(() => {
