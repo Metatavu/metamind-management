@@ -680,7 +680,7 @@ const EditorScreen: React.FC<Props> = ({
           name="type"
           select
           defaultValue={ selectedIntent.type }
-          onChange={ (e: any) => onUpdateIntentInfo(e) }
+          onChange={ onUpdateIntentInfo }
         >
           { intentTypes.map(name => 
             <MenuItem key={ name } value={ name }>
