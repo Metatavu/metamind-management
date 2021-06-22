@@ -201,7 +201,7 @@ const StoryEditorView: React.FC<Props> = ({
       selectionChanged: (selectionChangedEvent: any) => {
         onLinkSelectionChange(selectionChangedEvent.entity as CustomLinkModel);
       }
-    })
+    });
 
     return link;
   }
