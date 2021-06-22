@@ -49,8 +49,8 @@ const TrainingSelectionOptions: React.FC<Props> = ({
 
         const key = objectKeyConversion(name);
         const foundMaterial = trainingMaterial?.find(item => item.id === selectedIntent?.trainingMaterials[key]);
-        const onlyAddButton = (!editingTrainingMaterial && selectedIntent?.trainingMaterials[key] === undefined);
-        const addAndEditButton = (!editingTrainingMaterial && selectedIntent?.trainingMaterials[key] !== undefined);
+        const onlyAddButton = !editingTrainingMaterial && selectedIntent?.trainingMaterials[key] === undefined;
+        const addAndEditButton = !editingTrainingMaterial && selectedIntent?.trainingMaterials[key] !== undefined;
 
         return (
           <div className={ classes.trainingSelectionOption }>
