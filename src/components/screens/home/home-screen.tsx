@@ -178,12 +178,14 @@ class HomeScreen extends React.Component<Props, State> {
     if (!accessToken) {
       return;
     }
+
     const story = await Api.getStoriesApi(accessToken).createStory({
       story: {
         name: "Global & home knots tester",
         locale: "fi"
       }
     });
+
     if (story.id) {
       
       const knotsApi = Api.getKnotsApi(accessToken);
