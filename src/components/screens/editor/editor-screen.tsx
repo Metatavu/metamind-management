@@ -60,7 +60,8 @@ const EditorScreen: React.FC<Props> = ({
   const [ leftToolBarIndex, setLeftToolBarIndex ] = React.useState(0);
   const [ rightToolBarIndex, setRightToolBarIndex ] = React.useState(0);
   const [ addingKnots, setAddingKnots ] = React.useState(false);
-  const [ dataChanged, setDataChanged ] = React.useState(false);
+  const [ dataChanged, /* setDataChanged */ ] = React.useState(false);
+  const [ editingEntityInfo, setEditingEntityInfo ] = React.useState(false);
   const [ editingQuickResponse, setEditingQuickResponse ] = React.useState(false);
   const [ editingTrainingMaterial, setEditingTrainingMaterial ] = React.useState(false);
   const [ selectedTrainingMaterialType, setSelectedTrainingMaterialType ] = React.useState<TrainingMaterialType | null>(null);
@@ -566,6 +567,7 @@ const EditorScreen: React.FC<Props> = ({
             onRemoveNode={ onRemoveNode }
             onAddLink={ onAddLink }
             onRemoveLink={ onRemoveLink }
+            editingEntityInfo={ editingEntityInfo }
             onNodeSelectionChange={ onNodeSelectionChange }
             onLinkSelectionChange={ onLinkSelectionChange }
           />
@@ -627,6 +629,8 @@ const EditorScreen: React.FC<Props> = ({
       <TextField
         label={ strings.editorScreen.rightBar.storyNameHelper }
         defaultValue={ story?.name }
+        onFocus={ () => setEditingEntityInfo(true) }
+        onBlur={ () => setEditingEntityInfo(false) }
       />
     );
   }
@@ -642,6 +646,8 @@ const EditorScreen: React.FC<Props> = ({
             label={ strings.editorScreen.rightBar.knotNameHelper }
             name="name"
             defaultValue={ selectedKnot.name ?? "" }
+            onFocus={ () => setEditingEntityInfo(true) }
+            onBlur={ () => setEditingEntityInfo(false) }
             onChange={ onUpdateKnotInfo }
           />
         }
