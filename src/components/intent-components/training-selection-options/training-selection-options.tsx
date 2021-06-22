@@ -60,7 +60,7 @@ const TrainingSelectionOptions: React.FC<Props> = ({
             <Card className={ classes.trainingSelectionOptionContent }>
               <CardContent>
                 { renderDropdown(name, onSetActiveTrainingMaterialChange, editingTrainingMaterial, trainingMaterial, foundMaterial) }
-                { (onlyAddButton && editedTrainingMaterial?.type !== name as keyof object) &&
+                { onlyAddButton && editedTrainingMaterial?.type !== name as keyof object &&
                   <Button
                     className={ classes.trainingSelectionAddButton }
                     variant="outlined"
