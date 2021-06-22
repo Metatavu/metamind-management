@@ -18,6 +18,10 @@ import {
     CoordinatesFromJSON,
     CoordinatesFromJSONTyped,
     CoordinatesToJSON,
+    KnotScope,
+    KnotScopeFromJSON,
+    KnotScopeFromJSONTyped,
+    KnotScopeToJSON,
     KnotType,
     KnotTypeFromJSON,
     KnotTypeFromJSONTyped,
@@ -94,6 +98,12 @@ export interface Knot {
      * @memberof Knot
      */
     readonly modifiedAt?: Date;
+    /**
+     * 
+     * @type {KnotScope}
+     * @memberof Knot
+     */
+    scope?: KnotScope;
 }
 
 export function KnotFromJSON(json: any): Knot {
@@ -116,6 +126,7 @@ export function KnotFromJSONTyped(json: any, ignoreDiscriminator: boolean): Knot
         'coordinates': !exists(json, 'coordinates') ? undefined : CoordinatesFromJSON(json['coordinates']),
         'createdAt': !exists(json, 'createdAt') ? undefined : (new Date(json['createdAt'])),
         'modifiedAt': !exists(json, 'modifiedAt') ? undefined : (new Date(json['modifiedAt'])),
+        'scope': !exists(json, 'scope') ? undefined : KnotScopeFromJSON(json['scope']),
     };
 }
 
@@ -134,6 +145,7 @@ export function KnotToJSON(value?: Knot | null): any {
         'content': value.content,
         'hint': value.hint,
         'coordinates': CoordinatesToJSON(value.coordinates),
+        'scope': KnotScopeToJSON(value.scope),
     };
 }
 

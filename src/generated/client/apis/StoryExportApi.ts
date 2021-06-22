@@ -61,7 +61,7 @@ export class StoryExportApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/storyExport/{storyId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))),
+            path: `/v2/storyExport/{storyId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -103,7 +103,7 @@ export class StoryExportApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/storyImport/`,
+            path: `/v2/storyImport/`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,

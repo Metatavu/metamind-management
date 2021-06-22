@@ -5,7 +5,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../../../api/api";
-import { Story } from "../../../generated/client";
+import { Story, KnotType,TokenizerType, KnotScope } from "../../../generated/client";
 import strings from "../../../localization/strings";
 import { ReduxActions, ReduxState } from "../../../store";
 import { AccessToken } from "../../../types";
@@ -171,8 +171,48 @@ class HomeScreen extends React.Component<Props, State> {
   /**
    * Event handler for create new story click
    */
-  private onCreateNewStoryClick = () => {
-    // TODO: add functionality
+  private onCreateNewStoryClick = async () => {
+    //TODO: Proper implementation
+    const { accessToken } = this.props;
+
+    if (!accessToken) {
+      return;
+    }
+
+    const story = await Api.getStoriesApi(accessToken).createStory({
+      story: {
+        name: "Global & home knots tester",
+        locale: "fi"
+      }
+    });
+
+    if (story.id) {
+      
+      const knotsApi = Api.getKnotsApi(accessToken);
+      const globalKnot = await knotsApi.createKnot({
+        storyId: story.id,
+        knot: {
+          name: "Global",
+          type: KnotType.TEXT,
+          scope: KnotScope.Global,
+          tokenizer: TokenizerType.UNTOKENIZED,
+          content: ""
+        }
+      });
+
+      const homeKnot = await knotsApi.createKnot({
+        storyId: story.id,
+        knot: {
+          name: "Home",
+          type: KnotType.TEXT,
+          scope: KnotScope.Home,
+          tokenizer: TokenizerType.UNTOKENIZED,
+          content: ""
+        }
+      });
+
+      this.setState({ selectedStoryId: story.id });
+    }
   }
 
   /**
