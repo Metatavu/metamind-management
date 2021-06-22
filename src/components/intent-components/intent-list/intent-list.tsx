@@ -12,12 +12,15 @@ import InteractiveListItem from "../../generic/list-items/interactive-list-item"
  */
 interface Props {
   intents: Intent[];
+  onIntentClick: (intent: Intent) => void;
 }
 
 /**
- * Functional intent panel component
+ * Intent panel component
+ *
+ * @param props component properties
  */
-const IntentPanel: React.FC<Props> = ({ intents }) => {
+const IntentPanel: React.FC<Props> = ({ intents, onIntentClick }) => {
 
   /**
    * Renders list of intents based on type for left toolbar second tab
@@ -35,7 +38,7 @@ const IntentPanel: React.FC<Props> = ({ intents }) => {
               <InteractiveListItem
                 icon={ <IntentIcon/> }
                 title={ intent.name ?? "" }
-                onClick={ () => { } }
+                onClick={ () => onIntentClick(intent) }
               />
             ))
         }

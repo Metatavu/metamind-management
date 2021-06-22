@@ -56,6 +56,8 @@ const EditorScreen: React.FC<Props> = ({
   const classes = useEditorScreenStyles();
 
   const [ storyData, setStoryData ] = React.useState<StoryData>({});
+  const [ centeredKnot, setCenteredKnot ] = React.useState<Knot | undefined>(undefined);
+  const [ centeredIntent, setCenteredIntent ] = React.useState<Intent | undefined>(undefined);
   const { story, knots, selectedKnot, selectedIntent, intents, trainingMaterial } = storyData;
   const [ leftToolBarIndex, setLeftToolBarIndex ] = React.useState(0);
   const [ rightToolBarIndex, setRightToolBarIndex ] = React.useState(0);
@@ -71,6 +73,32 @@ const EditorScreen: React.FC<Props> = ({
     fetchData();
     // eslint-disable-next-line
   }, []);
+
+  /**
+   * Event handler for on knot click
+   * 
+   * @param knot knot
+   */
+  const onKnotClick = (knot: Knot) => {
+    if (!knot?.coordinates?.x || !knot?.coordinates?.y) {
+      return;
+    }
+    setCenteredKnot(knot);
+    setStoryData({ ...storyData, selectedKnot: knot });
+  }
+
+  /**
+   * Event handler for on intent click
+   * 
+   * @param intent intent
+   */
+  const onIntentClick = (intent: Intent) => {
+    if (!intent?.sourceKnotId || !intent?.targetKnotId) {
+      return;
+    }
+    setCenteredIntent(intent);
+    setStoryData({ ...storyData, selectedIntent: intent });
+  }
 
   /**
    * Event handler for add node
@@ -530,9 +558,21 @@ const EditorScreen: React.FC<Props> = ({
           />
         </Tabs>
         <Box>
-          { leftToolBarIndex === 0 && renderStoryTab() }
-          { leftToolBarIndex === 1 && <KnotPanel knots={ knots ?? [] }/> }
-          { leftToolBarIndex === 2 && <IntentPanel intents={ intents ?? [] }/> }
+          { leftToolBarIndex === 0 &&
+            renderStoryTab()
+          }
+          { leftToolBarIndex === 1 &&
+            <KnotPanel
+              knots={ knots ?? [] }
+              onKnotClick={ onKnotClick }
+            />
+          }
+          { leftToolBarIndex === 2 &&
+            <IntentPanel
+              intents={ intents ?? [] }
+              onIntentClick={ onIntentClick }
+            />
+          }
         </Box>
       </Drawer>
     );
@@ -562,6 +602,8 @@ const EditorScreen: React.FC<Props> = ({
             knots={ knots }
             intents={ intents }
             addingKnots={ addingKnots }
+            centeredKnot={ centeredKnot }
+            centeredIntent={ centeredIntent }
             onAddNode={ onAddNode }
             onMoveNode={ onMoveNode }
             onRemoveNode={ onRemoveNode }
