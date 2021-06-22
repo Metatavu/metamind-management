@@ -43,7 +43,7 @@ const TrainingSelectionOptions: React.FC<Props> = ({
   onSaveTrainingMaterialClick
 }) => {
 
-  return(
+  return (
     <div className={ classes.trainingSelectionOptions }>
       { Object.keys(TrainingMaterialType).map(name => {
 
