@@ -1,6 +1,6 @@
-import { IntentTrainingMaterials, TrainingMaterialType } from "../../../generated/client/models";
+import { IntentTrainingMaterials, TrainingMaterialType } from "../generated/client/models";
 
-export default class EditorScreenUtils {
+export default class EditorUtils {
 
   /**
    * Converts a training material type into intent training material key

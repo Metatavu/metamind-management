@@ -1,7 +1,8 @@
 import { Button, Card, CardContent, InputLabel, MenuItem, TextField, withStyles, WithStyles } from "@material-ui/core";
 import * as React from "react";
-import { Intent, IntentTrainingMaterials, TrainingMaterial, TrainingMaterialType } from "../../../generated/client/models";
+import { Intent, TrainingMaterial, TrainingMaterialType } from "../../../generated/client/models";
 import strings from "../../../localization/strings";
+import EditorUtils from "../../../utils/editor";
 import { styles } from "./training-selection-options-styles";
 
 /**
@@ -9,7 +10,6 @@ import { styles } from "./training-selection-options-styles";
  */
 interface Props extends WithStyles<typeof styles> {
   selectedIntent?: Intent;
-  objectKeyConversion: (name: string) => keyof IntentTrainingMaterials;
   trainingMaterial?: TrainingMaterial[];
   onSetActiveTrainingMaterialChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   editingTrainingMaterial: boolean;
@@ -30,7 +30,6 @@ interface Props extends WithStyles<typeof styles> {
 const TrainingSelectionOptions: React.FC<Props> = ({
   classes,
   selectedIntent,
-  objectKeyConversion,
   trainingMaterial,
   onSetActiveTrainingMaterialChange,
   editingTrainingMaterial,
@@ -47,7 +46,7 @@ const TrainingSelectionOptions: React.FC<Props> = ({
     <div className={ classes.trainingSelectionOptions }>
       { Object.keys(TrainingMaterialType).map(name => {
 
-        const key = objectKeyConversion(name);
+        const key = EditorUtils.objectKeyConversion(name);
         const foundMaterial = trainingMaterial?.find(item => item.id === selectedIntent?.trainingMaterials[key]);
         const onlyAddButton = !editingTrainingMaterial && selectedIntent?.trainingMaterials[key] === undefined;
         const addAndEditButton = !editingTrainingMaterial && selectedIntent?.trainingMaterials[key] !== undefined;

@@ -21,7 +21,7 @@ import CustomLinkModel from "../../diagram-components/custom-link/custom-link-mo
 import AccordionItem from "../../generic/accordion-item";
 import TrainingSelectionOptions from "../../intent-components/training-selection-options/training-selection-options";
 import QuickResponseButton from "../../intent-components/quick-response-button/quick-response-button";
-import EditorScreenUtils from "./object-key-conversion";
+import EditorUtils from "../../../utils/editor";
 
 /**
  * Component props
@@ -256,7 +256,7 @@ const EditorScreen: React.FC<Props> = ({
       ...selectedIntent,
       trainingMaterials: {
         ...selectedIntent.trainingMaterials,
-        [EditorScreenUtils.objectKeyConversion(name)]: foundMaterial?.id
+        [EditorUtils.objectKeyConversion(name)]: foundMaterial?.id
       }
     };
 
@@ -314,7 +314,7 @@ const EditorScreen: React.FC<Props> = ({
       return;
     }
 
-    const key = EditorScreenUtils.objectKeyConversion(editedTrainingMaterial.type);
+    const key = EditorUtils.objectKeyConversion(editedTrainingMaterial.type);
 
     setStoryData({
       ...storyData,
@@ -349,7 +349,7 @@ const EditorScreen: React.FC<Props> = ({
     if (!accessToken || !editedTrainingMaterial?.type || !trainingMaterial || !selectedIntent?.id || !intents) {
       return;
     }
-    const key = EditorScreenUtils.objectKeyConversion(editedTrainingMaterial.type);
+    const key = EditorUtils.objectKeyConversion(editedTrainingMaterial.type);
     try {
       updatedTrainingMaterial = await Api.getTrainingMaterialApi(accessToken).updateTrainingMaterial({
         trainingMaterialId: editedTrainingMaterial.id ?? "",
@@ -386,7 +386,7 @@ const EditorScreen: React.FC<Props> = ({
     if (!accessToken || !editedTrainingMaterial?.type || !trainingMaterial || !selectedIntent?.id || !intents) {
       return;
     }
-    const key = EditorScreenUtils.objectKeyConversion(editedTrainingMaterial.type);
+    const key = EditorUtils.objectKeyConversion(editedTrainingMaterial.type);
 
     try {
       updatedTrainingMaterial = await Api.getTrainingMaterialApi(accessToken).createTrainingMaterial({
@@ -738,7 +738,6 @@ const EditorScreen: React.FC<Props> = ({
     return (
       <TrainingSelectionOptions
         selectedIntent={ selectedIntent }
-        objectKeyConversion={ EditorScreenUtils.objectKeyConversion }
         trainingMaterial={ trainingMaterial }
         onSetActiveTrainingMaterialChange={ onSetActiveTrainingMaterialChange }
         editingTrainingMaterial={ editingTrainingMaterial }
