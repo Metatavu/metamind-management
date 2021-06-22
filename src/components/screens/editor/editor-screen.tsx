@@ -65,7 +65,6 @@ const EditorScreen: React.FC<Props> = ({
   const [ selectedTrainingMaterialType, setSelectedTrainingMaterialType ] = React.useState<TrainingMaterialType | null>(null);
   const [ editedTrainingMaterial, setEditedTrainingMaterial ] = React.useState<TrainingMaterial>();
 
-
   React.useEffect(() => {
     fetchData();
     // eslint-disable-next-line
