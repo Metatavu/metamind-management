@@ -21,6 +21,7 @@ import CustomLinkModel from "../../diagram-components/custom-link/custom-link-mo
 import AccordionItem from "../../generic/accordion-item";
 import TrainingSelectionOptions from "../../intent-components/training-selection-options/training-selection-options";
 import QuickResponseButton from "../../intent-components/quick-response-button/quick-response-button";
+import EditorScreenUtils from "./object-key-conversion";
 
 /**
  * Component props
@@ -255,7 +256,7 @@ const EditorScreen: React.FC<Props> = ({
       ...selectedIntent,
       trainingMaterials: {
         ...selectedIntent.trainingMaterials,
-        [objectKeyConversion(name)]: foundMaterial?.id
+        [EditorScreenUtils.objectKeyConversion(name)]: foundMaterial?.id
       }
     };
 
@@ -313,7 +314,7 @@ const EditorScreen: React.FC<Props> = ({
       return;
     }
 
-    const key = objectKeyConversion(editedTrainingMaterial.type);
+    const key = EditorScreenUtils.objectKeyConversion(editedTrainingMaterial.type);
 
     setStoryData({
       ...storyData,
@@ -348,7 +349,7 @@ const EditorScreen: React.FC<Props> = ({
     if (!accessToken || !editedTrainingMaterial?.type || !trainingMaterial || !selectedIntent?.id || !intents) {
       return;
     }
-    const key = objectKeyConversion(editedTrainingMaterial.type);
+    const key = EditorScreenUtils.objectKeyConversion(editedTrainingMaterial.type);
     try {
       updatedTrainingMaterial = await Api.getTrainingMaterialApi(accessToken).updateTrainingMaterial({
         trainingMaterialId: editedTrainingMaterial.id ?? "",
@@ -385,7 +386,7 @@ const EditorScreen: React.FC<Props> = ({
     if (!accessToken || !editedTrainingMaterial?.type || !trainingMaterial || !selectedIntent?.id || !intents) {
       return;
     }
-    const key = objectKeyConversion(editedTrainingMaterial.type);
+    const key = EditorScreenUtils.objectKeyConversion(editedTrainingMaterial.type);
 
     try {
       updatedTrainingMaterial = await Api.getTrainingMaterialApi(accessToken).createTrainingMaterial({
@@ -473,19 +474,6 @@ const EditorScreen: React.FC<Props> = ({
 
     setEditedTrainingMaterial({ ...editedTrainingMaterial, [name]: value });
   }
-
-  /**
-   * Converts a training material type into intent training material key
-   * 
-   * @param name training material type key or value
-   * @returns object key
-   */
-  const objectKeyConversion = (name: string): keyof IntentTrainingMaterials => (({
-    [TrainingMaterialType.INTENTOPENNLPDOCCAT]: "intentOpenNlpDoccatId",
-    [TrainingMaterialType.INTENTREGEX]: "intentRegexId",
-    [TrainingMaterialType.VARIABLEOPENNLPNER]: "variableOpenNlpNerId",
-    [TrainingMaterialType.VARIABLEOPENNLPREGEX]: "variableOpenNlpRegex"
-  })[name as TrainingMaterialType] ?? "intentOpenNlpDoccatId") as keyof IntentTrainingMaterials;
 
   /**
    * Fetches knots list for the story
@@ -750,7 +738,7 @@ const EditorScreen: React.FC<Props> = ({
     return (
       <TrainingSelectionOptions
         selectedIntent={ selectedIntent }
-        objectKeyConversion={ objectKeyConversion }
+        objectKeyConversion={ EditorScreenUtils.objectKeyConversion }
         trainingMaterial={ trainingMaterial }
         onSetActiveTrainingMaterialChange={ onSetActiveTrainingMaterialChange }
         editingTrainingMaterial={ editingTrainingMaterial }
