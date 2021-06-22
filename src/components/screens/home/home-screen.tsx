@@ -359,7 +359,7 @@ class HomeScreen extends React.Component<Props, State> {
         name: newStoryName
       }
     });
-    console.log(createdStory.id);
+
     if (createdStory.id) {
       const knotsApi = Api.getKnotsApi(accessToken);
       const globalKnot = await knotsApi.createKnot({
@@ -373,7 +373,7 @@ class HomeScreen extends React.Component<Props, State> {
           coordinates: { x: 200, y: 100 }
         }
       });
-      console.log(globalKnot);
+
       const homeKnot = await knotsApi.createKnot({
         storyId: createdStory.id,
         knot: {
@@ -385,7 +385,7 @@ class HomeScreen extends React.Component<Props, State> {
           coordinates: { x: 200, y: 400 }
         }
       });
-      console.log(homeKnot);
+
       this.setState({
         stories: [ ...this.state.stories, createdStory ],
         selectedStoryId: createdStory.id ?? this.state.selectedStoryId

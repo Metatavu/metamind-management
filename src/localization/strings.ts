@@ -11,7 +11,9 @@ export interface IStrings extends LocalizedStringsMethods {
   generic: {
     save: string;
     cancel: string;
+    edit: string;
     edited: string;
+    remove: string;
   };
 
   /**
@@ -52,17 +54,39 @@ export interface IStrings extends LocalizedStringsMethods {
     storyEditor: string;
     globalEditor: string;
     leftBar: {
+      storyLeftTab: string;
       knotsLeftTab: string;
       intentsLeftTab: string;
       knotSearchHelper: string;
       intentSearchHelper: string;
     };
     rightBar: {
-      storyRightTab: string;
       detailsRightTab: string;
       linkingRightTab: string;
       knotNameHelper: string;
       storyNameHelper: string;
+      intentNameHelper: string;
+      intentTypeHelper: string;
+      quickResponsesHelper: string;
+      quickResponseButtonDefault: string;
+      intentType: {
+        NORMAL: string;
+        CONFUSED: string;
+        REDIRECT: string;
+        DEFAULT: string;
+      },
+      trainingMaterialsHeader: string;
+      trainingMaterials: {
+        INTENTOPENNLPDOCCAT: string;
+        INTENTREGEX: string;
+        VARIABLEOPENNLPNER: string;
+        VARIABLEOPENNLPREGEX: string;
+      },
+      selectExisting: string;
+      none: string;
+      selectTrainingMaterial: string;
+      createNew: string;
+      name: string;
     };
     intents: {
       normalIntents: string;

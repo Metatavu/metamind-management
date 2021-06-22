@@ -4,7 +4,7 @@ import { Knot } from "../../../generated/client/models/Knot";
 import strings from "../../../localization/strings";
 import GlobalKnotIcon from "../../../resources/svg/global-knot-icon";
 import KnotIcon from "../../../resources/svg/knot-icon";
-import AccordionItem from "../../generic/accordion-item";
+import AccordionItem from "../../generic/accordion-item/accordion-item";
 import InteractiveListItem from "../../generic/list-items/interactive-list-item";
 
 /**
@@ -12,6 +12,7 @@ import InteractiveListItem from "../../generic/list-items/interactive-list-item"
  */
 interface Props {
   knots: Knot[];
+  onKnotClick: (knot: Knot) => void;
 }
 
 /**
@@ -19,7 +20,7 @@ interface Props {
  * 
  * @param props component properties
  */
-const KnotPanel: React.FC<Props> = ({ knots }) => {
+const KnotPanel: React.FC<Props> = ({ knots, onKnotClick }) => {
 
   const globalKnot = knots[0];
 
@@ -41,11 +42,14 @@ const KnotPanel: React.FC<Props> = ({ knots }) => {
     return (
       <AccordionItem title={ strings.editorScreen.globalKnots } >
         <List>
-          <InteractiveListItem
-            title={ globalKnot?.name }
-            icon={ <GlobalKnotIcon htmlColor="#000"/> }
-            onClick={ () => {} }
-          />
+          { globalKnot &&
+            <InteractiveListItem
+              title={ globalKnot.name }
+              icon={ <GlobalKnotIcon htmlColor="#000"/> }
+              onClick={ () => onKnotClick(globalKnot) }
+            />
+          }
+          
         </List>
       </AccordionItem>
     );
@@ -70,7 +74,7 @@ const KnotPanel: React.FC<Props> = ({ knots }) => {
               <InteractiveListItem
                 icon={ <KnotIcon htmlColor="#000"/> }
                 title={ knot.name }
-                onClick={ () => { } }
+                onClick={ () => onKnotClick(knot) }
               />
             ))
           }
