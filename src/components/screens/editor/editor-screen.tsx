@@ -393,7 +393,9 @@ const EditorScreen: React.FC<Props> = ({
       });
       updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
         intentId: selectedIntent.id,
-        intent: { ...selectedIntent, trainingMaterials: {
+        intent: {
+          ...selectedIntent,
+          trainingMaterials: {
             ...selectedIntent.trainingMaterials,
             [key]: editedTrainingMaterial.id
           }
