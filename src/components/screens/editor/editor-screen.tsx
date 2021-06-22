@@ -1,4 +1,4 @@
-import { Box, Drawer, Tab, Tabs, TextField, Button } from "@material-ui/core";
+import { Box, Drawer, Tab, Tabs, TextField, Button, MenuItem, InputLabel } from "@material-ui/core";
 import Divider from "@material-ui/core/Divider";
 import Toolbar from "@material-ui/core/Toolbar";
 import { KeycloakInstance } from "keycloak-js";
@@ -6,17 +6,22 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../../../api/api";
-import { TokenizerType, KnotType, Story, Knot, Intent, IntentType } from "../../../generated/client/models";
+import { TokenizerType, KnotType, Story, Knot, Intent, IntentType, TrainingMaterial, TrainingMaterialType, TrainingMaterialVisibility, IntentTrainingMaterials } from "../../../generated/client/models";
 import strings from "../../../localization/strings";
 import { ReduxActions, ReduxState } from "../../../store";
 import { AccessToken } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
-import IntentPanel from "../../panels/intent-panel";
-import KnotPanel from "../../panels/knot-panel";
+import IntentPanel from "../../intent-components/intent-list/intent-list";
+import KnotPanel from "../../knot-components/knot-list/knot-list";
 import StoryEditorView from "../../views/story-editor-view";
 import { CustomNodeModel } from "../../diagram-components/custom-node/custom-node-model";
 import { useEditorScreenStyles } from "./editor-screen.styles";
 import { useParams } from "react-router-dom";
+import CustomLinkModel from "../../diagram-components/custom-link/custom-link-model";
+import AccordionItem from "../../generic/accordion-item";
+import TrainingSelectionOptions from "../../intent-components/training-selection-options/training-selection-options";
+import QuickResponseButton from "../../intent-components/quick-response-button/quick-response-button";
+import EditorUtils from "../../../utils/editor";
 
 /**
  * Component props
@@ -34,6 +39,8 @@ interface StoryData {
   knots?: Knot[];
   intents?: Intent[];
   selectedKnot?: Knot;
+  selectedIntent? : Intent;
+  trainingMaterial?: TrainingMaterial[];
 }
 
 /**
@@ -49,11 +56,15 @@ const EditorScreen: React.FC<Props> = ({
   const classes = useEditorScreenStyles();
 
   const [ storyData, setStoryData ] = React.useState<StoryData>({});
-  const { story, knots, selectedKnot, intents } = storyData;
+  const { story, knots, selectedKnot, selectedIntent, intents, trainingMaterial } = storyData;
   const [ leftToolBarIndex, setLeftToolBarIndex ] = React.useState(0);
   const [ rightToolBarIndex, setRightToolBarIndex ] = React.useState(0);
   const [ addingKnots, setAddingKnots ] = React.useState(false);
   const [ dataChanged, setDataChanged ] = React.useState(false);
+  const [ editingQuickResponse, setEditingQuickResponse ] = React.useState(false);
+  const [ editingTrainingMaterial, setEditingTrainingMaterial ] = React.useState(false);
+  const [ selectedTrainingMaterialType, setSelectedTrainingMaterialType ] = React.useState<TrainingMaterialType | null>(null);
+  const [ editedTrainingMaterial, setEditedTrainingMaterial ] = React.useState<TrainingMaterial>();
 
   React.useEffect(() => {
     fetchData();
@@ -183,6 +194,288 @@ const EditorScreen: React.FC<Props> = ({
   }
 
   /**
+   * Event handler for node selection change
+   * 
+   * @param node node
+   */
+  const onNodeSelectionChange = async (node: CustomNodeModel) => {
+    if (!accessToken || !intents) {
+      return;
+    }
+
+    const knot = await Api.getKnotsApi(accessToken).findKnot({
+      storyId: storyId,
+      knotId: node.getID()
+    });
+
+    setStoryData({
+      ...storyData,
+      selectedIntent: undefined,
+      selectedKnot: knot
+    });
+  }
+
+  /**
+   * Event handler for link selection change
+   * 
+   * @param link link
+   */
+  const onLinkSelectionChange = async (link: CustomLinkModel) => {
+    if (!accessToken || !intents) {
+      return;
+    }
+
+    const intent = await Api.getIntentsApi(accessToken).findIntent({
+      storyId: storyId,
+      intentId: link.getID()
+    });
+
+    setStoryData({
+      ...storyData,
+      selectedIntent: intent,
+      selectedKnot: undefined
+    });
+  }
+
+  /**
+   * Event handler for set active training material change 
+   * 
+   * @param event event from input change
+   */
+  const onSetActiveTrainingMaterialChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+
+    if (!name || !value || !trainingMaterial || !selectedIntent || !intents) {
+      return;
+    }
+
+    const foundMaterial = trainingMaterial.find(item => item.id === value);
+    setEditedTrainingMaterial(foundMaterial);
+
+    const updatedIntent: Intent = {
+      ...selectedIntent,
+      trainingMaterials: {
+        ...selectedIntent.trainingMaterials,
+        [EditorUtils.objectKeyConversion(name)]: foundMaterial?.id
+      }
+    };
+
+    if (accessToken && updatedIntent.id) {
+      Api.getIntentsApi(accessToken).updateIntent({
+        intentId: updatedIntent.id,
+        intent: updatedIntent,
+        storyId: storyId
+      });
+    }    
+    
+    setStoryData({
+      ...storyData,
+      selectedIntent: updatedIntent,
+      intents: intents.map(intent => intent.id === updatedIntent.id ? updatedIntent : intent)
+    });
+  }
+
+  /**
+   * Event handler for add training material click
+   * 
+   * @param name name of the training material type
+   */
+  const onAddTrainingMaterialClick = (name: any) => {
+    if (!selectedIntent?.id) {
+      return;
+    }
+
+    setEditingTrainingMaterial(true);
+    setSelectedTrainingMaterialType(name as keyof object);
+    setEditedTrainingMaterial({
+      type: name,
+      storyId: storyId,
+      name: "",
+      text: "",
+      visibility: TrainingMaterialVisibility.STORY
+    });
+  }
+
+  /**
+   * Event handler for edit training material click
+   */
+  const onEditTrainingMaterialClick = () => {
+    if (editedTrainingMaterial?.type) {
+      setEditingTrainingMaterial(true);
+      setSelectedTrainingMaterialType(editedTrainingMaterial.type);
+    }
+  }
+
+  /**
+   * Event handler for delete training material click
+   */
+  const onDeleteTrainingMaterialClick = () => {
+    if (!editedTrainingMaterial?.type || !selectedIntent || !intents) {
+      return;
+    }
+
+    const key = EditorUtils.objectKeyConversion(editedTrainingMaterial.type);
+
+    setStoryData({
+      ...storyData,
+      selectedIntent: { ...selectedIntent, trainingMaterials: { ...selectedIntent.trainingMaterials, [key]: undefined } },
+      intents: intents.map(item => item.id === selectedIntent.id ? selectedIntent : item)
+    });
+    setEditingTrainingMaterial(false);
+    setEditedTrainingMaterial(undefined);
+  }
+
+  /**
+   * Event handler for save training material click
+   * 
+   * @param action action type: update / create
+   */
+  const onSaveTrainingMaterialClick = async () => {
+    if(!editedTrainingMaterial) {
+      return;
+    }
+
+    editedTrainingMaterial.id ? await updateTrainingMaterial() : await createTrainingMaterial();
+    setEditingTrainingMaterial(false);
+    setSelectedTrainingMaterialType(null);
+  }
+
+  /**
+   * Updates training material
+   */
+  const updateTrainingMaterial = async () => {
+    let updatedTrainingMaterial: TrainingMaterial;
+    let updatedIntent: Intent;
+    if (!accessToken || !editedTrainingMaterial?.type || !trainingMaterial || !selectedIntent?.id || !intents) {
+      return;
+    }
+    const key = EditorUtils.objectKeyConversion(editedTrainingMaterial.type);
+    try {
+      updatedTrainingMaterial = await Api.getTrainingMaterialApi(accessToken).updateTrainingMaterial({
+        trainingMaterialId: editedTrainingMaterial.id ?? "",
+        trainingMaterial: editedTrainingMaterial
+      });
+      updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
+        intentId: selectedIntent.id,
+        intent: {
+          ...selectedIntent,
+          trainingMaterials: { 
+            ...selectedIntent.trainingMaterials,
+            [key]: editedTrainingMaterial.id
+          }
+        },
+        storyId: storyId
+      });
+    } catch (error) {
+      throw error;
+    }
+    setStoryData({
+      ...storyData,
+      trainingMaterial: trainingMaterial.map(item => item.id === updatedTrainingMaterial.id ? updatedTrainingMaterial : item),
+      selectedIntent: updatedIntent,
+      intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
+    });
+  }
+
+  /**
+   * Creates training material
+   */
+  const createTrainingMaterial = async () => {
+    let updatedTrainingMaterial: TrainingMaterial;
+    let updatedIntent: Intent;
+    if (!accessToken || !editedTrainingMaterial?.type || !trainingMaterial || !selectedIntent?.id || !intents) {
+      return;
+    }
+    const key = EditorUtils.objectKeyConversion(editedTrainingMaterial.type);
+
+    try {
+      updatedTrainingMaterial = await Api.getTrainingMaterialApi(accessToken).createTrainingMaterial({
+        trainingMaterial: editedTrainingMaterial
+      });
+      updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
+        intentId: selectedIntent.id,
+        intent: {
+          ...selectedIntent,
+          trainingMaterials: {
+            ...selectedIntent.trainingMaterials,
+            [key]: editedTrainingMaterial.id
+          }
+        },
+        storyId: storyId
+      });
+    } catch (error) {
+      throw error;
+    }
+    setStoryData({
+      ...storyData,
+      trainingMaterial: [ ...trainingMaterial, updatedTrainingMaterial ],
+      selectedIntent: updatedIntent,
+      intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
+    });
+  }
+
+  /**
+   * Event handler for updating knot info
+   * 
+   * @param event event from input change
+   */
+  const onUpdateKnotInfo = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    let { name, value } = event?.target;
+    if (!accessToken || !knots || !selectedKnot?.id) {
+      return;
+    }
+
+    const updatedKnot = await Api.getKnotsApi(accessToken).updateKnot({
+      storyId: storyId,
+      knotId: selectedKnot.id,
+      knot: { ...selectedKnot, [name]: value }
+    });
+
+    setStoryData({
+      ...storyData,
+      knots: knots.map(item => item.id === updatedKnot.id ? updatedKnot : item)
+    });
+  }
+
+  /**
+   * Event handler for updating knot info
+   * 
+   * @param event event from input change
+   */
+  const onUpdateIntentInfo = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event?.target;
+    if (!accessToken || !intents || !selectedIntent?.id) {
+      return;
+    }
+
+    const updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
+      storyId: storyId,
+      intentId: selectedIntent.id,
+      intent: { ...selectedIntent, [name]: value }
+    });
+
+    setStoryData({
+      ...storyData,
+      selectedIntent: updatedIntent,
+      intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
+    });
+  }
+
+  /**
+   * Event handler for update edited training material
+   * 
+   * @param event event of input change
+   */
+  const onUpdateEditedTrainingMaterial = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event?.target;
+    if (!editedTrainingMaterial) {
+      return;
+    }
+
+    setEditedTrainingMaterial({ ...editedTrainingMaterial, [name]: value });
+  }
+
+  /**
    * Fetches knots list for the story
    */
   const fetchData = async () => {
@@ -190,16 +483,18 @@ const EditorScreen: React.FC<Props> = ({
       return;
     }
 
-    const [ story, knotList, intentList ] = await Promise.all([
+    const [ story, knotList, intentList, trainingMaterialList ] = await Promise.all([
       Api.getStoriesApi(accessToken).findStory({ storyId }),
       Api.getKnotsApi(accessToken).listKnots({ storyId }),
-      Api.getIntentsApi(accessToken).listIntents({ storyId })
+      Api.getIntentsApi(accessToken).listIntents({ storyId }),
+      Api.getTrainingMaterialApi(accessToken).listTrainingMaterials({ storyId })
     ]);
 
     setStoryData({
       story: story,
       knots: knotList,
-      intents: intentList
+      intents: intentList,
+      trainingMaterial: trainingMaterialList
     });
   }
 
@@ -220,25 +515,31 @@ const EditorScreen: React.FC<Props> = ({
           <Tab
             fullWidth
             value={ 0 }
-            label={ strings.editorScreen.leftBar.knotsLeftTab }
+            label={ strings.editorScreen.leftBar.storyLeftTab }
           />
           <Tab
             fullWidth
             value={ 1 }
+            label={ strings.editorScreen.leftBar.knotsLeftTab }
+          />
+          <Tab
+            fullWidth
+            value={ 2 }
             label={ strings.editorScreen.leftBar.intentsLeftTab }
           />
         </Tabs>
         <Box>
-          { leftToolBarIndex === 0 && <KnotPanel knots={ knots ?? [] }/> }
-          { leftToolBarIndex === 1 && <IntentPanel intents={ intents ?? [] }/> }
+          { leftToolBarIndex === 0 && renderStoryTab() }
+          { leftToolBarIndex === 1 && <KnotPanel knots={ knots ?? [] }/> }
+          { leftToolBarIndex === 2 && <IntentPanel intents={ intents ?? [] }/> }
         </Box>
       </Drawer>
     );
   }
 
   /**
-     * Renders main editor area
-     */
+   * Renders main editor area
+   */
   const renderEditorContent = () => {
     if (!knots || !intents) {
       return;
@@ -265,6 +566,8 @@ const EditorScreen: React.FC<Props> = ({
             onRemoveNode={ onRemoveNode }
             onAddLink={ onAddLink }
             onRemoveLink={ onRemoveLink }
+            onNodeSelectionChange={ onNodeSelectionChange }
+            onLinkSelectionChange={ onLinkSelectionChange }
           />
         </Box>
       </Box>
@@ -301,21 +604,16 @@ const EditorScreen: React.FC<Props> = ({
         >
           <Tab
             value={ 0 }
-            label={ strings.editorScreen.rightBar.storyRightTab }
-          />
-          <Tab
-            value={ 1 }
             label={ strings.editorScreen.rightBar.detailsRightTab }
           />
           <Tab
-            value={ 2 }
+            value={ 1 }
             label={ strings.editorScreen.rightBar.linkingRightTab }
           />
         </Tabs>
         <Box p={ 2 }>
-          { rightToolBarIndex === 0 && renderStoryTab() }
-          { rightToolBarIndex === 1 && renderDetailsTab() }
-          { rightToolBarIndex === 2 && renderLinkingTab() }
+          { rightToolBarIndex === 0 && renderDetailsTab() }
+          { rightToolBarIndex === 1 && renderLinkingTab() }
         </Box>
       </Drawer>
     );
@@ -334,17 +632,35 @@ const EditorScreen: React.FC<Props> = ({
   }
 
   /**
-   * Renders details tab if global knot is selected  
+   * Renders details tab if an entity is selected  
    */
   const renderDetailsTab = () => {
     return (
       <Box>
-        <TextField
-          label={ strings.editorScreen.rightBar.knotNameHelper }
-          defaultValue={ selectedKnot?.name }
-        />
-        <Divider/>
-        { renderKnotDetails(selectedKnot?.name) }
+        { selectedKnot &&
+          <TextField
+            label={ strings.editorScreen.rightBar.knotNameHelper }
+            name="name"
+            defaultValue={ selectedKnot.name ?? "" }
+            onChange={ onUpdateKnotInfo }
+          />
+        }
+        { selectedIntent &&
+          <TextField
+            label={ strings.editorScreen.rightBar.intentNameHelper }
+            name="name"
+            defaultValue={ selectedIntent.name ?? "" }
+            onChange={ (e: any) => onUpdateIntentInfo(e) }
+          />
+        }
+        <Divider className={ classes.divider }/>
+        { 
+          selectedKnot ?
+            renderKnotDetails() :
+            selectedIntent ?
+              renderIntentDetails() :
+              null
+        }
       </Box>
     )
   }
@@ -354,8 +670,86 @@ const EditorScreen: React.FC<Props> = ({
    * 
    * @param currentKnot current knot
    */
-  const renderKnotDetails = (currentKnot?: String) => {
+  const renderKnotDetails = () => {
     return null;
+  }
+
+  /**
+   * Renders detailed tab of intent details
+   * 
+   * @param currentKnot current intent
+   */
+  const renderIntentDetails = () => {
+    if (!selectedIntent) {
+      return null;
+    }
+
+    const intentTypes: string[] = Object.values(IntentType);
+
+    return (
+      <>
+        <TextField
+          label={ strings.editorScreen.rightBar.intentTypeHelper }
+          name="type"
+          select
+          defaultValue={ selectedIntent.type }
+          onChange={ onUpdateIntentInfo }
+        >
+          { intentTypes.map(name => 
+            <MenuItem key={ name } value={ name }>
+              { strings.editorScreen.rightBar.intentType[name as keyof object] }
+            </MenuItem>
+          )}
+        </TextField>
+        <Divider className={ classes.divider }/>
+          <InputLabel className={ classes.buttonLabel }>
+            { strings.editorScreen.rightBar.quickResponsesHelper }
+          </InputLabel>
+          { renderSpecialButton() }
+        <Divider className={ classes.divider }/>
+        <Box>
+          <AccordionItem title={ strings.editorScreen.rightBar.trainingMaterialsHeader }>
+            { renderTrainingSelectionOptions() }
+          </AccordionItem>
+        </Box>
+        <Divider className={ classes.divider }/>
+      </>
+    );
+  }
+
+  /**
+   * Renders special button
+   */
+  const renderSpecialButton = () => {
+    return (
+      <QuickResponseButton
+        editing={ editingQuickResponse }
+        selectedIntent={ selectedIntent }
+        setEditingButtonFieldValue={ setEditingQuickResponse }
+        onUpdateFieldInfo={ onUpdateIntentInfo }
+      />
+    );
+  }
+
+  /**
+   * Renders training selection options content cards
+   */
+  const renderTrainingSelectionOptions = () => {
+    return (
+      <TrainingSelectionOptions
+        selectedIntent={ selectedIntent }
+        trainingMaterial={ trainingMaterial }
+        onSetActiveTrainingMaterialChange={ onSetActiveTrainingMaterialChange }
+        editingTrainingMaterial={ editingTrainingMaterial }
+        onAddTrainingMaterialClick={ onAddTrainingMaterialClick }
+        onEditTrainingMaterialClick={ onEditTrainingMaterialClick }
+        selectedTrainingMaterialType={ selectedTrainingMaterialType }
+        editedTrainingMaterial={ editedTrainingMaterial }
+        onUpdateEditedTrainingMaterial={ onUpdateEditedTrainingMaterial }
+        onDeleteTrainingMaterialClick={ onDeleteTrainingMaterialClick }
+        onSaveTrainingMaterialClick={ onSaveTrainingMaterialClick }
+      />
+    );
   }
 
   /**
