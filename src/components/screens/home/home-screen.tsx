@@ -324,6 +324,11 @@ class HomeScreen extends React.Component<Props, State> {
     );
   }
 
+  /**
+   * Event handler for import story click
+   * 
+   * @returns 
+   */
   private onImportStoryClick = () => {
     const { accessToken } = this.props;
     const { viewIndex } = this.state;
@@ -332,6 +337,7 @@ class HomeScreen extends React.Component<Props, State> {
       this.setState({ viewIndex: 2 });
       return;
     }
+    // TODO: implement importing of story from the .xml file
     return;
   }
   
@@ -363,7 +369,8 @@ class HomeScreen extends React.Component<Props, State> {
           type: KnotType.TEXT,
           scope: KnotScope.Global,
           tokenizer: TokenizerType.UNTOKENIZED,
-          content: ""
+          content: "",
+          coordinates: { x: 200, y: 100 }
         }
       });
       console.log(globalKnot);
@@ -374,7 +381,8 @@ class HomeScreen extends React.Component<Props, State> {
           type: KnotType.TEXT,
           scope: KnotScope.Home,
           tokenizer: TokenizerType.UNTOKENIZED,
-          content: ""
+          content: "",
+          coordinates: { x: 200, y: 400 }
         }
       });
       console.log(homeKnot);
