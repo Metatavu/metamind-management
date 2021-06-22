@@ -480,12 +480,12 @@ const EditorScreen: React.FC<Props> = ({
    * @param name training material type key or value
    * @returns object key
    */
-  const objectKeyConversion = (name: string): keyof IntentTrainingMaterials => ({
-    [TrainingMaterialType.INTENTOPENNLPDOCCAT]: "intentOpenNlpDoccatId" as keyof IntentTrainingMaterials,
-    [TrainingMaterialType.INTENTREGEX]: "intentRegexId" as keyof IntentTrainingMaterials,
-    [TrainingMaterialType.VARIABLEOPENNLPNER]: "variableOpenNlpNerId" as keyof IntentTrainingMaterials,
-    [TrainingMaterialType.VARIABLEOPENNLPREGEX]: "variableOpenNlpRegex" as keyof IntentTrainingMaterials,
-  })[name as unknown as TrainingMaterialType] ?? "intentOpenNlpDoccatId" as keyof IntentTrainingMaterials;
+  const objectKeyConversion = (name: string): keyof IntentTrainingMaterials => (({
+    [TrainingMaterialType.INTENTOPENNLPDOCCAT]: "intentOpenNlpDoccatId",
+    [TrainingMaterialType.INTENTREGEX]: "intentRegexId",
+    [TrainingMaterialType.VARIABLEOPENNLPNER]: "variableOpenNlpNerId",
+    [TrainingMaterialType.VARIABLEOPENNLPREGEX]: "variableOpenNlpRegex"
+  })[name as TrainingMaterialType] ?? "intentOpenNlpDoccatId") as keyof IntentTrainingMaterials;
 
   /**
    * Fetches knots list for the story
