@@ -18,6 +18,10 @@ import {
     CoordinatesFromJSON,
     CoordinatesFromJSONTyped,
     CoordinatesToJSON,
+    KnotScope,
+    KnotScopeFromJSON,
+    KnotScopeFromJSONTyped,
+    KnotScopeToJSON,
     KnotType,
     KnotTypeFromJSON,
     KnotTypeFromJSONTyped,
@@ -52,6 +56,12 @@ export interface ExportedStoryKnot {
      * @memberof ExportedStoryKnot
      */
     tokenizer: TokenizerType;
+    /**
+     * 
+     * @type {KnotScope}
+     * @memberof ExportedStoryKnot
+     */
+    scope?: KnotScope;
     /**
      * 
      * @type {string}
@@ -91,6 +101,7 @@ export function ExportedStoryKnotFromJSONTyped(json: any, ignoreDiscriminator: b
         'id': !exists(json, 'id') ? undefined : json['id'],
         'type': KnotTypeFromJSON(json['type']),
         'tokenizer': TokenizerTypeFromJSON(json['tokenizer']),
+        'scope': !exists(json, 'scope') ? undefined : KnotScopeFromJSON(json['scope']),
         'name': json['name'],
         'content': json['content'],
         'hint': !exists(json, 'hint') ? undefined : json['hint'],
@@ -110,6 +121,7 @@ export function ExportedStoryKnotToJSON(value?: ExportedStoryKnot | null): any {
         'id': value.id,
         'type': KnotTypeToJSON(value.type),
         'tokenizer': TokenizerTypeToJSON(value.tokenizer),
+        'scope': KnotScopeToJSON(value.scope),
         'name': value.name,
         'content': value.content,
         'hint': value.hint,

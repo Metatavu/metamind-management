@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/IntentsApi.ts
 apis/KnotsApi.ts
 apis/MessagesApi.ts
@@ -22,6 +21,7 @@ models/Intent.ts
 models/IntentTrainingMaterials.ts
 models/IntentType.ts
 models/Knot.ts
+models/KnotScope.ts
 models/KnotType.ts
 models/Message.ts
 models/Script.ts

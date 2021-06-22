@@ -1,4 +1,4 @@
-import { Configuration } from "../generated/client";
+import { Configuration, TrainingMaterialsApi } from "../generated/client";
 import { AccessToken } from "../types";
 import { KnotsApi } from '../generated/client/apis/KnotsApi';
 import { StoriesApi } from '../generated/client/apis/StoriesApi';
@@ -50,5 +50,15 @@ export default class Api {
    */
   public static getIntentsApi(accessToken: AccessToken) {
     return new IntentsApi(Api.getConfiguration(accessToken));
+  }
+
+  /**
+   * Gets initialized Training materials API
+   * 
+   * @param accessToken access token
+   * @returns initialized Training materials API
+   */
+  public static getTrainingMaterialApi(accessToken: AccessToken) {
+    return new TrainingMaterialsApi(Api.getConfiguration(accessToken));
   }
 }

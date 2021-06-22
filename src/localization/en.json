@@ -2,7 +2,9 @@
   "generic": {
     "save": "Save",
     "cancel": "Cancel",
-    "edited": "Edited"
+    "edit": "Edit",
+    "edited": "Edited",
+    "remove": "Remove"
   },
 
   "header": {
@@ -30,17 +32,39 @@
     "storyEditor": "Story editor",
     "globalEditor": "Global editor",
     "leftBar" : {
+      "storyLeftTab": "Story",
       "knotsLeftTab": "Knots",
       "intentsLeftTab": "Intents",
       "knotSearchHelper": "Knot search",
       "intentSearchHelper": "Search for an intent"
     },
     "rightBar" : {
-      "storyRightTab": "Story",
       "detailsRightTab": "Details",
       "linkingRightTab": "Linking",
       "storyNameHelper": "Story name",
-      "knotNameHelper": "Knot name"
+      "knotNameHelper": "Knot name",
+      "intentNameHelper": "Intent name",
+      "intentTypeHelper": "Intent type",
+      "quickResponsesHelper": "Quick responses",
+      "quickResponseButtonDefault": "Click to add a quick response",
+      "intentType": {
+        "NORMAL": "Normal",
+        "CONFUSED": "Confused",
+        "REDIRECT": "Redirect",
+        "DEFAULT": "Default"
+      },
+      "trainingMaterialsHeader": "Training materials",
+      "trainingMaterials": {
+        "INTENTOPENNLPDOCCAT": "Intent OpenNLP Doccat",
+        "INTENTREGEX": "Intent Regex",
+        "VARIABLEOPENNLPNER": "Variable OpenNLP NER",
+        "VARIABLEOPENNLPREGEX": "Variable OpenNLP Regex"
+      },
+      "selectExisting": "Select existing",
+      "none": "None",
+      "selectTrainingMaterial": "Select training material",
+      "createNew": "Create new",
+      "name": "Name"
     },
     "intents": {
       "normalIntents": "Normal intents",

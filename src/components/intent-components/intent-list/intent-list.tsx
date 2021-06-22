@@ -34,7 +34,7 @@ const IntentPanel: React.FC<Props> = ({ intents }) => {
             .map(intent => (
               <InteractiveListItem
                 icon={ <IntentIcon/> }
-                title={ intent.name}
+                title={ intent.name ?? "" }
                 onClick={ () => { } }
               />
             ))

@@ -26,6 +26,7 @@ export default createMuiTheme({
   },
 
   typography: {
+    fontFamily: "sofia-pro, sans-serif",
     h1: {
       fontSize: 24
     },

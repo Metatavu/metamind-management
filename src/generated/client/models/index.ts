@@ -10,6 +10,7 @@ export * from './Intent';
 export * from './IntentTrainingMaterials';
 export * from './IntentType';
 export * from './Knot';
+export * from './KnotScope';
 export * from './KnotType';
 export * from './Message';
 export * from './Script';
