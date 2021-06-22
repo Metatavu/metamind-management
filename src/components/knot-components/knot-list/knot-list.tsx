@@ -4,7 +4,7 @@ import { Knot } from "../../../generated/client/models/Knot";
 import strings from "../../../localization/strings";
 import GlobalKnotIcon from "../../../resources/svg/global-knot-icon";
 import KnotIcon from "../../../resources/svg/knot-icon";
-import AccordionItem from "../../generic/accordion-item";
+import AccordionItem from "../../generic/accordion-item/accordion-item";
 import InteractiveListItem from "../../generic/list-items/interactive-list-item";
 
 /**

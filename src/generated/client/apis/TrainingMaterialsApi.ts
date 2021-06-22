@@ -81,7 +81,7 @@ export class TrainingMaterialsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/trainingMaterials`,
+            path: `/v2/trainingMaterials`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -122,7 +122,7 @@ export class TrainingMaterialsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/trainingMaterials/{trainingMaterialId}`.replace(`{${"trainingMaterialId"}}`, encodeURIComponent(String(requestParameters.trainingMaterialId))),
+            path: `/v2/trainingMaterials/{trainingMaterialId}`.replace(`{${"trainingMaterialId"}}`, encodeURIComponent(String(requestParameters.trainingMaterialId))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -161,7 +161,7 @@ export class TrainingMaterialsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/trainingMaterials/{trainingMaterialId}`.replace(`{${"trainingMaterialId"}}`, encodeURIComponent(String(requestParameters.trainingMaterialId))),
+            path: `/v2/trainingMaterials/{trainingMaterialId}`.replace(`{${"trainingMaterialId"}}`, encodeURIComponent(String(requestParameters.trainingMaterialId))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -209,7 +209,7 @@ export class TrainingMaterialsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/trainingMaterials`,
+            path: `/v2/trainingMaterials`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -255,7 +255,7 @@ export class TrainingMaterialsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/trainingMaterials/{trainingMaterialId}`.replace(`{${"trainingMaterialId"}}`, encodeURIComponent(String(requestParameters.trainingMaterialId))),
+            path: `/v2/trainingMaterials/{trainingMaterialId}`.replace(`{${"trainingMaterialId"}}`, encodeURIComponent(String(requestParameters.trainingMaterialId))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,

@@ -81,7 +81,7 @@ export class KnotsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/stories/{storyId}/knots`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))),
+            path: `/v2/stories/{storyId}/knots`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -126,7 +126,7 @@ export class KnotsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/stories/{storyId}/knots/{knotId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))).replace(`{${"knotId"}}`, encodeURIComponent(String(requestParameters.knotId))),
+            path: `/v2/stories/{storyId}/knots/{knotId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))).replace(`{${"knotId"}}`, encodeURIComponent(String(requestParameters.knotId))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -169,7 +169,7 @@ export class KnotsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/stories/{storyId}/knots/{knotId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))).replace(`{${"knotId"}}`, encodeURIComponent(String(requestParameters.knotId))),
+            path: `/v2/stories/{storyId}/knots/{knotId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))).replace(`{${"knotId"}}`, encodeURIComponent(String(requestParameters.knotId))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -209,7 +209,7 @@ export class KnotsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/stories/{storyId}/knots`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))),
+            path: `/v2/stories/{storyId}/knots`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -259,7 +259,7 @@ export class KnotsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/stories/{storyId}/knots/{knotId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))).replace(`{${"knotId"}}`, encodeURIComponent(String(requestParameters.knotId))),
+            path: `/v2/stories/{storyId}/knots/{knotId}`.replace(`{${"storyId"}}`, encodeURIComponent(String(requestParameters.storyId))).replace(`{${"knotId"}}`, encodeURIComponent(String(requestParameters.knotId))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
