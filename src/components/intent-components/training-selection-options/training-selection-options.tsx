@@ -87,7 +87,7 @@ const TrainingSelectionOptions: React.FC<Props> = ({
                       </Button>
                   </div>
                 }
-                { (editingTrainingMaterial && selectedTrainingMaterialType === name as keyof object) &&
+                { editingTrainingMaterial && selectedTrainingMaterialType === name as keyof object &&
                   renderEditContent(classes, onUpdateEditedTrainingMaterial, onDeleteTrainingMaterialClick, onSaveTrainingMaterialClick, editedTrainingMaterial)
                 }
               </CardContent>
