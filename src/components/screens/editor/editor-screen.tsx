@@ -729,6 +729,9 @@ const EditorScreen: React.FC<Props> = ({
     );
   }
 
+  /**
+   * Renders special button
+   */
   const renderSpecialButton = () => {
     return (
       <QuickResponseButton
