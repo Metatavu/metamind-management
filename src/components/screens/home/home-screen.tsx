@@ -5,13 +5,15 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../../../api/api";
-import { Story } from "../../../generated/client";
+import { KnotScope, KnotType, Story, TokenizerType } from "../../../generated/client";
 import strings from "../../../localization/strings";
 import { ReduxActions, ReduxState } from "../../../store";
 import { AccessToken } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
 import { styles } from "./home-screen.styles";
-import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
+import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
+import { DropzoneArea } from "material-ui-dropzone";
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 
 /**
  * Interface describing component props
@@ -29,6 +31,8 @@ interface State {
   stories: Story[];
   selectedStoryId?: string;
   viewIndex: number;
+  newStoryName: string;
+  storyFile?: File;
 }
 
 /**
@@ -46,7 +50,8 @@ class HomeScreen extends React.Component<Props, State> {
 
     this.state = {
       stories: [],
-      viewIndex: 0
+      viewIndex: 0,
+      newStoryName: ""
     }
   }
 
@@ -83,7 +88,7 @@ class HomeScreen extends React.Component<Props, State> {
               { this.renderCreateStory() }
             </Fade>
             <Fade in={ viewIndex === 2 } >
-              <></>
+              { this.renderImportStory() }
             </Fade>
           </Box>
         </Box>
@@ -91,16 +96,74 @@ class HomeScreen extends React.Component<Props, State> {
     );
   }
 
-  private renderCreateStory = () => {
+  /**
+   * Renders import story card
+   */
+  private renderImportStory = () => {
     const { classes } = this.props;
+    const { storyFile } = this.state;
+
     return (
-      <Box className={ classes.storySelectCard }>
+      <Box className={ classes.cardContent }>
         <Box className={ classes.cardHeader }>
           <Box className={ classes.backButtonContainer }>
             <IconButton
               title={ strings.header.settings }
               color="secondary"
-              onClick={ () => this.setState({ viewIndex: 0 }) }
+              onClick={ this.onReturnButtonClick }
+            >
+              <NavigateBeforeIcon/>
+            </IconButton>
+          </Box>
+          <Typography color="textSecondary" variant="h1">
+            { strings.homeScreen.importStory }
+          </Typography>
+        </Box>
+        { !storyFile &&
+          <Box p={ 2 } mb={ 2 }>
+            <DropzoneArea
+              acceptedFiles={ [ ".xml" ] }
+              clearOnUnmount
+              dropzoneText={ strings.homeScreen.dropFileHere }
+              onDrop={ this.onFilesDropped }
+              dropzoneClass={ classes.dropzone }
+              showPreviewsInDropzone={ false }
+              maxFileSize={ 2 * 1000000 }
+              filesLimit={ 1 }
+            />
+          </Box>
+        }
+        { storyFile &&
+          <>
+            { this.renderPreview() }
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={ () => console.log("TODO") }
+            >
+              { strings.homeScreen.importStory }
+            </Button>
+          </>
+        }
+      </Box>
+    );
+  }
+
+  /**
+   * Renders create story card
+   */
+  private renderCreateStory = () => {
+    const { classes } = this.props;
+    const { newStoryName } = this.state;
+
+    return (
+      <Box className={ classes.cardContent }>
+        <Box className={ classes.cardHeader }>
+          <Box className={ classes.backButtonContainer }>
+            <IconButton
+              title={ strings.header.settings }
+              color="secondary"
+              onClick={ this.onReturnButtonClick }
             >
               <NavigateBeforeIcon/>
             </IconButton>
@@ -111,17 +174,19 @@ class HomeScreen extends React.Component<Props, State> {
         </Box>
         <Box p={ 2 } mb={ 2 }>
           <TextField
-            className={ classes.field }
+            className={ classes.textField }
+            InputProps={{ className: classes.textInput }}
             label={ strings.homeScreen.storyName }
             title={ strings.homeScreen.storyName }
+            value={ newStoryName }
+            onChange={ this.onStoryNameChange }
             variant="outlined"
-            color="primary"
           />
         </Box>
         <Button
           variant="outlined"
           color="secondary"
-          onClick={ () => {} }
+          onClick={ this.onCreateNewStoryClick }
         >
           { strings.homeScreen.createNewStory }
         </Button>
@@ -137,8 +202,8 @@ class HomeScreen extends React.Component<Props, State> {
     const { selectedStoryId } = this.state;
 
     return (
-      <Box className={ classes.storySelectCard }>
-        <Box textAlign="center" mb={ 4 }>
+      <Box className={ classes.cardContent }>
+        <Box className={ classes.cardHeader }>
           <Typography color="textSecondary" variant="h1">
             { strings.homeScreen.selectStoryText }
           </Typography>
@@ -178,6 +243,17 @@ class HomeScreen extends React.Component<Props, State> {
           onClick={ this.onCreateNewStoryClick }
         >
           { strings.homeScreen.createNewStory }
+        </Button>
+        <Box 
+          mb={ 1 }
+          mt={ 1 }
+        ></Box>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={ this.onImportStoryClick }
+        >
+          { strings.homeScreen.importStory }
         </Button>
         { this.renderRecentStories() }
       </Box>
@@ -220,12 +296,133 @@ class HomeScreen extends React.Component<Props, State> {
       </Box>
     );
   }
+
+  /**
+   * Renders selected file  preview
+   */
+  private renderPreview = () => {
+    const { classes } = this.props;
+    const { storyFile } = this.state;
+    if (!storyFile) {
+      return null;
+    }
+
+    return (
+      <Box className={ classes.previewItem }>
+        <Typography variant="h4" color="textSecondary">
+          { storyFile.name }
+        </Typography>
+        <Box className={ classes.removeButtonContainer }>
+          <IconButton
+            color="secondary"
+            onClick={ () => this.setState({ storyFile: undefined }) }
+          >
+            <HighlightOffIcon/>
+          </IconButton>
+        </Box>
+      </Box>
+    );
+  }
+
+  private onImportStoryClick = () => {
+    const { accessToken } = this.props;
+    const { viewIndex } = this.state;
+
+    if (viewIndex === 0 || !accessToken) {
+      this.setState({ viewIndex: 2 });
+      return;
+    }
+    return;
+  }
   
   /**
    * Event handler for create new story click
    */
-  private onCreateNewStoryClick = () => {
-    this.setState({ viewIndex: 1 });
+  private onCreateNewStoryClick = async () => {
+    const { accessToken } = this.props;
+    const { viewIndex, newStoryName } = this.state;
+
+    if (viewIndex === 0 || !accessToken) {
+      this.setState({ viewIndex: 1 });
+      return;
+    }
+    
+    const createdStory = await Api.getStoriesApi(accessToken).createStory({
+      story: {
+        locale: strings.getLanguage(),
+        name: newStoryName
+      }
+    });
+    console.log(createdStory.id);
+    if (createdStory.id) {
+      const knotsApi = Api.getKnotsApi(accessToken);
+      const globalKnot = await knotsApi.createKnot({
+        storyId: createdStory.id,
+        knot: {
+          name: "Global",
+          type: KnotType.TEXT,
+          scope: KnotScope.Global,
+          tokenizer: TokenizerType.UNTOKENIZED,
+          content: ""
+        }
+      });
+      console.log(globalKnot);
+      const homeKnot = await knotsApi.createKnot({
+        storyId: createdStory.id,
+        knot: {
+          name: "Home",
+          type: KnotType.TEXT,
+          scope: KnotScope.Home,
+          tokenizer: TokenizerType.UNTOKENIZED,
+          content: ""
+        }
+      });
+      console.log(homeKnot);
+      this.setState({
+        stories: [ ...this.state.stories, createdStory ],
+        selectedStoryId: createdStory.id ?? this.state.selectedStoryId
+      });
+      this.props.history.push(`editor/${createdStory.id}`);
+    }
+    
+  }
+
+  /**
+   * Event handler for return button click
+   */
+  onReturnButtonClick = () => {
+    this.setState({
+      viewIndex: 0,
+      newStoryName: "",
+      storyFile: undefined
+    });
+  }
+
+  /**
+   * Event handler for story name change
+   * 
+   * @param event change event
+   */
+  onStoryNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+
+    if (!value) {
+      return;
+    }
+    this.setState({ newStoryName: value });
+  }
+
+  /**
+   * Event handler for files drop
+   * 
+   * @param file dropped file
+   */
+  onFilesDropped = (files: File[]) => {
+    if (!files?.length) {
+      return;
+    }
+
+    this.setState({ storyFile: files[0] });
   }
 
   /**

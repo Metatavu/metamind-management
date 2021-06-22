@@ -69,7 +69,7 @@ export class ScriptsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/scripts`,
+            path: `/v2/scripts`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -110,7 +110,7 @@ export class ScriptsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/scripts/{scriptId}`.replace(`{${"scriptId"}}`, encodeURIComponent(String(requestParameters.scriptId))),
+            path: `/v2/scripts/{scriptId}`.replace(`{${"scriptId"}}`, encodeURIComponent(String(requestParameters.scriptId))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -149,7 +149,7 @@ export class ScriptsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/scripts/{scriptId}`.replace(`{${"scriptId"}}`, encodeURIComponent(String(requestParameters.scriptId))),
+            path: `/v2/scripts/{scriptId}`.replace(`{${"scriptId"}}`, encodeURIComponent(String(requestParameters.scriptId))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -185,7 +185,7 @@ export class ScriptsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/scripts`,
+            path: `/v2/scripts`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -231,7 +231,7 @@ export class ScriptsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/scripts/{scriptId}`.replace(`{${"scriptId"}}`, encodeURIComponent(String(requestParameters.scriptId))),
+            path: `/v2/scripts/{scriptId}`.replace(`{${"scriptId"}}`, encodeURIComponent(String(requestParameters.scriptId))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
