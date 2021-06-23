@@ -6,7 +6,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../../../api/api";
-import { TokenizerType, KnotType, Story, Knot, Intent, IntentType, TrainingMaterial, TrainingMaterialType, TrainingMaterialVisibility, IntentTrainingMaterials } from "../../../generated/client/models";
+import { TokenizerType, KnotType, Story, Knot, Intent, IntentType, TrainingMaterial, TrainingMaterialType, TrainingMaterialVisibility, KnotScope } from "../../../generated/client/models";
 import strings from "../../../localization/strings";
 import { ReduxActions, ReduxState } from "../../../store";
 import { AccessToken } from "../../../types";
@@ -62,12 +62,14 @@ const EditorScreen: React.FC<Props> = ({
   const [ leftToolBarIndex, setLeftToolBarIndex ] = React.useState(0);
   const [ rightToolBarIndex, setRightToolBarIndex ] = React.useState(0);
   const [ addingKnots, setAddingKnots ] = React.useState(false);
-  const [ dataChanged, /* setDataChanged */ ] = React.useState(false);
+  const [ dataChanged, setDataChanged ] = React.useState(false);
   const [ editingEntityInfo, setEditingEntityInfo ] = React.useState(false);
   const [ editingQuickResponse, setEditingQuickResponse ] = React.useState(false);
   const [ editingTrainingMaterial, setEditingTrainingMaterial ] = React.useState(false);
   const [ selectedTrainingMaterialType, setSelectedTrainingMaterialType ] = React.useState<TrainingMaterialType | null>(null);
   const [ editedTrainingMaterial, setEditedTrainingMaterial ] = React.useState<TrainingMaterial>();
+  const [ removedKnots, setRemovedKnots ] = React.useState<Knot[]>([]);
+  const [ removedIntents, setRemovedIntents ] = React.useState<Intent[]>([]);
 
   React.useEffect(() => {
     fetchData();
@@ -105,26 +107,26 @@ const EditorScreen: React.FC<Props> = ({
    *
    * @param node added node
    */
-  const onAddNode = async (node: CustomNodeModel) => {
-    if (!accessToken || !knots) {
+  const onAddNode = (node: CustomNodeModel) => {
+    if (!knots) {
       return;
     }
 
-    const createdKnot = await Api.getKnotsApi(accessToken).createKnot({
+    const createdKnot: Knot = {
       storyId: storyId,
-      knot: {
-        name: "New Knot",
-        content: "",
-        tokenizer: TokenizerType.UNTOKENIZED,
-        type: KnotType.TEXT,
-        coordinates: node.getPosition()
-      }
-    });
+      name: "New Knot",
+      content: "",
+      scope: KnotScope.Basic,
+      tokenizer: TokenizerType.UNTOKENIZED,
+      type: KnotType.TEXT,
+      coordinates: node.getPosition()
+    }
 
     setStoryData({
       ...storyData,
       knots: [ ...knots, createdKnot ]
     });
+    setDataChanged(true);
   }
 
   /**
@@ -133,21 +135,21 @@ const EditorScreen: React.FC<Props> = ({
    * @param movedNode moved node
    * @param knot knot that needs update
    */
-  const onMoveNode = async (movedNode: CustomNodeModel, knot?: Knot) => {
-    if (!accessToken || !knots || !knot?.id) {
+  const onMoveNode = (movedNode: CustomNodeModel, knot?: Knot) => {
+    if (!knots || !knot?.id) {
       return;
     }
 
-    const updatedKnot = await Api.getKnotsApi(accessToken).updateKnot({
-      storyId: storyId,
-      knotId: knot.id,
-      knot: { ...knot, coordinates: movedNode.getPosition() }
-    });
+    const updatedKnot: Knot = {
+      ...knot,
+      coordinates: movedNode.getPosition()
+    }
 
     setStoryData({
       ...storyData,
-      knots: knots.map(knot => knot.id === updatedKnot.id ? updatedKnot : knot)
+      knots: knots.map(item => item.id === updatedKnot.id ? updatedKnot : item)
     });
+    setDataChanged(true);
   }
 
   /**
@@ -155,20 +157,23 @@ const EditorScreen: React.FC<Props> = ({
    *
    * @param removedNodeId Removed node id (knot ID)
    */
-  const onRemoveNode = async (removedNodeId: string) => {
-    if (!accessToken || !knots) {
+  const onRemoveNode = (removedNodeId: string) => {
+    if (!knots) {
+      return;
+    }
+    const knot = knots.find(item => item.id === removedNodeId);
+    if (knot?.scope === KnotScope.Home || knot?.scope === KnotScope.Global) {
       return;
     }
 
-    await Api.getKnotsApi(accessToken).deleteKnot({
-      storyId: storyId,
-      knotId: removedNodeId,
-    });
-
+    if (knot) {
+      setRemovedKnots([ ...removedKnots, knot ]);
+    }
     setStoryData({
       ...storyData,
-      knots: knots.filter(knot => knot.id !== removedNodeId)
+      knots: knots.filter(item => item.id !== removedNodeId)
     });
+    setDataChanged(true);
   }
 
   /**
@@ -177,28 +182,26 @@ const EditorScreen: React.FC<Props> = ({
    * @param sourceNodeId link (intent) source node (knot) id
    * @param targetNodeId link (intent) target node (knot) id
    */
-  const onAddLink = async (sourceNodeId: string, targetNodeId: string) => {
-    if (!accessToken || !intents) {
+  const onAddLink = (sourceNodeId: string, targetNodeId: string) => {
+    if (!intents) {
       return;
     }
 
-    const createdIntent = await Api.getIntentsApi(accessToken).createIntent({
-      storyId: storyId,
-      intent: {
-        name: "New intent name",
-        global: false,
-        sourceKnotId: sourceNodeId,
-        targetKnotId: targetNodeId,
-        quickResponseOrder: 0,
-        trainingMaterials: {},
-        type: IntentType.NORMAL
-      }
-    });
+    const createdIntent: Intent = {
+      name: "New intent name",
+      global: false,
+      sourceKnotId: sourceNodeId,
+      targetKnotId: targetNodeId,
+      quickResponseOrder: 0,
+      trainingMaterials: {},
+      type: IntentType.NORMAL
+    }
 
     setStoryData({
       ...storyData,
       intents: [ ...intents, createdIntent ]
     });
+    setDataChanged(true);
   }
 
   /**
@@ -206,20 +209,21 @@ const EditorScreen: React.FC<Props> = ({
    *
    * @param linkId removed link (intent) id
    */
-  const onRemoveLink = async (linkId: string) => {
-    if (!accessToken || !intents) {
+  const onRemoveLink = (linkId: string) => {
+    if (!intents) {
       return;
     }
 
-    await Api.getIntentsApi(accessToken).deleteIntent({
-      storyId: storyId,
-      intentId: linkId
-    });
+    const intent = intents.find(item => item.id === linkId);
+    if (intent) {
+      setRemovedIntents([ ...removedIntents, intent ])
+    }
 
     setStoryData({
       ...storyData,
-      intents: intents.filter(intent => intent.id !== linkId)
+      intents: intents.filter(item => item.id !== linkId)
     });
+    setDataChanged(true);
   }
 
   /**
@@ -227,21 +231,23 @@ const EditorScreen: React.FC<Props> = ({
    * 
    * @param node node
    */
-  const onNodeSelectionChange = async (node: CustomNodeModel) => {
-    if (!accessToken || !intents) {
+  const onNodeSelectionChange = (node: CustomNodeModel) => {
+    if (!knots) {
       return;
     }
 
-    const knot = await Api.getKnotsApi(accessToken).findKnot({
-      storyId: storyId,
-      knotId: node.getID()
-    });
+    const knot = knots.find(item => item.id === node.getID());
 
     setStoryData({
       ...storyData,
       selectedIntent: undefined,
       selectedKnot: knot
     });
+    if (knot?.scope && (knot?.scope === KnotScope.Home || knot?.scope === KnotScope.Global)) {
+      setEditingEntityInfo(true);
+    } else {
+      setEditingEntityInfo(false);
+    }
   }
 
   /**
@@ -249,15 +255,12 @@ const EditorScreen: React.FC<Props> = ({
    * 
    * @param link link
    */
-  const onLinkSelectionChange = async (link: CustomLinkModel) => {
-    if (!accessToken || !intents) {
+  const onLinkSelectionChange = (link: CustomLinkModel) => {
+    if (!intents) {
       return;
     }
 
-    const intent = await Api.getIntentsApi(accessToken).findIntent({
-      storyId: storyId,
-      intentId: link.getID()
-    });
+    const intent = intents.find(item => item.id === link.getID());
 
     setStoryData({
       ...storyData,
@@ -288,20 +291,13 @@ const EditorScreen: React.FC<Props> = ({
         [EditorUtils.objectKeyConversion(name)]: foundMaterial?.id
       }
     };
-
-    if (accessToken && updatedIntent.id) {
-      Api.getIntentsApi(accessToken).updateIntent({
-        intentId: updatedIntent.id,
-        intent: updatedIntent,
-        storyId: storyId
-      });
-    }    
     
     setStoryData({
       ...storyData,
       selectedIntent: updatedIntent,
       intents: intents.map(intent => intent.id === updatedIntent.id ? updatedIntent : intent)
     });
+    setDataChanged(true);
   }
 
   /**
@@ -352,6 +348,7 @@ const EditorScreen: React.FC<Props> = ({
     });
     setEditingTrainingMaterial(false);
     setEditedTrainingMaterial(undefined);
+    setDataChanged(true);
   }
 
   /**
@@ -359,12 +356,12 @@ const EditorScreen: React.FC<Props> = ({
    * 
    * @param action action type: update / create
    */
-  const onSaveTrainingMaterialClick = async () => {
+  const onSaveTrainingMaterialClick = () => {
     if(!editedTrainingMaterial) {
       return;
     }
 
-    editedTrainingMaterial.id ? await updateTrainingMaterial() : await createTrainingMaterial();
+    editedTrainingMaterial.id ? updateTrainingMaterial() : createTrainingMaterial();
     setEditingTrainingMaterial(false);
     setSelectedTrainingMaterialType(null);
   }
@@ -372,75 +369,50 @@ const EditorScreen: React.FC<Props> = ({
   /**
    * Updates training material
    */
-  const updateTrainingMaterial = async () => {
-    let updatedTrainingMaterial: TrainingMaterial;
-    let updatedIntent: Intent;
-    if (!accessToken || !editedTrainingMaterial?.type || !trainingMaterial || !selectedIntent?.id || !intents) {
+  const updateTrainingMaterial = () => {
+    if (!editedTrainingMaterial?.type || !trainingMaterial || !selectedIntent?.id || !intents) {
       return;
     }
     const key = EditorUtils.objectKeyConversion(editedTrainingMaterial.type);
-    try {
-      updatedTrainingMaterial = await Api.getTrainingMaterialApi(accessToken).updateTrainingMaterial({
-        trainingMaterialId: editedTrainingMaterial.id ?? "",
-        trainingMaterial: editedTrainingMaterial
-      });
-      updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
-        intentId: selectedIntent.id,
-        intent: {
-          ...selectedIntent,
-          trainingMaterials: { 
-            ...selectedIntent.trainingMaterials,
-            [key]: editedTrainingMaterial.id
-          }
-        },
-        storyId: storyId
-      });
-    } catch (error) {
-      throw error;
+    const updatedIntent: Intent = {
+        ...selectedIntent,
+        trainingMaterials: { 
+          ...selectedIntent.trainingMaterials,
+          [key]: editedTrainingMaterial.id
+        }
     }
     setStoryData({
       ...storyData,
-      trainingMaterial: trainingMaterial.map(item => item.id === updatedTrainingMaterial.id ? updatedTrainingMaterial : item),
+      trainingMaterial: trainingMaterial.map(item => item.id === editedTrainingMaterial.id ? editedTrainingMaterial : item),
       selectedIntent: updatedIntent,
       intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
     });
+    setDataChanged(true);
   }
 
   /**
    * Creates training material
    */
-  const createTrainingMaterial = async () => {
-    let updatedTrainingMaterial: TrainingMaterial;
-    let updatedIntent: Intent;
-    if (!accessToken || !editedTrainingMaterial?.type || !trainingMaterial || !selectedIntent?.id || !intents) {
+  const createTrainingMaterial = () => {
+    if (!editedTrainingMaterial?.type || !trainingMaterial || !selectedIntent?.id || !intents) {
       return;
     }
     const key = EditorUtils.objectKeyConversion(editedTrainingMaterial.type);
-
-    try {
-      updatedTrainingMaterial = await Api.getTrainingMaterialApi(accessToken).createTrainingMaterial({
-        trainingMaterial: editedTrainingMaterial
-      });
-      updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
-        intentId: selectedIntent.id,
-        intent: {
-          ...selectedIntent,
-          trainingMaterials: {
-            ...selectedIntent.trainingMaterials,
-            [key]: editedTrainingMaterial.id
-          }
-        },
-        storyId: storyId
-      });
-    } catch (error) {
-      throw error;
+    const updatedIntent: Intent = {
+      ...selectedIntent,
+      trainingMaterials: {
+        ...selectedIntent.trainingMaterials,
+        [key]: editedTrainingMaterial.id
+      }
     }
+
     setStoryData({
       ...storyData,
-      trainingMaterial: [ ...trainingMaterial, updatedTrainingMaterial ],
+      trainingMaterial: [ ...trainingMaterial, editedTrainingMaterial ],
       selectedIntent: updatedIntent,
       intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
     });
+    setDataChanged(true);
   }
 
   /**
@@ -448,22 +420,22 @@ const EditorScreen: React.FC<Props> = ({
    * 
    * @param event event from input change
    */
-  const onUpdateKnotInfo = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    let { name, value } = event?.target;
-    if (!accessToken || !knots || !selectedKnot?.id) {
+  const onUpdateKnotInfo = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event?.target;
+    if (!knots || !selectedKnot?.id) {
       return;
     }
 
-    const updatedKnot = await Api.getKnotsApi(accessToken).updateKnot({
-      storyId: storyId,
-      knotId: selectedKnot.id,
-      knot: { ...selectedKnot, [name]: value }
-    });
+    const updatedKnot: Knot = {
+      ...selectedKnot,
+      [name]: value
+    }
 
     setStoryData({
       ...storyData,
       knots: knots.map(item => item.id === updatedKnot.id ? updatedKnot : item)
     });
+    setDataChanged(true);
   }
 
   /**
@@ -471,23 +443,23 @@ const EditorScreen: React.FC<Props> = ({
    * 
    * @param event event from input change
    */
-  const onUpdateIntentInfo = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onUpdateIntentInfo = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event?.target;
-    if (!accessToken || !intents || !selectedIntent?.id) {
+    if (!intents || !selectedIntent?.id) {
       return;
     }
 
-    const updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
-      storyId: storyId,
-      intentId: selectedIntent.id,
-      intent: { ...selectedIntent, [name]: value }
-    });
+    const updatedIntent: Intent = {
+      ...selectedIntent,
+      [name]: value
+    }
 
     setStoryData({
       ...storyData,
       selectedIntent: updatedIntent,
       intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
     });
+    setDataChanged(true);
   }
 
   /**
@@ -502,6 +474,107 @@ const EditorScreen: React.FC<Props> = ({
     }
 
     setEditedTrainingMaterial({ ...editedTrainingMaterial, [name]: value });
+    setDataChanged(true);
+  }
+
+  /**
+   * Event handler for save button click
+   */
+  const onSaveClick = async () => {
+    if (!accessToken || !storyData.story) {
+      return;
+    }
+    try {
+      const knotsApi = Api.getKnotsApi(accessToken);
+      const intentsApi = Api.getIntentsApi(accessToken);
+      const trainingMaterialsApi = Api.getTrainingMaterialApi(accessToken);
+      let currentStory = story;
+      if (story) {
+        currentStory = await Api.getStoriesApi(accessToken).updateStory({ storyId: storyId, story: story });  
+      }
+
+      let currentKnots = knots ? knots : [];
+      if (knots) {
+        for (const knot of knots) {
+          if (knot.id) {
+            const updatedKnot = await knotsApi.updateKnot({
+              storyId: storyId,
+              knotId: knot.id,
+              knot: knot
+            });
+            currentKnots = [ ...currentKnots.filter(item => item.id !== updatedKnot.id), updatedKnot ];
+          } else {
+            const createdKnot = await knotsApi.createKnot({
+              storyId: storyId,
+              knot: knot
+            });
+            currentKnots = [ ...currentKnots, createdKnot ];
+          }
+        }
+      }
+      for (const knot of removedKnots) {
+        knot.id && await knotsApi.deleteKnot({
+          storyId: storyId,
+          knotId: knot.id
+        });
+      }
+      setRemovedKnots([]);
+
+      let currentIntents = intents ? intents : [];
+      if (intents) {
+        for (const intent of intents) {
+          if (intent.id) {
+            const updatedIntent = await intentsApi.updateIntent({
+              storyId: storyId,
+              intentId: intent.id,
+              intent: intent
+            });
+            currentIntents = [ ...currentIntents.filter(item => item.id !== updatedIntent.id), updatedIntent ];
+          } else {
+            const createdIntent = await intentsApi.createIntent({
+              storyId: storyId,
+              intent: intent
+            });
+            currentIntents = [ ...currentIntents, createdIntent ];
+          }
+        }
+      }
+      for (const intent of removedIntents) {
+        intent.id && await intentsApi.deleteIntent({
+          storyId: storyId,
+          intentId: intent.id
+        });
+      }
+      setRemovedIntents([]);
+      
+      let currentMaterial = trainingMaterial ? trainingMaterial : [];
+      if (trainingMaterial) {
+        for (const material of trainingMaterial) {
+          if (material.id) {
+            const updatedMaterial = await trainingMaterialsApi.updateTrainingMaterial({
+              trainingMaterialId: material.id,
+              trainingMaterial: material
+            });
+            currentMaterial = [ ...currentMaterial.filter(item => item.id !== updatedMaterial.id), updatedMaterial ];
+          } else {
+            const createdMaterial = await trainingMaterialsApi.createTrainingMaterial({
+              trainingMaterial: material
+            });
+            currentMaterial = [ ...currentMaterial, createdMaterial ];
+          }
+        }
+      }
+      
+      setStoryData({
+        story: currentStory,
+        knots: currentKnots,
+        intents: currentIntents,
+        trainingMaterial: currentMaterial
+      });
+      setDataChanged(false);
+  } catch (error) {
+    console.error(error);
+  }
   }
 
   /**
@@ -699,6 +772,8 @@ const EditorScreen: React.FC<Props> = ({
             name="name"
             defaultValue={ selectedIntent.name ?? "" }
             onChange={ (e: any) => onUpdateIntentInfo(e) }
+            onFocus={ () => setEditingEntityInfo(true) }
+            onBlur={ () => setEditingEntityInfo(false) }
           />
         }
         <Divider className={ classes.divider }/>
@@ -742,6 +817,8 @@ const EditorScreen: React.FC<Props> = ({
           select
           defaultValue={ selectedIntent.type }
           onChange={ onUpdateIntentInfo }
+          onFocus={ () => setEditingEntityInfo(true) }
+          onBlur={ () => setEditingEntityInfo(false) }
         >
           { intentTypes.map(name => 
             <MenuItem key={ name } value={ name }>
@@ -775,6 +852,8 @@ const EditorScreen: React.FC<Props> = ({
         selectedIntent={ selectedIntent }
         setEditingButtonFieldValue={ setEditingQuickResponse }
         onUpdateFieldInfo={ onUpdateIntentInfo }
+        onFocus={ () => setEditingEntityInfo(true) }
+        onBlur={ () => setEditingEntityInfo(false) }
       />
     );
   }
@@ -796,6 +875,8 @@ const EditorScreen: React.FC<Props> = ({
         onUpdateEditedTrainingMaterial={ onUpdateEditedTrainingMaterial }
         onDeleteTrainingMaterialClick={ onDeleteTrainingMaterialClick }
         onSaveTrainingMaterialClick={ onSaveTrainingMaterialClick }
+        onFocus={ () => setEditingEntityInfo(true) }
+        onBlur={ () => setEditingEntityInfo(false) }
       />
     );
   }
@@ -817,6 +898,7 @@ const EditorScreen: React.FC<Props> = ({
       pageTitle={ storyData.story?.name ?? "" }
       dataChanged={ dataChanged }
       storySelected
+      onSaveClick= { onSaveClick }
     >
       { renderLeftToolbar() }
       { renderEditorContent() }

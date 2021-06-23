@@ -13,6 +13,7 @@ export interface IStrings extends LocalizedStringsMethods {
     cancel: string;
     edit: string;
     edited: string;
+    ok: string;
     remove: string;
   };
 
