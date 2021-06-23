@@ -53,7 +53,6 @@ class PreviewScreen extends React.Component<Props, State> {
         keycloak={ keycloak }
         pageTitle="Story name"
         dataChanged={ true }
-        storySelected={ true }
       >
         { this.renderLeftToolbar() }
         <Box marginLeft="320px">

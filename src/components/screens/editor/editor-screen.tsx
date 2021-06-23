@@ -816,7 +816,6 @@ const EditorScreen: React.FC<Props> = ({
       keycloak={ keycloak }
       pageTitle={ storyData.story?.name ?? "" }
       dataChanged={ dataChanged }
-      storySelected
     >
       { renderLeftToolbar() }
       { renderEditorContent() }
@@ -833,7 +832,8 @@ const EditorScreen: React.FC<Props> = ({
  */
 const mapStateToProps = (state: ReduxState) => ({
   accessToken: state.auth.accessToken,
-  keycloak: state.auth.keycloak
+  keycloak: state.auth.keycloak,
+  storyId: state.story.storyId
 });
 
 /**

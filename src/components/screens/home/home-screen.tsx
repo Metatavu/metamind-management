@@ -4,6 +4,7 @@ import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
+import { selectStory, unselectStory } from "../../../actions/story";
 import Api from "../../../api/api";
 import { Story, KnotType,TokenizerType, KnotScope } from "../../../generated/client";
 import strings from "../../../localization/strings";
@@ -19,6 +20,8 @@ interface Props extends WithStyles<typeof styles> {
   history: History;
   accessToken?: AccessToken;
   keycloak?: KeycloakInstance;
+  selectStory: (storyId: string) => void;
+  unselectStory: () => void;
 }
 
 /**
@@ -51,6 +54,9 @@ class HomeScreen extends React.Component<Props, State> {
    * Component did mount life cycle handler
    */
   public componentDidMount = async () => {
+    const { unselectStory } = this.props;
+    
+    unselectStory();
     await this.fetchData();
   }
 
@@ -228,12 +234,14 @@ class HomeScreen extends React.Component<Props, State> {
    * Event handler for selected story open click
    */
   private onOpenSelectedStoryClick = () => {
+    const { selectStory } = this.props;
     const { selectedStoryId } = this.state;
 
     if (!selectedStoryId) {
       return;
     }
 
+    selectStory(selectedStoryId);
     this.props.history.push(`editor/${selectedStoryId}`);
   }
 
@@ -273,6 +281,9 @@ const mapStateToProps = (state: ReduxState) => ({
  *
  * @param dispatch dispatch method
  */
-const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({});
+const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({
+  selectStory: (storyId: string) => {dispatch(selectStory(storyId))},
+  unselectStory: () => {dispatch(unselectStory())},
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(HomeScreen));
