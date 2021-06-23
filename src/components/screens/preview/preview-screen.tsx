@@ -1,4 +1,4 @@
-import { Box, Drawer, WithStyles, withStyles } from "@material-ui/core";
+import { Box, Drawer } from "@material-ui/core";
 import Toolbar from "@material-ui/core/Toolbar";
 import * as React from "react";
 import { connect } from "react-redux";
@@ -6,14 +6,16 @@ import { Dispatch } from "redux";
 import { ReduxActions, ReduxState } from "../../../store";
 import { AccessToken } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
-import { styles } from "./preview-screen.styles";
+import { usePreviewStyles } from "./preview-screen.styles";
 import { History } from "history";
 import { KeycloakInstance } from 'keycloak-js';
+import KnotPanel from "../../knot-components/knot-list/knot-list";
+import { Story, Knot, Intent, TrainingMaterial } from "../../../generated/client/models";
 
 /**
  * Interface describing component props
  */
-interface Props extends WithStyles<typeof styles> {
+interface Props {
   history: History;
   keycloak: KeycloakInstance;
   accessToken: AccessToken;
@@ -21,60 +23,70 @@ interface Props extends WithStyles<typeof styles> {
 }
 
 /**
- * Interface describing component state
+ * Story data
  */
-interface State {
+interface StoryData {
+  story?: Story;
+  knots?: Knot[];
+  intents?: Intent[];
+  selectedKnot?: Knot;
+  selectedIntent? : Intent;
+  trainingMaterial?: TrainingMaterial[];
 }
 
 /**
  * Preview screen component
  */
-class PreviewScreen extends React.Component<Props, State> {
+const  PreviewScreen: React.FC<Props> = ({ keycloak }) => {
+  const classes = usePreviewStyles(); 
 
-  /**
-   * Constructor
-   *
-   * @param props props
-   */
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {}
-  }
-
-  /**
-   * Component render
-   */
-  public render = () => {
-    const { keycloak } = this.props;
-
-    return (
-      <AppLayout
-        keycloak={ keycloak }
-        pageTitle="Story name"
-        dataChanged={ true }
-      >
-        { this.renderLeftToolbar() }
-        <Box marginLeft="320px">
-
-        </Box>
-      </AppLayout>
-    );
-  }
+  const [ storyData, setStoryData ] = React.useState<StoryData>({});
+  const { story, knots, selectedKnot, selectedIntent, intents, trainingMaterial } = storyData;
 
   /**
    * Renders left toolbar
    */
-  private renderLeftToolbar = () => {
+  const renderLeftToolbar = () => {
     return (
       <Drawer
         variant="permanent"
         anchor="left"
       >
         <Toolbar/>
+        <Box>
+          <KnotPanel 
+            knots={ knots ?? [] }
+            onKnotClick={ onKnotClick }
+          />
+        </Box>
       </Drawer>
     );
   }
+
+  /**
+   * Event handler for on knot click
+   * 
+   * @param knot knot
+   */
+  const onKnotClick = (knot: Knot) => {
+    if (!knot?.coordinates?.x || !knot?.coordinates?.y) {
+      return;
+    }
+    setStoryData({ ...storyData, selectedKnot: knot });
+  }
+
+  return (
+    <AppLayout
+      keycloak={ keycloak }
+      pageTitle="Story name"
+      dataChanged={ true }
+    >
+      { renderLeftToolbar() }
+      <Box marginLeft="320px">
+
+      </Box>
+    </AppLayout>
+  );
 }
 
 /**
@@ -95,4 +107,4 @@ const mapStateToProps = (state: ReduxState) => ({
  */
 const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({});
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(PreviewScreen));
+export default connect(mapStateToProps, mapDispatchToProps)(PreviewScreen);
