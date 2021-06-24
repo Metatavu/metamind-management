@@ -24,6 +24,8 @@ interface Props {
   addingKnots: boolean;
   centeredKnot?: Knot;
   centeredIntent?: Intent;
+  deletedKnot?: Knot;
+  deletedIntent?: Intent;
   onAddNode: (node: CustomNodeModel) => void;
   onMoveNode: (node: CustomNodeModel, knot?: Knot) => void;
   onRemoveNode: (nodeId: string) => void;
@@ -45,6 +47,8 @@ const StoryEditorView: React.FC<Props> = ({
   addingKnots,
   centeredKnot,
   centeredIntent,
+  deletedKnot,
+  deletedIntent,
   onAddNode,
   onMoveNode,
   onRemoveNode,
@@ -109,6 +113,40 @@ const StoryEditorView: React.FC<Props> = ({
       } 
     }
   }, [ centeredIntent ]);
+
+  /**
+   * Effect that deletes a node related to a knot
+   */
+  React.useEffect(() => {
+    if(!deletedKnot || !deletedKnot.id) {
+      return;
+    }
+
+    const model = engineRef.current.getModel();
+    const node = model.getNodes().find(item => item.getID() === deletedKnot?.id);
+    if (node) {
+      console.log(node)
+      node.remove();
+      model.removeNode(node);
+    }
+  }, [ deletedKnot ]);
+
+  /**
+   * Effect that deletes a link related to an intent
+   */
+  React.useEffect(() => {
+    if(!deletedIntent || !deletedIntent.id) {
+      return;
+    }
+
+    const model = engineRef.current.getModel();
+    const link = model.getLinks().find(item => item.getID() === deletedIntent?.id);
+    if (link) {
+      console.log(link)
+      link.remove();
+      model.removeLink(link);
+    }
+  }, [ deletedIntent ]);
 
   /**
    * Effect that syncs knots to diagram nodes when length of knots list is changed
@@ -279,6 +317,10 @@ const StoryEditorView: React.FC<Props> = ({
     link.registerListener({
       selectionChanged: (selectionChangedEvent: any) => {
         onLinkSelectionChange(selectionChangedEvent.entity as CustomLinkModel);
+        
+      },
+      entityRemoved: ({ entity }: any) => {
+        onRemoveLink(entity.getID() as string);
       }
     });
 

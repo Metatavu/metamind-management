@@ -72,6 +72,8 @@ const EditorScreen: React.FC<Props> = ({
   const [ removedKnots, setRemovedKnots ] = React.useState<Knot[]>([]);
   const [ removedIntents, setRemovedIntents ] = React.useState<Intent[]>([]);
   const [ deleteConfirmDialogOpen, setDeleteConfirmDialogOpen ] = React.useState(false);
+  const [ deletedKnotRef, setDeletedknotRef ] = React.useState<Knot | undefined>(undefined);
+  const [ deletedIntentRef, setDeletedIntentRef ] = React.useState<Intent | undefined>(undefined);
 
   React.useEffect(() => {
     fetchData();
@@ -390,6 +392,7 @@ const EditorScreen: React.FC<Props> = ({
         selectedKnot: entity as Knot,
         selectedIntent: undefined
       });
+
     setDeleteConfirmDialogOpen(true);
   }
 
@@ -398,23 +401,26 @@ const EditorScreen: React.FC<Props> = ({
    */
   const onDeleteConfirmClick = () => {
     if (selectedIntent && intents) {
+      setDeletedIntentRef(selectedIntent);
       setRemovedIntents([ ...removedIntents, selectedIntent ]);
       setStoryData({
         ...storyData,
         intents: intents.filter(intent => intent.id !== selectedIntent.id),
         selectedIntent: undefined
       });
-      setDeleteConfirmDialogOpen(false);
     }
+
     if (selectedKnot && knots) {
+      setDeletedknotRef(selectedKnot);
       setRemovedKnots([ ...removedKnots, selectedKnot ]);
       setStoryData({
         ...storyData,
         knots: knots.filter(knot => knot.id !== selectedKnot.id),
         selectedKnot: undefined
       });
-      setDeleteConfirmDialogOpen(false);
     }
+    
+    setDeleteConfirmDialogOpen(false);
   }
 
   /**
@@ -654,6 +660,8 @@ const EditorScreen: React.FC<Props> = ({
             addingKnots={ addingKnots }
             centeredKnot={ centeredKnot }
             centeredIntent={ centeredIntent }
+            deletedKnot={ deletedKnotRef }
+            deletedIntent={ deletedIntentRef }
             onAddNode={ onAddNode }
             onMoveNode={ onMoveNode }
             onRemoveNode={ onRemoveNode }
