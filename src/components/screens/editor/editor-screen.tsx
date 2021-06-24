@@ -858,6 +858,9 @@ const EditorScreen: React.FC<Props> = ({
     );
   }
 
+  /**
+   * Renders delete confirm dialog
+   */
   const renderDeleteConfirmDialog = () => {
     return (
       <GenericDialog
