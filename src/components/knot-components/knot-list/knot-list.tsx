@@ -1,18 +1,23 @@
-import { Box, Divider, List, TextField } from "@material-ui/core";
+import { Box, Divider, List, TextField, WithStyles, withStyles } from "@material-ui/core";
 import * as React from "react";
+import { KnotScope } from "../../../generated/client";
 import { Knot } from "../../../generated/client/models/Knot";
 import strings from "../../../localization/strings";
 import GlobalKnotIcon from "../../../resources/svg/global-knot-icon";
 import KnotIcon from "../../../resources/svg/knot-icon";
 import AccordionItem from "../../generic/accordion-item/accordion-item";
 import InteractiveListItem from "../../generic/list-items/interactive-list-item";
+import HomeIcon from '@material-ui/icons/Home';
+import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
+import { styles } from "./knot-list.styles";
 
 /**
  * Interface describing component props
  */
-interface Props {
+interface Props extends WithStyles<typeof styles> {
   knots: Knot[];
   onKnotClick: (knot: Knot) => void;
+  onKnotSecondaryClick: (knot: Knot) => void;
 }
 
 /**
@@ -20,9 +25,9 @@ interface Props {
  * 
  * @param props component properties
  */
-const KnotPanel: React.FC<Props> = ({ knots, onKnotClick }) => {
+const KnotPanel: React.FC<Props> = ({ knots, onKnotClick, classes, onKnotSecondaryClick }) => {
 
-  const globalKnot = knots[0];
+  const globalKnots = knots.filter(item => item.scope === KnotScope.Global);
 
   React.useEffect(() => {
     // TODO: Add fetch logic
@@ -41,13 +46,14 @@ const KnotPanel: React.FC<Props> = ({ knots, onKnotClick }) => {
 
     return (
       <AccordionItem title={ strings.editorScreen.globalKnots } >
-        <List>
-          { globalKnot &&
-            <InteractiveListItem
-              title={ globalKnot.name }
-              icon={ <GlobalKnotIcon htmlColor="#000"/> }
-              onClick={ () => onKnotClick(globalKnot) }
-            />
+        <List className={ classes.list }>
+          { globalKnots && globalKnots.map(globalKnot =>
+              <InteractiveListItem
+                title={ globalKnot.name }
+                icon={ <GlobalKnotIcon htmlColor="#000"/> }
+                onClick={ () => onKnotClick(globalKnot) }
+              />
+            )
           }
           
         </List>
@@ -56,9 +62,7 @@ const KnotPanel: React.FC<Props> = ({ knots, onKnotClick }) => {
   }
 
   /**
-   * Render basic knots
-   * 
-   * TODO: fetch basic knots
+   * Render basic and home knots
    */
   const renderBasicKnots = () => {
 
@@ -68,15 +72,29 @@ const KnotPanel: React.FC<Props> = ({ knots, onKnotClick }) => {
 
     return (
       <AccordionItem title={ strings.editorScreen.storyKnots }>
-        <List>
+        <List className={ classes.list }>
           {
-            knots.map(knot => (
-              <InteractiveListItem
-                icon={ <KnotIcon htmlColor="#000"/> }
-                title={ knot.name }
-                onClick={ () => onKnotClick(knot) }
-              />
-            ))
+            knots.map(knot => {
+              if (knot.scope === KnotScope.Home) {
+                return (
+                  <InteractiveListItem
+                    icon={ <HomeIcon htmlColor="#000"/> }
+                    title={ knot.name }
+                    onClick={ () => onKnotClick(knot) }
+                  />
+                );
+              } else {
+                return (
+                  <InteractiveListItem
+                    icon={ <KnotIcon htmlColor="#000"/> }
+                    title={ knot.name }
+                    onClick={ () => onKnotClick(knot) }
+                    onSecondaryActionClick={ () => onKnotSecondaryClick(knot) }
+                    secondaryActionIcon={ <DeleteOutlineIcon htmlColor="#000"/> }
+                  />
+                );
+              }
+            })
           }
         </List>
       </AccordionItem>
@@ -102,4 +120,4 @@ const KnotPanel: React.FC<Props> = ({ knots, onKnotClick }) => {
   );
 }
 
-export default KnotPanel;
+export default withStyles(styles)(KnotPanel);
