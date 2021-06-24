@@ -80,5 +80,25 @@
       "knot": "Remove knot and all related intents?",
       "intent": "Remove selected intent?"
     }
+  },
+
+  "previewScreen": {
+    "storyKnots": "Story knots",
+    "globalKnots": "Global knots",
+    "storyEditor": "Story editor",
+    "globalEditor": "Global editor",
+    "leftBar" : {
+      "storyLeftTab": "Story",
+      "knotsLeftTab": "Knots",
+      "intentsLeftTab": "Intents",
+      "knotSearchHelper": "Knot search",
+      "intentSearchHelper": "Search for an intent"
+    },
+    "intents": {
+      "normalIntents": "Normal intents",
+      "defaultIntents": "Default intents",
+      "confusedIntents": "Confused intents",
+      "redirectIntents": "Redirect intents"
+    }
   }
 }

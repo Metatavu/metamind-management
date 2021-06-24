@@ -1,4 +1,4 @@
-import { Box, Drawer } from "@material-ui/core";
+import { Box, Drawer, Tabs, Tab } from "@material-ui/core";
 import Toolbar from "@material-ui/core/Toolbar";
 import * as React from "react";
 import { connect } from "react-redux";
@@ -11,6 +11,8 @@ import { History } from "history";
 import { KeycloakInstance } from 'keycloak-js';
 import KnotPanel from "../../knot-components/knot-list/knot-list";
 import { Story, Knot, Intent, TrainingMaterial } from "../../../generated/client/models";
+import strings from "../../../localization/strings";
+import { Typography } from "@material-ui/core";
 
 /**
  * Interface describing component props
@@ -53,6 +55,13 @@ const  PreviewScreen: React.FC<Props> = ({ keycloak }) => {
         anchor="left"
       >
         <Toolbar/>
+        <Box height="49px" display="flex" borderBottom={1}>
+          <Box margin="auto">
+            <Typography component="h3">
+              { strings.previewScreen.leftBar.knotsLeftTab }
+            </Typography>
+          </Box>
+        </Box>
         <Box>
           <KnotPanel 
             knots={ knots ?? [] }
@@ -83,6 +92,7 @@ const  PreviewScreen: React.FC<Props> = ({ keycloak }) => {
     >
       { renderLeftToolbar() }
       <Box marginLeft="320px">
+        {/* <MessageList /> */}
 
       </Box>
     </AppLayout>
