@@ -22,6 +22,7 @@ import AccordionItem from "../../generic/accordion-item";
 import TrainingSelectionOptions from "../../intent-components/training-selection-options/training-selection-options";
 import QuickResponseButton from "../../intent-components/quick-response-button/quick-response-button";
 import EditorUtils from "../../../utils/editor";
+import DiscussionComponent from "../../knot-components/discussion-component/discussion-component";
 
 /**
  * Component props
@@ -715,11 +716,27 @@ const EditorScreen: React.FC<Props> = ({
 
   /**
    * Renders detailed tab of knot details
-   * 
-   * @param currentKnot current knot
    */
   const renderKnotDetails = () => {
-    return null;
+    if (!selectedKnot) {
+      return null;
+    }
+
+    return (
+      <>
+        <AccordionItem title={ strings.editorScreen.knots.discussion }>
+          <DiscussionComponent
+            selectedKnot= { selectedKnot }
+          />
+        </AccordionItem>
+        <AccordionItem title={ strings.editorScreen.knots.linkedQuickResponses }>
+
+        </AccordionItem>
+        <AccordionItem title={ strings.editorScreen.knots.advancedSettings }>
+
+        </AccordionItem>
+      </>
+    );
   }
 
   /**

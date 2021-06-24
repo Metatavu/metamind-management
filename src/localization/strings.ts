@@ -90,6 +90,14 @@ export interface IStrings extends LocalizedStringsMethods {
       confusedIntents: string;
       redirectIntents: string;
     };
+    knots: {
+      discussion: string;
+      linkedQuickResponses: string;
+      advancedSettings: string;
+      reply: string;
+      availableScripts: string;
+      uploadHelperText: string;
+    };
     add: {
       knot: string;
       indent: string;

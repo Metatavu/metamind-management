@@ -72,6 +72,14 @@
       "confusedIntents": "Hämmentymiset",
       "redirectIntents": "Uudelleenohjaukset"
     },
+    "knots": {
+      "discussion": "Keskustelu",
+      "linkedQuickResponses": "Linkatut pikavastaukset",
+      "advancedSettings": "Lisäasetukset",
+      "reply": "Vastaus",
+      "availableScripts": "Toiminnot saatavilla",
+      "uploadHelperText": "Pudota kuva tähän tai valitse klikkaamalla"
+    },
     "add": {
       "knot": "Lisää solmu",
       "indent": "Lisää aikomus"
