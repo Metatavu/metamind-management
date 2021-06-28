@@ -122,7 +122,7 @@ class HomeScreen extends React.Component<Props, State> {
         { !storyFile &&
           <Box p={ 2 } mb={ 2 }>
             <DropzoneArea
-              acceptedFiles={ [ ".xml" ] }
+              acceptedFiles={ [ ".json" ] }
               clearOnUnmount
               dropzoneText={ strings.homeScreen.dropFileHere }
               onDrop={ this.onFilesDropped }
@@ -368,7 +368,7 @@ class HomeScreen extends React.Component<Props, State> {
           name: "Global",
           type: KnotType.TEXT,
           scope: KnotScope.Global,
-          tokenizer: TokenizerType.UNTOKENIZED,
+          tokenizer: TokenizerType.WHITESPACE,
           content: "",
           coordinates: { x: 200, y: 100 }
         }
@@ -380,7 +380,7 @@ class HomeScreen extends React.Component<Props, State> {
           name: "Home",
           type: KnotType.TEXT,
           scope: KnotScope.Home,
-          tokenizer: TokenizerType.UNTOKENIZED,
+          tokenizer: TokenizerType.WHITESPACE,
           content: "",
           coordinates: { x: 200, y: 400 }
         }
