@@ -42,7 +42,7 @@ export const styles = createStyles({
 
   headerButtonIcon: {
     color: "#999999",
-    "& :hover": {
+    "&:hover": {
       color:theme.palette.primary.main
     }
   },
@@ -50,6 +50,8 @@ export const styles = createStyles({
   responseField: {
     display: "flex",
     width: "100%",
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(1),
     border: "2px solid #999999",
     borderRadius: "5px"
   },
@@ -69,6 +71,58 @@ export const styles = createStyles({
     },
     "& .MuiDropzoneArea-icon": {
       display: "none"
+    }
+  },
+
+  fileDisplayContainer: {
+    display: "flex",
+    width: "100%",
+    minWidth: 255,
+    minHeight: 50,
+    padding: theme.spacing(1),
+    borderRadius: "5px",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    border: "1px solid #36B0F4"
+  },
+
+  fileNameDisplay: {
+    display: "flex",
+    width: "90%"
+  },
+
+  removeButtonContainer: {
+    display: "flex",
+    width: "10%",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+
+  removeButton: {
+    width: 24,
+    height: 24
+  },
+
+  scriptButtonContainer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "left",
+    width: "100%"
+  },
+
+  scriptButton: {
+    width: 32,
+    height: 32,
+    marginRight: theme.spacing(1),
+    display: "flex",
+    color: "#999999",
+    border: "1px solid #999999",
+    "&:hover": {
+      border: "1px solid #36B0F4"
+    },
+    "& :hover": {
+      color: "#36B0F4"
     }
   }
 

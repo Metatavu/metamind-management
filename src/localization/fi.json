@@ -65,7 +65,7 @@
       "selectTrainingMaterial": "Valitse harjoitusmateriaali",
       "createNew": "Luo uusi",
       "name": "Nimi",
-      "tokenizerHeader": "Botin käyttäjän vastauksen tunnistaminen",
+      "tokenizerHeader": "Botin käyttäjän vastauksen tunnistus",
       "tokenizerType": {
         "UNTOKENIZED": "Ei käsittelyä",
         "WHITESPACE": "Välilyönti"
@@ -81,7 +81,8 @@
       "discussion": "Keskustelu",
       "linkedQuickResponses": "Linkatut pikavastaukset",
       "advancedSettings": "Lisäasetukset",
-      "reply": "Vastaus",
+      "imageReply": "Kuvavastaus",
+      "textReply": "Tekstivastaus",
       "availableScripts": "Toiminnot saatavilla",
       "uploadHelperText": "Pudota kuva tähän tai valitse klikkaamalla"
     },

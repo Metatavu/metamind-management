@@ -24,6 +24,14 @@ export const useEditorScreenStyles = makeStyles({
   },
   buttonLabel: {
     fontSize: 11
+  },
+  accordionContent: {
+    display: "flex",
+    flexDirection: "column",
+    width: "100%"
+  },
+  textField: {
+    marginBottom: theme.spacing(2)
   }
 
 }, {

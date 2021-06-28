@@ -6,7 +6,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../../../api/api";
-import { TokenizerType, KnotType, Story, Knot, Intent, IntentType, TrainingMaterial, TrainingMaterialType, TrainingMaterialVisibility, IntentTrainingMaterials } from "../../../generated/client/models";
+import { TokenizerType, KnotType, Story, Knot, Intent, IntentType, TrainingMaterial, TrainingMaterialType, TrainingMaterialVisibility, Script } from "../../../generated/client/models";
 import strings from "../../../localization/strings";
 import { ReduxActions, ReduxState } from "../../../store";
 import { AccessToken } from "../../../types";
@@ -42,6 +42,7 @@ interface StoryData {
   selectedKnot?: Knot;
   selectedIntent? : Intent;
   trainingMaterial?: TrainingMaterial[];
+  scripts?: Script[];
 }
 
 /**
@@ -59,7 +60,7 @@ const EditorScreen: React.FC<Props> = ({
   const [ storyData, setStoryData ] = React.useState<StoryData>({});
   const [ centeredKnot, setCenteredKnot ] = React.useState<Knot | undefined>(undefined);
   const [ centeredIntent, setCenteredIntent ] = React.useState<Intent | undefined>(undefined);
-  const { story, knots, selectedKnot, selectedIntent, intents, trainingMaterial } = storyData;
+  const { story, knots, selectedKnot, selectedIntent, intents, trainingMaterial, scripts } = storyData;
   const [ leftToolBarIndex, setLeftToolBarIndex ] = React.useState(0);
   const [ rightToolBarIndex, setRightToolBarIndex ] = React.useState(0);
   const [ addingKnots, setAddingKnots ] = React.useState(false);
@@ -505,6 +506,28 @@ const EditorScreen: React.FC<Props> = ({
     setEditedTrainingMaterial({ ...editedTrainingMaterial, [name]: value });
   }
 
+  const onUpdateKnotContent = (text: string, imageUrl?: string, script?: string) => {
+    if (!selectedKnot) {
+      return;
+    }
+
+    let content = text;
+    if (imageUrl) {
+      content += `\n<img src="${imageUrl}"/>`;
+    }
+    if (script) {
+      content += `\n<script>${script}</script>`;
+    }
+
+    setStoryData({
+      ...storyData,
+      selectedKnot: {
+        ...selectedKnot,
+        content: content
+      }
+    })
+  }
+
   /**
    * Fetches knots list for the story
    */
@@ -513,18 +536,20 @@ const EditorScreen: React.FC<Props> = ({
       return;
     }
 
-    const [ story, knotList, intentList, trainingMaterialList ] = await Promise.all([
+    const [ story, knotList, intentList, trainingMaterialList, scriptList ] = await Promise.all([
       Api.getStoriesApi(accessToken).findStory({ storyId }),
       Api.getKnotsApi(accessToken).listKnots({ storyId }),
       Api.getIntentsApi(accessToken).listIntents({ storyId }),
-      Api.getTrainingMaterialApi(accessToken).listTrainingMaterials({ storyId })
+      Api.getTrainingMaterialApi(accessToken).listTrainingMaterials({ storyId }),
+      Api.getScriptsApi(accessToken).listScripts()
     ]);
 
     setStoryData({
       story: story,
       knots: knotList,
       intents: intentList,
-      trainingMaterial: trainingMaterialList
+      trainingMaterial: trainingMaterialList,
+      scripts: scriptList
     });
   }
 
@@ -726,7 +751,9 @@ const EditorScreen: React.FC<Props> = ({
       <>
         <AccordionItem title={ strings.editorScreen.knots.discussion }>
           <DiscussionComponent
-            selectedKnot= { selectedKnot }
+            selectedKnot={ selectedKnot }
+            onUpdateKnotContent={ onUpdateKnotContent }
+            scripts={ scripts }
           />
         </AccordionItem>
         <AccordionItem title={ strings.editorScreen.knots.linkedQuickResponses }>
@@ -740,19 +767,30 @@ const EditorScreen: React.FC<Props> = ({
           )}
         </AccordionItem>
         <AccordionItem title={ strings.editorScreen.knots.advancedSettings }>
-          <TextField
-            label={ strings.editorScreen.rightBar.tokenizerHeader }
-            name={ "tokenizer" }
-            select
-            value={ selectedKnot.tokenizer ?? TokenizerType.WHITESPACE }
-            onChange={ onUpdateKnotInfo }
-          >
-            { Object.values(TokenizerType).map(name =>
-              <MenuItem key={ name } value={ name }>
-                { strings.editorScreen.rightBar.tokenizerType[name] }
-              </MenuItem>
-            )}
-          </TextField>
+          <div className={ classes.accordionContent }>
+            <TextField
+              className={ classes.textField }
+              label={ "Hint" }
+              name={ "hint" }
+              placeholder={ "Hint" }
+              value={ selectedKnot.hint ?? "" }
+              onChange={ onUpdateKnotInfo }
+            />
+            <TextField
+              className={ classes.textField }
+              label={ strings.editorScreen.rightBar.tokenizerHeader }
+              name={ "tokenizer" }
+              select
+              value={ selectedKnot.tokenizer ?? TokenizerType.WHITESPACE }
+              onChange={ onUpdateKnotInfo }
+            >
+              { Object.values(TokenizerType).map(name =>
+                <MenuItem key={ name } value={ name }>
+                  { strings.editorScreen.rightBar.tokenizerType[name] }
+                </MenuItem>
+              )}
+            </TextField>
+          </div>
         </AccordionItem>
       </>
     );

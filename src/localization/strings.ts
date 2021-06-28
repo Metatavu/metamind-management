@@ -99,7 +99,8 @@ export interface IStrings extends LocalizedStringsMethods {
       discussion: string;
       linkedQuickResponses: string;
       advancedSettings: string;
-      reply: string;
+      imageReply: string;
+      textReply: string;
       availableScripts: string;
       uploadHelperText: string;
     };

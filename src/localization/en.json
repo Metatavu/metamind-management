@@ -81,7 +81,8 @@
       "discussion": "Discussion",
       "linkedQuickResponses": "Linked quick responses",
       "advancedSettings": "Advanced settings",
-      "reply": "Reply",
+      "imageReply": "Image reply",
+      "textReply": "Text reply",
       "availableScripts": "Available scripts",
       "uploadHelperText": "Drag & drop, or click to upload an image"
     },
