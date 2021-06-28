@@ -60,7 +60,7 @@ const DiscussionComponent: React.FC<Props> = ({
 
   const onTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
-    setText(value);
+    setText(value.replace(/<|>/, ""));
     onUpdateKnotContent(text, image, script);
   }
 
