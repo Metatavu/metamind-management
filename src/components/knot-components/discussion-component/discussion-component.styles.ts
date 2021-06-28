@@ -111,19 +111,29 @@ export const styles = createStyles({
     width: "100%"
   },
 
+  activeScript: {
+    border: "1px solid #36B0F4",
+    color: "#36B0F4",
+    "&:hover": {
+      border: `1px solid ${theme.palette.error.main}`,
+      color: theme.palette.error.main 
+    }
+  },
+
+  inactiveScript: {
+    color: "#999999",
+    border: "1px solid #999999",
+    "&:hover": {
+      border: "1px solid #36B0F4",
+      color: "#36B0F4"
+    }
+  },
+
   scriptButton: {
     width: 32,
     height: 32,
     marginRight: theme.spacing(1),
-    display: "flex",
-    color: "#999999",
-    border: "1px solid #999999",
-    "&:hover": {
-      border: "1px solid #36B0F4"
-    },
-    "& :hover": {
-      color: "#36B0F4"
-    }
+    display: "flex"
   }
 
 });

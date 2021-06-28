@@ -56,11 +56,31 @@ const DiscussionComponent: React.FC<Props> = ({
     }
 
     setImageFile(files[0]);
+    if (imageFile) {
+      // TODO: actual uploading to a bucket
+      setImage(imageFile.name);
+    }
+    onUpdateKnotContent(text, image, script);
   }
 
+  /**
+   * Event handler for text content change
+   * 
+   * @param event event
+   */
   const onTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setText(value.replace(/<|>/, ""));
+    onUpdateKnotContent(text, image, script);
+  }
+
+  /**
+   * Event handler for script click
+   * 
+   * @param value script or undefined, if adding or removing
+   */
+  const onScriptClick = (value: string | undefined) => {
+    setScript(value);
     onUpdateKnotContent(text, image, script);
   }
 
@@ -73,7 +93,7 @@ const DiscussionComponent: React.FC<Props> = ({
         { imageReply && renderImageReply(
           classes, imageReply, setImageReply, textReply, setTextReply, onFilesDropped, setImageFile, imageFile
         )}
-        { renderScripts(classes, scripts) }
+        { renderScripts(classes, onScriptClick, script, scripts) }
       </List>
     </>
   );
@@ -224,10 +244,13 @@ const renderImageReply = (classes: any,
  * @param classes classes
  * @param scripts scripts
  * TODO: actual script icons separation
- * TODO: add script to knot
- * TODO: delete scripts from knot
  */
-const renderScripts = (classes: any, scripts?: Script[]) => {
+const renderScripts = (
+  classes: any,
+  onScriptClick: (value: string | undefined) => void,
+  script?: string,
+  scripts?: Script[]
+  ) => {
 
   return (
     <ListItem className={ classes.listItem } button={ false }>
@@ -250,8 +273,8 @@ const renderScripts = (classes: any, scripts?: Script[]) => {
       <div className={ classes.scriptButtonContainer }>
         { scripts && scripts.map(item => 
           <IconButton
-            className={ classes.scriptButton }
-            onClick={ () => {} }
+            className={ `${item.content === script ? classes.activeScript : classes.inactiveScript} ${classes.scriptButton}` }
+            onClick={ () => onScriptClick(item.content === script ? undefined : item.content) }
           >
             { item.name === "replay" ? <ReplayIcon/> : <ArrowBackIcon/> }
           </IconButton>
