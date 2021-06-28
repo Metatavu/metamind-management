@@ -70,19 +70,24 @@ export interface IStrings extends LocalizedStringsMethods {
         CONFUSED: string;
         REDIRECT: string;
         DEFAULT: string;
-      },
+      };
       trainingMaterialsHeader: string;
       trainingMaterials: {
         INTENTOPENNLPDOCCAT: string;
         INTENTREGEX: string;
         VARIABLEOPENNLPNER: string;
         VARIABLEOPENNLPREGEX: string;
-      },
+      };
       selectExisting: string;
       none: string;
       selectTrainingMaterial: string;
       createNew: string;
       name: string;
+      tokenizerHeader: string;
+      tokenizerType: {
+        UNTOKENIZED: string;
+        WHITESPACE: string;
+      };
     };
     intents: {
       normalIntents: string;

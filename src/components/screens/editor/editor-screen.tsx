@@ -730,10 +730,29 @@ const EditorScreen: React.FC<Props> = ({
           />
         </AccordionItem>
         <AccordionItem title={ strings.editorScreen.knots.linkedQuickResponses }>
-
+          { intents && intents.filter(item => item.sourceKnotId === selectedKnot.id).map(item =>
+            <QuickResponseButton
+              editing={ editingQuickResponse }
+              selectedIntent={ item }
+              setEditingButtonFieldValue={ setEditingQuickResponse }
+              onUpdateFieldInfo={ onUpdateIntentInfo }
+            />
+          )}
         </AccordionItem>
         <AccordionItem title={ strings.editorScreen.knots.advancedSettings }>
-
+          <TextField
+            label={ strings.editorScreen.rightBar.tokenizerHeader }
+            name={ "tokenizer" }
+            select
+            value={ selectedKnot.tokenizer ?? TokenizerType.WHITESPACE }
+            onChange={ onUpdateKnotInfo }
+          >
+            { Object.values(TokenizerType).map(name =>
+              <MenuItem key={ name } value={ name }>
+                { strings.editorScreen.rightBar.tokenizerType[name] }
+              </MenuItem>
+            )}
+          </TextField>
         </AccordionItem>
       </>
     );

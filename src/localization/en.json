@@ -64,7 +64,12 @@
       "none": "None",
       "selectTrainingMaterial": "Select training material",
       "createNew": "Create new",
-      "name": "Name"
+      "name": "Name",
+      "tokenizerHeader": "Bot user answer recognition",
+      "tokenizerType": {
+        "UNTOKENIZED": "Untokenized",
+        "WHITESPACE": "Whitespace"
+      }
     },
     "intents": {
       "normalIntents": "Normal intents",

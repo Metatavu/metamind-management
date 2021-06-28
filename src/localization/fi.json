@@ -64,7 +64,12 @@
       "none": "Tyhjä",
       "selectTrainingMaterial": "Valitse harjoitusmateriaali",
       "createNew": "Luo uusi",
-      "name": "Nimi"
+      "name": "Nimi",
+      "tokenizerHeader": "Botin käyttäjän vastauksen tunnistaminen",
+      "tokenizerType": {
+        "UNTOKENIZED": "Ei käsittelyä",
+        "WHITESPACE": "Välilyönti"
+      }
     },
     "intents": {
       "normalIntents": "Normaalit aikomukset",
