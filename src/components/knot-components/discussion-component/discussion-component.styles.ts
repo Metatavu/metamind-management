@@ -80,7 +80,7 @@ export const styles = createStyles({
     minWidth: 255,
     minHeight: 50,
     padding: theme.spacing(1),
-    borderRadius: "5px",
+    borderRadius: 5,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
