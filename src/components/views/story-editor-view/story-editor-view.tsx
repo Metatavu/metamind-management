@@ -141,7 +141,6 @@ const StoryEditorView: React.FC<Props> = ({
     const model = engineRef.current.getModel();
     const link = model.getLinks().find(item => item.getID() === deletedIntent?.id);
     if (link) {
-      console.log(link)
       link.remove();
       model.removeLink(link);
     }
