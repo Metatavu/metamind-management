@@ -121,7 +121,7 @@ export const styles = createStyles({
     marginRight: theme.spacing(2),
     marginBottom: theme.spacing(4),
     border: "1px solid rgba(255,255,255,0.54)",
-    borderRadius: "5px",
+    borderRadius: 5,
     justifyContent: "space-between",
     alignItems: "center"
   },
