@@ -103,6 +103,7 @@ export interface IStrings extends LocalizedStringsMethods {
       textReply: string;
       availableScripts: string;
       uploadHelperText: string;
+      hint: string;
     };
     add: {
       knot: string;

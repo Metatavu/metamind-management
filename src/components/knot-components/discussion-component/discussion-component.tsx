@@ -20,6 +20,8 @@ interface Props extends WithStyles<typeof styles> {
   selectedKnot?: Knot;
   onUpdateKnotContent: (text: string, imageUrl?: string, script?: string) => void;
   scripts?: Script[];
+  onFocus: () => void;
+  onBlur: () => void;
 }
 
 /**
@@ -31,19 +33,22 @@ const DiscussionComponent: React.FC<Props> = ({
   classes,
   selectedKnot,
   scripts,
-  onUpdateKnotContent
+  onUpdateKnotContent,
+  onFocus,
+  onBlur
 }) => {
 
   const textSplitted = selectedKnot?.content.split(/<.{1,}>/);
   const imageSplitted = selectedKnot?.content.split(/<img?\/?>/);
   const scriptSplitted = selectedKnot?.content.split(/<script\/?>/);
 
-  const [ textReply, setTextReply ] = React.useState(true);
-  const [ imageReply, setImageReply ] = React.useState(false);
   const [ text, setText ] = React.useState(textSplitted ? textSplitted[0] : "");
   const [ image, setImage ] = React.useState(imageSplitted ? imageSplitted[1] : undefined);
   const [ script, setScript ] = React.useState(scriptSplitted? scriptSplitted[1] : undefined);
   const [ imageFile, setImageFile ] = React.useState<File | undefined>(undefined);
+  const [ textReply, setTextReply ] = React.useState(true);
+  const [ imageReply, setImageReply ] = React.useState(image ? true : false);
+  
 
   /**
    * Event handler for files drop
@@ -88,7 +93,7 @@ const DiscussionComponent: React.FC<Props> = ({
     <>
       <List className={ classes.list }>
         { textReply && renderTextReply(
-          classes, imageReply, setImageReply, textReply, setTextReply, onTextChange, text
+          classes, imageReply, setImageReply, textReply, setTextReply, onTextChange, text, onFocus, onBlur
         )}
         { imageReply && renderImageReply(
           classes, imageReply, setImageReply, textReply, setTextReply, onFilesDropped, setImageFile, imageFile
@@ -107,8 +112,8 @@ const DiscussionComponent: React.FC<Props> = ({
  * @param setImageReply set image reply
  * @param textReply text reply
  * @param setTextReply set text reply
- * @param onUpdateKnot event handler for update knot
- * @param selectedKnot selected knot
+ * @param onTextChange event handler for text change
+ * @param text text
  */
 const renderTextReply = (
   classes: any,
@@ -117,7 +122,9 @@ const renderTextReply = (
   textReply: boolean,
   setTextReply: (value: boolean) => void,
   onTextChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
-  text: string
+  text: string,
+  onFocus: () => void,
+  onBlur: () => void
 ) => {
 
   return (
@@ -154,6 +161,8 @@ const renderTextReply = (
         rows={ 14 }
         InputProps={{ disableUnderline: true }}
         multiline
+        onFocus={ onFocus }
+        onBlur={ onBlur }
       />
     </ListItem>
   );
@@ -167,9 +176,13 @@ const renderTextReply = (
  * @param setImageReply set image reply
  * @param textReply text reply
  * @param setTextReply set text reply
+ * @param onFilesDropped event handler for on files dropped
+ * @param setImageFile set image file
+ * @param imageFile image file
  * TODO: actual image upload
  */
-const renderImageReply = (classes: any,
+const renderImageReply = (
+  classes: any,
   imageReply: boolean,
   setImageReply: (value: boolean) => void,
   textReply: boolean,
@@ -242,6 +255,8 @@ const renderImageReply = (classes: any,
  * Renders scripts
  * 
  * @param classes classes
+ * @param onScriptClick event handler for script click
+ * @param script script
  * @param scripts scripts
  * TODO: actual script icons separation
  */
@@ -264,7 +279,7 @@ const renderScripts = (
         <div className={ classes.headerButtons }>
           <IconButton
             edge="end"
-            onClick={ () => {} }
+            onClick={ () => onScriptClick(undefined) }
           >
             <RemoveIcon className={ classes.headerButtonIcon }/>
           </IconButton>

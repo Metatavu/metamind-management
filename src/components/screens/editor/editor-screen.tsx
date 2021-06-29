@@ -506,6 +506,13 @@ const EditorScreen: React.FC<Props> = ({
     setEditedTrainingMaterial({ ...editedTrainingMaterial, [name]: value });
   }
 
+  /**
+   * Event handler for updating the content property of a knot
+   * 
+   * @param text text content
+   * @param imageUrl image content
+   * @param script script content
+   */
   const onUpdateKnotContent = (text: string, imageUrl?: string, script?: string) => {
     if (!selectedKnot) {
       return;
@@ -754,6 +761,8 @@ const EditorScreen: React.FC<Props> = ({
             selectedKnot={ selectedKnot }
             onUpdateKnotContent={ onUpdateKnotContent }
             scripts={ scripts }
+            onFocus={ () => setEditingEntityInfo(true) }
+            onBlur={ () => setEditingEntityInfo(false) }
           />
         </AccordionItem>
         <AccordionItem title={ strings.editorScreen.knots.linkedQuickResponses }>
@@ -770,9 +779,9 @@ const EditorScreen: React.FC<Props> = ({
           <div className={ classes.accordionContent }>
             <TextField
               className={ classes.textField }
-              label={ "Hint" }
+              label={ strings.editorScreen.knots.hint }
               name={ "hint" }
-              placeholder={ "Hint" }
+              placeholder={ strings.editorScreen.knots.hint }
               value={ selectedKnot.hint ?? "" }
               onChange={ onUpdateKnotInfo }
             />

@@ -65,8 +65,8 @@ export default class Api {
   /**
    * Gets initialized Scripts API
    * 
-   * @param accessToken 
-   * @returns 
+   * @param accessToken access token
+   * @returns initialized Scripts API
    */
   public static getScriptsApi(accessToken: AccessToken) {
     return new ScriptsApi(Api.getConfiguration(accessToken));
