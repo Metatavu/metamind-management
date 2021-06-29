@@ -9,6 +9,7 @@ import AppLayout from "../../layouts/app-layout/app-layout";
 import { styles } from "./preview-screen.styles";
 import { History } from "history";
 import { KeycloakInstance } from 'keycloak-js';
+import strings from "../../../localization/strings";
 
 /**
  * Interface describing component props
@@ -24,6 +25,7 @@ interface Props extends WithStyles<typeof styles> {
  * Interface describing component state
  */
 interface State {
+  locale?: string;
 }
 
 /**
@@ -39,7 +41,9 @@ class PreviewScreen extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    this.state = {}
+    this.state = {
+      locale: strings.getLanguage()
+    };
   }
 
   /**
@@ -54,6 +58,8 @@ class PreviewScreen extends React.Component<Props, State> {
         pageTitle="Story name"
         dataChanged={ true }
         storySelected={ true }
+        locale={ this.state.locale }
+        setLocale={ this.setLocale }
       >
         { this.renderLeftToolbar() }
         <Box marginLeft="320px">
@@ -76,6 +82,15 @@ class PreviewScreen extends React.Component<Props, State> {
       </Drawer>
     );
   }
+
+  /**
+   * Sets locale
+   * 
+   * @param locale locale
+   */
+  private setLocale = (locale: string) => {
+    this.setState({ locale: locale });
+  }
 }
 
 /**
@@ -86,7 +101,8 @@ class PreviewScreen extends React.Component<Props, State> {
  */
 const mapStateToProps = (state: ReduxState) => ({
   accessToken: state.auth.accessToken as AccessToken,
-  keycloak: state.auth.keycloak as KeycloakInstance
+  keycloak: state.auth.keycloak as KeycloakInstance,
+  locale: state.locale.locale
 });
 
 /**

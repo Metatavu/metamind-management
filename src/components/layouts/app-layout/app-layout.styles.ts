@@ -8,6 +8,22 @@ export const styles = createStyles({
     width: "100vw",
     height: "100vh",
     backgroundColor: theme.palette.secondary.dark
+  },
+
+  languageSelect: {
+    width: "fit-content",
+    color: "#fff",
+    "& .MuiSelect-selectMenu": {
+      color: "#fff",
+      textTransform: "uppercase"
+    },
+    "& .MuiOutlinedInput-notchedOutline": {
+      borderWidth: 0
+    }
+  },
+
+  languageOption: {
+    textTransform: "uppercase"
   }
 
 });
