@@ -125,7 +125,6 @@ const StoryEditorView: React.FC<Props> = ({
     const model = engineRef.current.getModel();
     const node = model.getNodes().find(item => item.getID() === deletedKnot?.id);
     if (node) {
-      console.log(node)
       node.remove();
       model.removeNode(node);
     }
