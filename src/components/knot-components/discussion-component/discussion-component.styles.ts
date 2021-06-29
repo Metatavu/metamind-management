@@ -12,7 +12,7 @@ export const styles = createStyles({
     display: "flex",
     flexDirection: "column",
     padding: 0,
-    minHeight: "48px",
+    minHeight: 48,
     height: "auto"
   },
 
