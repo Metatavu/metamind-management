@@ -53,7 +53,7 @@ export const styles = createStyles({
     paddingLeft: theme.spacing(1),
     paddingRight: theme.spacing(1),
     border: "2px solid #999999",
-    borderRadius: "5px"
+    borderRadius: 5
   },
 
   dropzone: {
