@@ -75,25 +75,20 @@ const KnotPanel: React.FC<Props> = ({ knots, onKnotClick, classes, onKnotSeconda
         <List className={ classes.list }>
           {
             knots.map(knot => {
-              if (knot.scope === KnotScope.Home) {
-                return (
-                  <InteractiveListItem
-                    icon={ <HomeIcon htmlColor="#000"/> }
-                    title={ knot.name }
-                    onClick={ () => onKnotClick(knot) }
-                  />
-                );
-              } else {
-                return (
-                  <InteractiveListItem
-                    icon={ <KnotIcon htmlColor="#000"/> }
-                    title={ knot.name }
-                    onClick={ () => onKnotClick(knot) }
-                    onSecondaryActionClick={ () => onKnotSecondaryClick(knot) }
-                    secondaryActionIcon={ <DeleteOutlineIcon htmlColor="#000"/> }
-                  />
-                );
-              }
+              return knot.scope === KnotScope.Home ?
+                <InteractiveListItem
+                  icon={ <HomeIcon htmlColor="#000"/> }
+                  title={ knot.name }
+                  onClick={ () => onKnotClick(knot) }
+                /> : 
+                <InteractiveListItem
+                  icon={ <KnotIcon htmlColor="#000"/> }
+                  title={ knot.name }
+                  onClick={ () => onKnotClick(knot) }
+                  onSecondaryActionClick={ () => onKnotSecondaryClick(knot) }
+                  secondaryActionIcon={ <DeleteOutlineIcon htmlColor="#000"/> }
+                />
+              
             })
           }
         </List>
