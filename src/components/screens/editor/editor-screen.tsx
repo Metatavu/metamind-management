@@ -232,6 +232,16 @@ const EditorScreen: React.FC<Props> = ({
       return;
     }
 
+    if (selectedKnot && node.getID() === selectedKnot.id) {
+      setStoryData({
+        ...storyData,
+        selectedIntent: undefined,
+        selectedKnot: undefined
+      });
+      return;
+    }
+
+    console.log("Fired");
     const knot = await Api.getKnotsApi(accessToken).findKnot({
       storyId: storyId,
       knotId: node.getID()
@@ -253,6 +263,16 @@ const EditorScreen: React.FC<Props> = ({
     if (!accessToken || !intents) {
       return;
     }
+
+    if (selectedIntent && link.getID() === selectedIntent.id) {
+      setStoryData({
+        ...storyData,
+        selectedIntent: undefined,
+        selectedKnot: undefined
+      });
+      return;
+    }
+    console.log("Fired");
 
     const intent = await Api.getIntentsApi(accessToken).findIntent({
       storyId: storyId,
@@ -589,7 +609,7 @@ const EditorScreen: React.FC<Props> = ({
     return (
       <Box
         marginLeft="320px"
-        marginRight="320px"
+        marginRight={ (selectedKnot || selectedIntent) ? "320px" : "0px" }
         height="100%"
       >
         <Toolbar/>
@@ -820,7 +840,7 @@ const EditorScreen: React.FC<Props> = ({
     >
       { renderLeftToolbar() }
       { renderEditorContent() }
-      { renderRightToolbar() }
+      { (selectedKnot !== undefined || selectedIntent !== undefined) && renderRightToolbar() }
     </AppLayout>
   );
 }
