@@ -27,6 +27,7 @@ interface Props extends WithStyles<typeof styles> {
 interface State {
   stories: Story[];
   selectedStoryId?: string;
+  locale?: string;
 }
 
 /**
@@ -43,7 +44,8 @@ class HomeScreen extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      stories: []
+      stories: [],
+      locale: strings.getLanguage()
     }
   }
 
@@ -68,6 +70,8 @@ class HomeScreen extends React.Component<Props, State> {
       <AppLayout 
         pageTitle={ strings.homeScreen.title }
         keycloak={ keycloak }
+        locale={ this.state.locale }
+        setLocale={ this.setLocale }
       >
         <Box className={ classes.root }>
           { this.renderSelectStoryCard() }
@@ -238,6 +242,15 @@ class HomeScreen extends React.Component<Props, State> {
   }
 
   /**
+   * Sets locale
+   * 
+   * @param locale locale
+   */
+  private setLocale = (locale: string) => {
+    this.setState({ locale: locale });
+  }
+
+  /**
    * Fetches data from API
    */
   private fetchData = async () => {
@@ -265,7 +278,8 @@ class HomeScreen extends React.Component<Props, State> {
  */
 const mapStateToProps = (state: ReduxState) => ({
   accessToken: state.auth.accessToken,
-  keycloak: state.auth.keycloak
+  keycloak: state.auth.keycloak,
+  locale: state.locale.locale
 });
 
 /**

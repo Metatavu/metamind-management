@@ -68,6 +68,7 @@ const EditorScreen: React.FC<Props> = ({
   const [ editingTrainingMaterial, setEditingTrainingMaterial ] = React.useState(false);
   const [ selectedTrainingMaterialType, setSelectedTrainingMaterialType ] = React.useState<TrainingMaterialType | null>(null);
   const [ editedTrainingMaterial, setEditedTrainingMaterial ] = React.useState<TrainingMaterial>();
+  const [ locale, setLocale ] = React.useState(strings.getLanguage());
 
   React.useEffect(() => {
     fetchData();
@@ -817,6 +818,8 @@ const EditorScreen: React.FC<Props> = ({
       pageTitle={ storyData.story?.name ?? "" }
       dataChanged={ dataChanged }
       storySelected
+      locale={ locale }
+      setLocale={ setLocale }
     >
       { renderLeftToolbar() }
       { renderEditorContent() }
@@ -833,7 +836,8 @@ const EditorScreen: React.FC<Props> = ({
  */
 const mapStateToProps = (state: ReduxState) => ({
   accessToken: state.auth.accessToken,
-  keycloak: state.auth.keycloak
+  keycloak: state.auth.keycloak,
+  locale: state.locale.locale
 });
 
 /**
