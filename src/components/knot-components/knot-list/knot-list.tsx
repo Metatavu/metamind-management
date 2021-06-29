@@ -101,11 +101,7 @@ const KnotPanel: React.FC<Props> = ({ knots, onKnotClick }) => {
    */
   const renderSearchedKnots = () => {
 
-    if (!knots) {
-      return null;
-    }
-
-    return (
+    return knots ? (
       <List>
         {
           knots.filter(item => item.name.toLowerCase().includes(searchValue.toLowerCase())).map(knot => (
@@ -117,7 +113,7 @@ const KnotPanel: React.FC<Props> = ({ knots, onKnotClick }) => {
           ))
         }
       </List>
-    );
+    ) : null;
   }
 
   /**

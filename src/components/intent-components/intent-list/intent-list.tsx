@@ -39,11 +39,7 @@ const IntentPanel: React.FC<Props> = ({ intents, onIntentClick }) => {
    */
   const renderSearchedIntents = () => {
 
-    if (!intents) {
-      return null;
-    }
-
-    return (
+    return intents ? (
       <List>
         {
           intents.filter(item => item.name?.toLowerCase().includes(searchValue.toLowerCase())).map(intent => (
@@ -55,7 +51,7 @@ const IntentPanel: React.FC<Props> = ({ intents, onIntentClick }) => {
           ))
         }
       </List>
-    );
+    ) : null;
   }
 
   /**
