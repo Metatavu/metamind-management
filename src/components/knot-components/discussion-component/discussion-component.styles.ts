@@ -112,11 +112,10 @@ export const styles = createStyles({
   },
 
   activeScript: {
-    border: "1px solid #36B0F4",
-    color: "#36B0F4",
+    backgroundColor: "#36B0F4",
+    color: "#fff",
     "&:hover": {
-      border: `1px solid ${theme.palette.error.main}`,
-      color: theme.palette.error.main 
+      backgroundColor: theme.palette.error.main
     }
   },
 
