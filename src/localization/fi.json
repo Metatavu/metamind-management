@@ -78,7 +78,8 @@
     },
     "confirm": {
       "knot": "Poistetaanko valittu solmu ja kaikki siihen liitetyt aikomukset?",
-      "intent": "Poistetaanko valittu aikomus?"
+      "intent": "Poistetaanko valittu aikomus?",
+      "title": "Poista kappale"
     }
   }
 }
