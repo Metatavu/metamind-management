@@ -85,7 +85,8 @@
       "textReply": "Tekstivastaus",
       "availableScripts": "Toiminnot saatavilla",
       "uploadHelperText": "Pudota kuva tähän tai valitse klikkaamalla",
-      "hint": "Vihje"
+      "hint": "Vihje",
+      "hintHelper": "Botin käyttäjän vastauksen vihje"
     },
     "add": {
       "knot": "Lisää solmu",

@@ -85,7 +85,8 @@
       "textReply": "Text reply",
       "availableScripts": "Available scripts",
       "uploadHelperText": "Drag & drop, or click to upload an image",
-      "hint": "Hint"
+      "hint": "Hint",
+      "hintHelper": "Bot user answer hint"
     },
     "add": {
       "knot": "Add knot",

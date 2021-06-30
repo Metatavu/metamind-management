@@ -779,7 +779,7 @@ const EditorScreen: React.FC<Props> = ({
           <div className={ classes.accordionContent }>
             <TextField
               className={ classes.textField }
-              label={ strings.editorScreen.knots.hint }
+              label={ strings.editorScreen.knots.hintHelper }
               name={ "hint" }
               placeholder={ strings.editorScreen.knots.hint }
               value={ selectedKnot.hint ?? "" }

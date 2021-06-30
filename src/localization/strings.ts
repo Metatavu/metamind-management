@@ -104,6 +104,7 @@ export interface IStrings extends LocalizedStringsMethods {
       availableScripts: string;
       uploadHelperText: string;
       hint: string;
+      hintHelper: string;
     };
     add: {
       knot: string;
