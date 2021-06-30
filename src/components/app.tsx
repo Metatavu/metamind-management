@@ -60,7 +60,6 @@ const App: React.FC = () => {
                 render={({ history, match }) => (
                   <PreviewScreen
                     history={ history }
-                    storyId={ match.params.storyId }
                   />
                 )}
               />

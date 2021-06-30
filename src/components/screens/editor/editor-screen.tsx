@@ -80,6 +80,10 @@ const EditorScreen: React.FC<Props> = ({
       return;
     }
 
+    if (!storyLoading && storyData){
+      return;
+    }
+
     loadStory();
 
     const [ story, knotList, intentList, trainingMaterialList ] = await Promise.all([
@@ -823,9 +827,12 @@ const EditorScreen: React.FC<Props> = ({
         keycloak={ keycloak }
         pageTitle={ "Loading" }
       >
-        { renderLeftToolbar() }
+        <Dialog open style={{ height: 100, width: 100 }}>
+          <CircularProgress style={{ height: 95, width: 95 }}/>
+        </Dialog>
+        {/* { renderLeftToolbar() }
         { renderEditorContent() }
-        { renderRightToolbar() }
+        { renderRightToolbar() } */}
       </AppLayout>
     );
   }
@@ -840,9 +847,6 @@ const EditorScreen: React.FC<Props> = ({
       pageTitle={ storyData.story?.name ?? "" }
       dataChanged={ dataChanged }
     >
-      <Dialog open>
-        <CircularProgress />
-      </Dialog>
       { renderLeftToolbar() }
       { renderEditorContent() }
       { renderRightToolbar() }

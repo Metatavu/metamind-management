@@ -1,4 +1,4 @@
-import { Box, Drawer, Tabs, Tab } from "@material-ui/core";
+import { Box, Drawer, Tabs, Tab, CircularProgress, Dialog } from "@material-ui/core";
 import Toolbar from "@material-ui/core/Toolbar";
 import * as React from "react";
 import { connect } from "react-redux";
@@ -16,6 +16,7 @@ import { Typography } from "@material-ui/core";
 import Api from "../../../api/api";
 import { useParams } from "react-router-dom";
 import { StoryData } from "../../../constants/types"
+import { selectStory, loadStory, unselectStory, setStoryData } from "../../../actions/story";
 
 /**
  * Interface describing component props
@@ -24,7 +25,12 @@ interface Props {
   history: History;
   keycloak: KeycloakInstance;
   accessToken: AccessToken;
-  storyId: string;
+  selectedStoryId: string;
+  storyData?: StoryData;
+  storyLoading: boolean;
+  selectStory: (storyId: string) => void;
+  loadStory: () => void;
+  setStoryData: (storyData: StoryData) => void;
 }
 
 /**
@@ -32,26 +38,34 @@ interface Props {
  */
 const  PreviewScreen: React.FC<Props> = ({   
   accessToken,
-  keycloak
+  keycloak,
+  selectedStoryId,
+  storyData,
+  storyLoading,
+  selectStory,
+  loadStory,
+  setStoryData
 }) => {
   const { storyId } = useParams<{ storyId: string }>();
 
   const classes = usePreviewStyles(); 
-  const [ storyData, setStoryData ] = React.useState<StoryData>({});
-  const { story, knots, selectedKnot, selectedIntent, intents, trainingMaterial } = storyData;
+  // const [ storyData, setStoryData ] = React.useState<StoryData>({});
 
-  React.useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line
-  }, []);
+  storyId !== selectedStoryId && selectStory(storyId);
 
   /**
    * Fetches knots list for the story
    */
   const fetchData = async () => {
-    if (!accessToken) {
+    if (!accessToken || !selectedStoryId) {
       return;
     }
+
+    if (!storyLoading && storyData){
+      return;
+    }
+
+    loadStory();
 
     const [ story, knotList, intentList, trainingMaterialList ] = await Promise.all([
       Api.getStoriesApi(accessToken).findStory({ storyId }),
@@ -67,6 +81,11 @@ const  PreviewScreen: React.FC<Props> = ({
       trainingMaterial: trainingMaterialList
     });
   }
+
+  React.useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line
+  }, []);
 
   /**
    * Renders left toolbar
@@ -107,6 +126,25 @@ const  PreviewScreen: React.FC<Props> = ({
     setStoryData({ ...storyData, selectedKnot: knot });
   }
 
+  if (storyLoading || !storyData) {
+    // TODO fix Loading
+    return (
+      <AppLayout
+        keycloak={ keycloak }
+        pageTitle={ "Loading" }
+      >
+        <Dialog open style={{ height: 100, width: 100 }}>
+          <CircularProgress style={{ height: 95, width: 95 }}/>
+        </Dialog>
+        {/* { renderLeftToolbar() }
+        { renderEditorContent() }
+        { renderRightToolbar() } */}
+      </AppLayout>
+    );
+  }
+
+  const { story, knots, selectedKnot, selectedIntent, intents, trainingMaterial } = storyData;
+
   return (
     <AppLayout
       storySelected
@@ -131,7 +169,10 @@ const  PreviewScreen: React.FC<Props> = ({
  */
 const mapStateToProps = (state: ReduxState) => ({
   accessToken: state.auth.accessToken as AccessToken,
-  keycloak: state.auth.keycloak as KeycloakInstance
+  keycloak: state.auth.keycloak as KeycloakInstance,
+  selectedStoryId: state.story.selectedStoryId,
+  storyData: state.story.storyData,
+  storyLoading: state.story.storyLoading
 });
 
 /**
@@ -139,6 +180,11 @@ const mapStateToProps = (state: ReduxState) => ({
  *
  * @param dispatch dispatch method
  */
-const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({});
+const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({
+  selectStory: (storyId: string) => dispatch(selectStory(storyId)),
+  loadStory: () => dispatch(loadStory()),
+  setStoryData: (storyData: StoryData) => dispatch(setStoryData(storyData)),
+  unselectStory: () => dispatch(unselectStory())
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(PreviewScreen);
