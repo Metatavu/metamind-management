@@ -1,4 +1,4 @@
-import { Box, Drawer, Tabs, Tab, CircularProgress, Dialog } from "@material-ui/core";
+import { Box, Drawer, Tabs, Tab, CircularProgress, Dialog, Divider } from "@material-ui/core";
 import Toolbar from "@material-ui/core/Toolbar";
 import * as React from "react";
 import { connect } from "react-redux";
@@ -17,6 +17,7 @@ import Api from "../../../api/api";
 import { useParams } from "react-router-dom";
 import { StoryData } from "../../../constants/types"
 import { selectStory, loadStory, unselectStory, setStoryData } from "../../../actions/story";
+// import StoryPreviewView from "../../views/story-preview-view";
 
 /**
  * Interface describing component props
@@ -111,6 +112,39 @@ const  PreviewScreen: React.FC<Props> = ({
           />
         </Box>
       </Drawer>
+    );
+  }
+
+  const renderEditorContent = () => {
+    if (!knots || !intents) {
+      return;
+    }
+
+    return (
+      <Box
+        marginLeft="320px"
+        marginRight="320px"
+        height="100%"
+      >
+        <Toolbar/>
+        <Box className={ classes.previewContainer }>
+          {/* <StoryPreviewView
+            knots={ knots }
+            intents={ intents }
+            // addingKnots={ addingKnots }
+            // centeredKnot={ centeredKnot }
+            // centeredIntent={ centeredIntent }
+            // onAddNode={ onAddNode }
+            // onMoveNode={ onMoveNode }
+            // onRemoveNode={ onRemoveNode }
+            // onAddLink={ onAddLink }
+            // onRemoveLink={ onRemoveLink }
+            // editingEntityInfo={ editingEntityInfo }
+            // onNodeSelectionChange={ onNodeSelectionChange }
+            // onLinkSelectionChange={ onLinkSelectionChange }
+          /> */}
+        </Box>
+      </Box>
     );
   }
 
