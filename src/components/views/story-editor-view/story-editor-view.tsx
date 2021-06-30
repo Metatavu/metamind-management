@@ -32,6 +32,7 @@ interface Props {
   editingEntityInfo: boolean;
   onNodeSelectionChange: (node: CustomNodeModel) => void;
   onLinkSelectionChange: (link: CustomLinkModel) => void;
+  onSelectedEntitiesAmountChange: (value: number) => void;
 }
 
 /**
@@ -52,7 +53,8 @@ const StoryEditorView: React.FC<Props> = ({
   onRemoveLink,
   editingEntityInfo,
   onNodeSelectionChange,
-  onLinkSelectionChange
+  onLinkSelectionChange,
+  onSelectedEntitiesAmountChange
 }) => {
   const classes = useStoryEditorViewStyles();
   const [ newPoint, setNewPoint ] = React.useState<Point>();
@@ -116,13 +118,6 @@ const StoryEditorView: React.FC<Props> = ({
   React.useEffect(() => {
     const engine = engineRef.current;
     const nodes = engine.getModel().getNodes();
-
-    if(knots[0] && knots[0].scope !== KnotScope.Global) {
-      knots[0].scope = KnotScope.Global;
-    }
-    if (knots[1] && knots[1].scope !== KnotScope.Home) {
-      knots[1].scope = KnotScope.Home;
-    }
 
     nodes.forEach(node => knots.every(knot => knot.id !== node.getID()) && engine.getModel().removeNode(node));
     knots.forEach(knot => translateToNode(knot));
@@ -251,6 +246,7 @@ const StoryEditorView: React.FC<Props> = ({
     node.registerListener({
       selectionChanged: (selectionChangedEvent: any) => {
         onNodeSelectionChange(selectionChangedEvent.entity as CustomNodeModel);
+        onSelectedEntitiesAmountChange(engineRef.current.getModel().getSelectedEntities().length);
       },
       positionChanged: ({ entity }: any) => {
         setMovedNode(entity);
@@ -286,6 +282,7 @@ const StoryEditorView: React.FC<Props> = ({
     link.registerListener({
       selectionChanged: (selectionChangedEvent: any) => {
         onLinkSelectionChange(selectionChangedEvent.entity as CustomLinkModel);
+        onSelectedEntitiesAmountChange(engineRef.current.getModel().getSelectedEntities().length);
       }
     });
 

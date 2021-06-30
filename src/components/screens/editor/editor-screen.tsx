@@ -68,6 +68,7 @@ const EditorScreen: React.FC<Props> = ({
   const [ editingTrainingMaterial, setEditingTrainingMaterial ] = React.useState(false);
   const [ selectedTrainingMaterialType, setSelectedTrainingMaterialType ] = React.useState<TrainingMaterialType | null>(null);
   const [ editedTrainingMaterial, setEditedTrainingMaterial ] = React.useState<TrainingMaterial>();
+  const [ selectedEntititiesLength, setSelectedEntitiesLength ] = React.useState(0);
 
   React.useEffect(() => {
     fetchData();
@@ -227,12 +228,12 @@ const EditorScreen: React.FC<Props> = ({
    * 
    * @param node node
    */
-  const onNodeSelectionChange = async (node: CustomNodeModel) => {
-    if (!accessToken || !intents) {
+  const onNodeSelectionChange = (node: CustomNodeModel) => {
+    if (!knots) {
       return;
     }
 
-    if (selectedKnot && node.getID() === selectedKnot.id) {
+    if (selectedEntititiesLength !== 0) {
       setStoryData({
         ...storyData,
         selectedIntent: undefined,
@@ -241,11 +242,7 @@ const EditorScreen: React.FC<Props> = ({
       return;
     }
 
-    console.log("Fired");
-    const knot = await Api.getKnotsApi(accessToken).findKnot({
-      storyId: storyId,
-      knotId: node.getID()
-    });
+    const knot = knots.find(item => item.id === node.getID());
 
     setStoryData({
       ...storyData,
@@ -259,12 +256,12 @@ const EditorScreen: React.FC<Props> = ({
    * 
    * @param link link
    */
-  const onLinkSelectionChange = async (link: CustomLinkModel) => {
-    if (!accessToken || !intents) {
+  const onLinkSelectionChange = (link: CustomLinkModel) => {
+    if (!intents) {
       return;
     }
 
-    if (selectedIntent && link.getID() === selectedIntent.id) {
+    if (selectedEntititiesLength !== 0) {
       setStoryData({
         ...storyData,
         selectedIntent: undefined,
@@ -272,12 +269,8 @@ const EditorScreen: React.FC<Props> = ({
       });
       return;
     }
-    console.log("Fired");
 
-    const intent = await Api.getIntentsApi(accessToken).findIntent({
-      storyId: storyId,
-      intentId: link.getID()
-    });
+    const intent = intents.find(item => item.id === link.getID());
 
     setStoryData({
       ...storyData,
@@ -609,7 +602,7 @@ const EditorScreen: React.FC<Props> = ({
     return (
       <Box
         marginLeft="320px"
-        marginRight={ (selectedKnot || selectedIntent) ? "320px" : "0px" }
+        marginRight={ selectedEntititiesLength !== 0 ? "320px" : "0px" }
         height="100%"
       >
         <Toolbar/>
@@ -632,6 +625,7 @@ const EditorScreen: React.FC<Props> = ({
             editingEntityInfo={ editingEntityInfo }
             onNodeSelectionChange={ onNodeSelectionChange }
             onLinkSelectionChange={ onLinkSelectionChange }
+            onSelectedEntitiesAmountChange = { setSelectedEntitiesLength }
           />
         </Box>
       </Box>
@@ -840,7 +834,7 @@ const EditorScreen: React.FC<Props> = ({
     >
       { renderLeftToolbar() }
       { renderEditorContent() }
-      { (selectedKnot !== undefined || selectedIntent !== undefined) && renderRightToolbar() }
+      { selectedEntititiesLength !== 0 && renderRightToolbar() }
     </AppLayout>
   );
 }
