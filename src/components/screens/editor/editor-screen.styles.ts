@@ -24,6 +24,29 @@ export const useEditorScreenStyles = makeStyles({
   },
   buttonLabel: {
     fontSize: 11
+  },
+
+  knotButton : {
+    backgroundColor: "#121212",
+    border: "1px solid #121212",
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+    "&:hover": {
+      backgroundColor: "#121212",
+      border: `1px solid ${theme.palette.primary.main}`
+    }
+  },
+
+  activeKnotButtonContainer : {
+    display: "flex",
+    flexDirection: "column",
+    color: theme.palette.primary.main
+  },
+
+  inactiveKnotButtonContainer : {
+    display: "flex",
+    flexDirection: "column",
+    color: "#fff"
   }
 
 }, {

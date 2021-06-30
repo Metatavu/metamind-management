@@ -22,6 +22,7 @@ import AccordionItem from "../../generic/accordion-item";
 import TrainingSelectionOptions from "../../intent-components/training-selection-options/training-selection-options";
 import QuickResponseButton from "../../intent-components/quick-response-button/quick-response-button";
 import EditorUtils from "../../../utils/editor";
+import KnotIcon from "../../../resources/svg/knot-icon";
 
 /**
  * Component props
@@ -624,10 +625,18 @@ const EditorScreen: React.FC<Props> = ({
   const renderActionButtons = () => {
     return (
       <Button
+        className= { classes.knotButton }
         variant="contained"
         onClick={ () => setAddingKnots(!addingKnots) }
-      >
-        { strings.editorScreen.add.knot }
+      > 
+        <div className={ addingKnots ? classes.activeKnotButtonContainer : classes.inactiveKnotButtonContainer }>
+          <Box width="100%" color="inherit">
+            <KnotIcon htmlColor={ "inherit" }/>
+          </Box>
+          <Box width="100%">
+            { strings.editorScreen.add.knot }
+          </Box>
+        </div>
       </Button>
     );
   }
