@@ -23,6 +23,18 @@ export const SELECT_STORY = "SELECT_STORY";
 export type SELECT_STORY = typeof SELECT_STORY;
 
 /**
+ * Load a story
+ */
+export const LOAD_STORY = "LOAD_STORY";
+export type LOAD_STORY = typeof LOAD_STORY;
+
+/**
+ * Set the story
+ */
+export const SET_STORY = "SET_STORY";
+export type SET_STORY = typeof SET_STORY;
+
+/**
  * Unselect a story
  */
 export const UNSELECT_STORY = "UNSELECT_STORY";

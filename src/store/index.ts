@@ -13,6 +13,9 @@ export const rootReducer = combineReducers({
   story: storyReducer,
 });
 
+/**
+ * Type for Redux state 
+ */
 export type ReduxState = ReturnType<typeof rootReducer>;
 
 /**

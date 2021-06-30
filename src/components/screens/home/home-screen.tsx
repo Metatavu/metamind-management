@@ -282,8 +282,8 @@ const mapStateToProps = (state: ReduxState) => ({
  * @param dispatch dispatch method
  */
 const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({
-  selectStory: (storyId: string) => {dispatch(selectStory(storyId))},
-  unselectStory: () => {dispatch(unselectStory())},
+  selectStory: (storyId: string) => dispatch(selectStory(storyId)),
+  unselectStory: () => dispatch(unselectStory())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(HomeScreen));

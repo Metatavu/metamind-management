@@ -13,6 +13,9 @@ import KnotPanel from "../../knot-components/knot-list/knot-list";
 import { Story, Knot, Intent, TrainingMaterial } from "../../../generated/client/models";
 import strings from "../../../localization/strings";
 import { Typography } from "@material-ui/core";
+import Api from "../../../api/api";
+import { useParams } from "react-router-dom";
+import { StoryData } from "../../../constants/types"
 
 /**
  * Interface describing component props
@@ -25,25 +28,45 @@ interface Props {
 }
 
 /**
- * Story data
- */
-interface StoryData {
-  story?: Story;
-  knots?: Knot[];
-  intents?: Intent[];
-  selectedKnot?: Knot;
-  selectedIntent? : Intent;
-  trainingMaterial?: TrainingMaterial[];
-}
-
-/**
  * Preview screen component
  */
-const  PreviewScreen: React.FC<Props> = ({ keycloak }) => {
-  const classes = usePreviewStyles(); 
+const  PreviewScreen: React.FC<Props> = ({   
+  accessToken,
+  keycloak
+}) => {
+  const { storyId } = useParams<{ storyId: string }>();
 
+  const classes = usePreviewStyles(); 
   const [ storyData, setStoryData ] = React.useState<StoryData>({});
   const { story, knots, selectedKnot, selectedIntent, intents, trainingMaterial } = storyData;
+
+  React.useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line
+  }, []);
+
+  /**
+   * Fetches knots list for the story
+   */
+  const fetchData = async () => {
+    if (!accessToken) {
+      return;
+    }
+
+    const [ story, knotList, intentList, trainingMaterialList ] = await Promise.all([
+      Api.getStoriesApi(accessToken).findStory({ storyId }),
+      Api.getKnotsApi(accessToken).listKnots({ storyId }),
+      Api.getIntentsApi(accessToken).listIntents({ storyId }),
+      Api.getTrainingMaterialApi(accessToken).listTrainingMaterials({ storyId })
+    ]);
+
+    setStoryData({
+      story: story,
+      knots: knotList,
+      intents: intentList,
+      trainingMaterial: trainingMaterialList
+    });
+  }
 
   /**
    * Renders left toolbar
@@ -86,14 +109,15 @@ const  PreviewScreen: React.FC<Props> = ({ keycloak }) => {
 
   return (
     <AppLayout
+      storySelected
+      storyId={ storyId }
       keycloak={ keycloak }
-      pageTitle="Story name"
+      pageTitle={ storyData.story?.name ?? "" }
       dataChanged={ true }
     >
       { renderLeftToolbar() }
       <Box marginLeft="320px">
         {/* <MessageList /> */}
-
       </Box>
     </AppLayout>
   );

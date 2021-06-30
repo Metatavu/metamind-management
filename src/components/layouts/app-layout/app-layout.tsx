@@ -20,7 +20,7 @@ interface Props extends WithStyles<typeof styles> {
   dataChanged?: boolean;
   storySelected?: boolean;
   pageTitle: string;
-  storyId: string | null;
+  storyId?: string;
   keycloak: KeycloakInstance;
   children: react.ReactNode;
 }
@@ -196,15 +196,4 @@ class AppLayout extends React.Component<Props, State> {
   }
 }
 
-/**
- * Redux mapper for mapping store state to component props
- *
- * @param state store state
- * @returns state from props
- */
-const mapStateToProps = (state: ReduxState) => ({
-  storyId: state.story.storyId,
-  storySelected: state.story.storySelected,
-});
-
-export default connect(mapStateToProps)(withStyles(styles)(AppLayout));
+export default withStyles(styles)(AppLayout);

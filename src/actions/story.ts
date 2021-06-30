@@ -1,4 +1,5 @@
 import * as ActionTypes from "../constants/actionTypes";
+import { StoryData } from "../constants/types";
 
 /**
  * Interface for select story type
@@ -6,6 +7,21 @@ import * as ActionTypes from "../constants/actionTypes";
 export interface SelectStoryAction {
   type: ActionTypes.SELECT_STORY;
   storyId: string;
+}
+
+/**
+ * Interface for story loading
+ */
+export interface LoadStoryAction {
+  type: ActionTypes.LOAD_STORY;
+}
+
+/**
+ * Interface for setting story
+ */
+export interface SetStoryDataAction {
+  type: ActionTypes.SET_STORY;
+  storyData?: StoryData;
 }
 
 /**
@@ -28,6 +44,27 @@ export function selectStory(storyId: string): SelectStoryAction {
 }
 
 /**
+ * method for loading the selected story
+ */
+export function loadStory(): LoadStoryAction {
+  return {
+    type: ActionTypes.LOAD_STORY
+  }
+}
+
+/**
+ *  Method for setting loaded story
+ * 
+ * @param storyData story data
+ */
+export function setStoryData(storyData: StoryData): SetStoryDataAction {
+  return {
+    type: ActionTypes.SET_STORY,
+    storyData: storyData
+  }
+}
+
+/**
  * Story unselect method
  */
 export function unselectStory(): UnselectStoryAction {
@@ -36,4 +73,4 @@ export function unselectStory(): UnselectStoryAction {
   };
 }
 
-export type StoryAction = SelectStoryAction | UnselectStoryAction;
+export type StoryAction = SelectStoryAction | LoadStoryAction | SetStoryDataAction | UnselectStoryAction;
