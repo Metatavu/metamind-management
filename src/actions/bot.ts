@@ -53,7 +53,7 @@ export function botOrUserResponse(messageData: MessageData): BotOrUserResponseAc
 /**
  * Reset bot method
  */
-export function BotReset(): BotResetAction {
+export function botReset(): BotResetAction {
   return {
     type: ActionTypes.BOT_RESET
   };
@@ -62,7 +62,7 @@ export function BotReset(): BotResetAction {
 /**
  * Bot interrupt method
  */
-export function BotInterrupted(): BotInterruptedAction {
+export function botInterrupted(): BotInterruptedAction {
   return {
     type: ActionTypes.BOT_INTERRUPTED
   };
