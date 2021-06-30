@@ -14,6 +14,14 @@ export const useEditorScreenStyles = makeStyles({
       color: "#fff"
     }
   },
+
+  headerButtonsContainer : {
+    display: "flex",
+    width: "100%",
+    height: "100%",
+    justifyContent: "space-between"
+  },
+
   editorContainer: {
     // 100% height substracted with two toolbars and extra spacing for tight fit
     height: `calc(100% - ${toolbarHeight}px - ${toolbarHeight}px - ${theme.spacing(2)}px)`,
@@ -24,6 +32,25 @@ export const useEditorScreenStyles = makeStyles({
   },
   buttonLabel: {
     fontSize: 11
+  },
+
+  zoomButton : {
+    backgroundColor: "#121212",
+    border: "1px solid #121212",
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+    color: "#fff",
+    "&:hover": {
+      backgroundColor: "#121212",
+      border: `1px solid ${theme.palette.primary.main}`,
+      color: theme.palette.primary.main
+    }
+  },
+
+  zoomButtonContainer : {
+    display: "flex",
+    flexDirection: "column",
+    color: "inherit"
   }
 
 }, {
