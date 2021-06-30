@@ -8,13 +8,16 @@ import { MessageData } from "metamind-metatavu-bot/src/types";
 import { botOrUserResponse, messagesEndUpdate } from "metamind-metatavu-bot/src/actions";
 import MessageList from "metamind-metatavu-bot/src/components/message-list/message-list"
 import MessageInput from "metamind-metatavu-bot/src/components/message-input/message-input"
+import { connect } from "react-redux";
 
 
 /**
  * Interface describing component props
  */
 interface Props {
-
+  messageDatas: state.messageDatas
+  conversationStarted: state.conversationStarted,
+  messagesEnd: state.messagesEnd
 }
 
 /**
@@ -58,32 +61,29 @@ const StoryPreviewView: React.FC<Props> = ({
   );
 }
 
-// /**
-//  * Redux mapper for mapping store state to component properties
-//  * 
-//  * @param state store state
-//  */
-// const mapStateToProps = (state: StoreState) => ({
-//   session: state.session,
-//   messageDatas: state.messageDatas,
-//   conversationStarted: state.conversationStarted,
-//   accessToken: state.accessToken,
-//   messagesEnd: state.messagesEnd
-// });
+/**
+ * Redux mapper for mapping store state to component properties
+ * 
+ * @param state store state
+ */
+const mapStateToProps = (state: StoreState) => ({
+  messageDatas: state.messageDatas,
+  conversationStarted: state.conversationStarted,
+  messagesEnd: state.messagesEnd
+});
 
-// /**
-//  * Redux mapper for mapping component dispatches 
-//  * 
-//  * @param dispatch dispatch method
-//  */
-// const mapDispatchToProps = (dispatch: Dispatch<actions.RootAction>) => ({
-//   onBotConnected: (session: Session) => dispatch(actions.botConnected(session)),
-//   botOrUserResponse: (messageData: MessageData) => dispatch(actions.botOrUserResponse(messageData)),
-//   startConversation: () => dispatch(actions.conversationStart()),
-//   onBotReset: () => dispatch(actions.BotReset()),
-//   onBotInterrupt: () => dispatch(actions.BotInterrupted()),
-//   onAccessTokenUpdate: (accessToken: AccessToken) => dispatch(actions.accessTokenUpdate(accessToken)),
-//   messagesEndUpdate: (messagesEnd?: HTMLDivElement) => dispatch(actions.messagesEndUpdate(messagesEnd))
-// });
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+const mapDispatchToProps = (dispatch: Dispatch<actions.RootAction>) => ({
+  botOrUserResponse: (messageData: MessageData) => dispatch(actions.botOrUserResponse(messageData)),
+  startConversation: () => dispatch(actions.conversationStart()),
+  onBotReset: () => dispatch(actions.BotReset()),
+  onBotInterrupt: () => dispatch(actions.BotInterrupted()),
+  onAccessTokenUpdate: (accessToken: AccessToken) => dispatch(actions.accessTokenUpdate(accessToken)),
+  messagesEndUpdate: (messagesEnd?: HTMLDivElement) => dispatch(actions.messagesEndUpdate(messagesEnd))
+});
 
-export default StoryPreviewView;
+export default connect(mapStateToProps, mapDispatchToProps)(StoryPreviewView);
