@@ -1,4 +1,5 @@
 import { createStyles } from "@material-ui/core";
+import theme from "../../../theme/theme";
 
 export const styles = createStyles({
 
@@ -8,11 +9,14 @@ export const styles = createStyles({
   },
 
   listItem: {
-    padding: 0
+    display: "flex",
+    padding: 0,
+    alignItems: "center"
   },
-  
+
   autoComplete: {
-    width: "100%"
+    width: "100%",
+    paddingBottom: 20
   }
 
 });
