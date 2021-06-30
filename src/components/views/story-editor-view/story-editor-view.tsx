@@ -24,6 +24,8 @@ interface Props {
   addingKnots: boolean;
   centeredKnot?: Knot;
   centeredIntent?: Intent;
+  zoom100: boolean;
+  setZoom100: (value: boolean) => void;
   onAddNode: (node: CustomNodeModel) => void;
   onMoveNode: (node: CustomNodeModel, knot?: Knot) => void;
   onRemoveNode: (nodeId: string) => void;
@@ -45,6 +47,8 @@ const StoryEditorView: React.FC<Props> = ({
   addingKnots,
   centeredKnot,
   centeredIntent,
+  zoom100,
+  setZoom100,
   onAddNode,
   onMoveNode,
   onRemoveNode,
@@ -70,6 +74,21 @@ const StoryEditorView: React.FC<Props> = ({
     addInitialData();
     // eslint-disable-next-line
   }, []);
+
+  /**
+   * Effect that zooms diagram to 100%
+   */
+  React.useEffect(() => {
+    if(!zoom100) {
+      return;
+    }
+    
+    engineRef.current.getModel().setZoomLevel(100);
+    engineRef.current.zoomToFit();
+    setZoom100(false);
+
+    // eslint-disable-next-line
+  }, [ zoom100 ]);
 
   /**
    * Effect that centers the canvas to certain coordinates and selects a knot
@@ -116,13 +135,6 @@ const StoryEditorView: React.FC<Props> = ({
   React.useEffect(() => {
     const engine = engineRef.current;
     const nodes = engine.getModel().getNodes();
-
-    if(knots[0] && knots[0].scope !== KnotScope.Global) {
-      knots[0].scope = KnotScope.Global;
-    }
-    if (knots[1] && knots[1].scope !== KnotScope.Home) {
-      knots[1].scope = KnotScope.Home;
-    }
 
     nodes.forEach(node => knots.every(knot => knot.id !== node.getID()) && engine.getModel().removeNode(node));
     knots.forEach(knot => translateToNode(knot));

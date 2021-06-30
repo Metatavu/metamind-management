@@ -22,6 +22,7 @@ import AccordionItem from "../../generic/accordion-item";
 import TrainingSelectionOptions from "../../intent-components/training-selection-options/training-selection-options";
 import QuickResponseButton from "../../intent-components/quick-response-button/quick-response-button";
 import EditorUtils from "../../../utils/editor";
+import FullscreenIcon from '@material-ui/icons/Fullscreen';
 
 /**
  * Component props
@@ -62,6 +63,7 @@ const EditorScreen: React.FC<Props> = ({
   const [ leftToolBarIndex, setLeftToolBarIndex ] = React.useState(0);
   const [ rightToolBarIndex, setRightToolBarIndex ] = React.useState(0);
   const [ addingKnots, setAddingKnots ] = React.useState(false);
+  const [ zoom100, setZoom100 ] = React.useState(false);
   const [ dataChanged, /* setDataChanged */ ] = React.useState(false);
   const [ editingEntityInfo, setEditingEntityInfo ] = React.useState(false);
   const [ editingQuickResponse, setEditingQuickResponse ] = React.useState(false);
@@ -604,6 +606,8 @@ const EditorScreen: React.FC<Props> = ({
             addingKnots={ addingKnots }
             centeredKnot={ centeredKnot }
             centeredIntent={ centeredIntent }
+            zoom100={ zoom100 }
+            setZoom100={ setZoom100 }
             onAddNode={ onAddNode }
             onMoveNode={ onMoveNode }
             onRemoveNode={ onRemoveNode }
@@ -623,12 +627,28 @@ const EditorScreen: React.FC<Props> = ({
    */
   const renderActionButtons = () => {
     return (
-      <Button
-        variant="contained"
-        onClick={ () => setAddingKnots(!addingKnots) }
-      >
-        { strings.editorScreen.add.knot }
-      </Button>
+      <div className={ classes.headerButtonsContainer }>
+        <Button
+          variant="contained"
+          onClick={ () => setAddingKnots(!addingKnots) }
+        >
+          { strings.editorScreen.add.knot }
+        </Button>
+        <Button
+          className={ classes.zoomButton }
+          variant="contained"
+          onClick={ () => setZoom100(true) }
+        >
+          <div className={ classes.zoomButtonContainer }>
+            <Box width="100%" color="inherit">
+              <FullscreenIcon htmlColor={ "inherit" }/>
+            </Box>
+            <Box width="100%">
+            { "100%" }
+            </Box>
+          </div>
+        </Button>
+      </div>
     );
   }
 
