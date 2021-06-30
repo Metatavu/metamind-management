@@ -1,44 +1,46 @@
-import { AuthAction } from "../actions/auth";
-import { LOGIN, LOGOUT } from "../constants/actionTypes";
-import { KeycloakInstance } from "keycloak-js";
-import { AccessToken } from "../types";
+import { MessageData } from "../../metamind-metatavu-bot/src/types";
+import { BotAction } from "../actions/bot";
+import { BOT_INTERRUPTED, BOT_OR_USER_RESPONSE, BOT_RESET, CONVERSATION_START, MESSAGES_END_UPDATE } from "../constants/actionTypes";
 
 /**
- * Redux auth state
+ * Redux bot state
  */
-export interface AuthState {
-  accessToken?: AccessToken;
-  keycloak?: KeycloakInstance;
+export interface BotState {
+  messageDatas: MessageData[];
+  conversationStarted: boolean;
+  messagesEnd?: HTMLDivElement;
 }
 
 /**
- * Initial auth state
+ * Initial bot state
  */
-const initialState: AuthState = {
-  accessToken: undefined,
-  keycloak: undefined
+const initialState: BotState = {
+  messageDatas: [],
+  conversationStarted: false,
+  messagesEnd: undefined
 }
 
 /**
- * Redux reducer for authorization
+ * Redux reducer for all the states
  *
- * @param state auth state
- * @param action auth action
- * @returns changed auth state
+ * @param state bot state
+ * @param action bot action
+ * @returns changed bot state
  */
-export function authReducer(state: AuthState = initialState, action: AuthAction): AuthState {
-  switch (action.type) {
-    case LOGIN:
-      const keycloak = action.keycloak;
-      const { token, tokenParsed } = keycloak;
-      const userId = tokenParsed?.sub;
-      const accessToken = userId && token ?
-        { token, userId } :
-        undefined;
+export function botReducer(state: BotState = initialState, action: BotAction): BotState {
 
-      return { ...state, keycloak: keycloak, accessToken: accessToken };
-    case LOGOUT:
-      return { ...state, keycloak: undefined, accessToken: undefined };
+  switch (action.type) {
+    case BOT_OR_USER_RESPONSE:
+      return { ...state, messageDatas: state.messageDatas.filter(messageData => !messageData.id.startsWith("temp")).concat([action.messageData])};
+    case BOT_INTERRUPTED:
+      return { ...state, messageDatas: state.messageDatas.filter(messageData => !messageData.id.startsWith("temp"))};
+    case CONVERSATION_START:
+      return { ...state, conversationStarted: true};
+    case BOT_RESET:
+      return { ...state, messageDatas: [], conversationStarted: false };
+    case MESSAGES_END_UPDATE:
+      const messagesEnd = action.messagesEnd;
+      return { ...state, messagesEnd }
     default:
       return state;
   }
