@@ -64,7 +64,11 @@
       "none": "Tyhjä",
       "selectTrainingMaterial": "Valitse harjoitusmateriaali",
       "createNew": "Luo uusi",
-      "name": "Nimi"
+      "name": "Nimi",
+      "intentsTab": {
+        "incoming": "Saapuvat",
+        "outcoming": "Lähtevät"
+      }
     },
     "intents": {
       "normalIntents": "Normaalit aikomukset",

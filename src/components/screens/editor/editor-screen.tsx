@@ -6,7 +6,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../../../api/api";
-import { TokenizerType, KnotType, Story, Knot, Intent, IntentType, TrainingMaterial, TrainingMaterialType, TrainingMaterialVisibility, IntentTrainingMaterials } from "../../../generated/client/models";
+import { TokenizerType, KnotType, Story, Knot, Intent, IntentType, TrainingMaterial, TrainingMaterialType, TrainingMaterialVisibility } from "../../../generated/client/models";
 import strings from "../../../localization/strings";
 import { ReduxActions, ReduxState } from "../../../store";
 import { AccessToken } from "../../../types";
@@ -22,6 +22,7 @@ import AccordionItem from "../../generic/accordion-item";
 import TrainingSelectionOptions from "../../intent-components/training-selection-options/training-selection-options";
 import QuickResponseButton from "../../intent-components/quick-response-button/quick-response-button";
 import EditorUtils from "../../../utils/editor";
+import KnotLinking from "../../knot-components/knot-linking/knot-linking";
 
 /**
  * Component props
@@ -804,7 +805,17 @@ const EditorScreen: React.FC<Props> = ({
    * Renders right toolbar linking tab
    */
   const renderLinkingTab = () => {
-    return null;
+    if (!selectedKnot || !knots || !intents) {
+      return null;
+    }
+
+    return (
+      <KnotLinking
+        selectedKnot={ selectedKnot }
+        knots={ knots }
+        intents={ intents }
+      />
+    );
   }
 
   if (!keycloak) {

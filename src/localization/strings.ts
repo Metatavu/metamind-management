@@ -83,6 +83,10 @@ export interface IStrings extends LocalizedStringsMethods {
       selectTrainingMaterial: string;
       createNew: string;
       name: string;
+      intentsTab: {
+        incoming: string;
+        outcoming: string;
+      };
     };
     intents: {
       normalIntents: string;

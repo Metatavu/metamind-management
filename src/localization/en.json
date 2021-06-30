@@ -64,7 +64,11 @@
       "none": "None",
       "selectTrainingMaterial": "Select training material",
       "createNew": "Create new",
-      "name": "Name"
+      "name": "Name",
+      "intentsTab": {
+        "incoming": "Incoming",
+        "outcoming": "Outcoming"
+      }
     },
     "intents": {
       "normalIntents": "Normal intents",
