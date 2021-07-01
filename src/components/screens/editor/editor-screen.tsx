@@ -58,7 +58,6 @@ const EditorScreen: React.FC<Props> = ({
   const { storyId } = useParams<{ storyId: string }>();
   const classes = useEditorScreenStyles();
 
-  // const [ storyData, setStoryData ] = React.useState<StoryData>({});
   const [ centeredKnot, setCenteredKnot ] = React.useState<Knot | undefined>(undefined);
   const [ centeredIntent, setCenteredIntent ] = React.useState<Intent | undefined>(undefined);
   const [ leftToolBarIndex, setLeftToolBarIndex ] = React.useState(0);

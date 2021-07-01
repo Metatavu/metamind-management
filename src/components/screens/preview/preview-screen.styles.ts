@@ -11,4 +11,6 @@ export const usePreviewStyles = makeStyles({
     display: "flex",
     margin: "auto"
   }
+}, {
+  name: "preview-screen"
 })

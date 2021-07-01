@@ -52,7 +52,6 @@ const  PreviewScreen: React.FC<Props> = ({
   const { storyId } = useParams<{ storyId: string }>();
 
   const classes = usePreviewStyles(); 
-  // const [ storyData, setStoryData ] = React.useState<StoryData>({});
 
   storyId !== selectedStoryId && selectStory(storyId);
 
