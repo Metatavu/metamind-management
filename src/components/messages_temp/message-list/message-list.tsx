@@ -182,13 +182,14 @@ class MessageList extends React.Component<Props, State> {
     const messageItems = messageDatas.map(messageData => messageData.isBot ? this.renderBotMessage(messageData) : this.renderUserMessage(messageData));
     const quickReplyItems = quickResponses.map(this.renderQuickReply);
 
+    console.log(quickReplyItems)
     return (
       <Box className={ classes.messageListContainer }>
         { this.state.imageOpen && this.renderImageDisplay() }
         <Box style={{ position: "relative", width: "100%" }}>
           { messageItems }
         </Box>
-        { quickResponses.length && !waitingForBot &&
+        { quickResponses.length != 0 && !waitingForBot &&
           <Box className={ classes.quickReplyItems }>
             { quickReplyItems }
           </Box>

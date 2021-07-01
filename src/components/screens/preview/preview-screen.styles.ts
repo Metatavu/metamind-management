@@ -7,5 +7,8 @@ export const usePreviewStyles = makeStyles({
   previewContainer: {
     // 100% height substracted with two toolbars and extra spacing for tight fit
     height: `calc(100% - ${toolbarHeight}px - ${theme.spacing(2)}px)`,
+    width: "50%",
+    display: "flex",
+    margin: "auto"
   }
 })

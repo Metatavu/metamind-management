@@ -8,6 +8,7 @@ import { ReduxActions, ReduxState } from "../../../store";
 import { Dispatch } from "react";
 import { botInterrupted, botOrUserResponse, botReset, conversationStart, messagesEndUpdate } from "../../../actions/bot";
 import { StoryData } from "../../../constants/types";
+import { Box } from "@material-ui/core";
 
 /**
  * Interface describing component props
@@ -68,8 +69,25 @@ const StoryPreviewView: React.FC<Props> = ({
   /**
    * Load the story
    */
-  const loadData = async () => {
+  const loadData = () => {
     // TODO
+    botOrUserResponse({
+      content: "INIT",
+      id: "5b097404-4c4d-4a32-8d64-87b1ebfca5d3-message",
+      isBot: false
+    });
+
+    botOrUserResponse({
+      content: "Hei! <br>Nimeni on Elykäs ja olen ELY-keskuksen kevyellä tekoälyllä höystetty chatbot. ",
+      id: "5b097404-4c4d-4a32-8d64-87b1ebfca5d3-response-0",
+      isBot: true
+    });
+
+    botOrUserResponse({
+      content: "Kyllä",
+      id: "2968ce0c-8d5e-4dec-9458-9a6ad2202c34-message",
+      isBot: false
+    })
   }
 
   const globalQuickResponses: string[] = [];
@@ -77,30 +95,35 @@ const StoryPreviewView: React.FC<Props> = ({
    * Component render
    */
   return (
-    <div style={{ width: "100%", height: "100%" }}>
-      <MessageList
-        messageDatas={ messageDatas }
-        messagesEnd={ messagesEnd }
-        waitingForBot={ waitingForBot }
-        conversationStarted={ conversationStarted } 
-        quickResponses={ quickResponses }
-        startConversation={ conversationStart }
-        onSendMessage={ sendMessage }
-        onReset={ onBotReset }
-        onWaitingForBotChange={ setWaitingForBot }
-        userResponse={ botOrUserResponse }
-        messagesEndUpdate={ messagesEndUpdate }
-      />
-      <MessageInput
-        messagesEnd={ messagesEnd }
-        waitingForBot={ waitingForBot }
-        globalQuickResponses={ globalQuickResponses }
-        hint={ hint || "Sano jotain..." }
-        onSendMessage={ sendMessage }
-        conversationStarted={ conversationStarted } 
-        onReset={ onBotReset }
-        onRestartConversation={ restartConversation }
-      />
+    <div className={ classes.root }>
+      <Box className={ classes.messageListBox }>
+        <MessageList
+          messageDatas={ messageDatas }
+          messagesEnd={ messagesEnd }
+          waitingForBot={ waitingForBot }
+          conversationStarted={ conversationStarted } 
+          quickResponses={ quickResponses }
+          startConversation={ conversationStart }
+          onSendMessage={ sendMessage }
+          onReset={ onBotReset }
+          onWaitingForBotChange={ setWaitingForBot }
+          userResponse={ botOrUserResponse }
+          messagesEndUpdate={ messagesEndUpdate }
+        />
+      </Box>
+      <Box className={ classes.messageInputBox }>
+        <MessageInput
+          inputOnly
+          messagesEnd={ messagesEnd }
+          waitingForBot={ waitingForBot }
+          globalQuickResponses={ globalQuickResponses }
+          hint={ hint || "Sano jotain..." }
+          onSendMessage={ sendMessage }
+          conversationStarted={ conversationStarted } 
+          onReset={ onBotReset }
+          onRestartConversation={ restartConversation }
+        />
+      </Box>
     </div>
   );
 }

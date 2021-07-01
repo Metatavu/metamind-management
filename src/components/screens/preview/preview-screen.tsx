@@ -116,21 +116,22 @@ const  PreviewScreen: React.FC<Props> = ({
     );
   }
 
-  const renderEditorContent = () => {
+  const renderPreviewContent = () => {
     if (!knots || !intents) {
       return;
     }
 
     return (
+      // TODO fix the absolute margin
       <Box
         marginLeft="320px"
-        marginRight="320px"
         height="100%"
       >
         <Toolbar/>
         <Box className={ classes.previewContainer }>
           <StoryPreviewView
-          storyData={ storyData }/>
+            storyData={ storyData }
+          />
         </Box>
       </Box>
     );
@@ -176,9 +177,7 @@ const  PreviewScreen: React.FC<Props> = ({
       dataChanged={ true }
     >
       { renderLeftToolbar() }
-      <Box marginLeft="320px">
-        { renderEditorContent() }
-      </Box>
+      { renderPreviewContent() }
     </AppLayout>
   );
 }

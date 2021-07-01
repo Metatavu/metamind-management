@@ -7,6 +7,7 @@ import { styles } from "./message-input.style";
  * Interface describing component properties
  */
 interface Props extends WithStyles<typeof styles>{
+  inputOnly: boolean;
   messagesEnd?: HTMLDivElement;
   conversationStarted: boolean;
   waitingForBot: boolean;
@@ -43,29 +44,39 @@ class MessageInput extends React.Component<Props, State> {
    * Component render method
    */
   public render() {
-    const { hint, classes, waitingForBot } = this.props;
+    const { inputOnly, hint, classes, waitingForBot } = this.props;
     const { pendingMessage } = this.state;
+
+    const input = () => (
+      <Box style={{ position: "relative" }}>
+        <OutlinedInput
+          fullWidth
+          className={ classes.messageInput }
+          placeholder={ hint }
+          value={ pendingMessage }
+          onChange={ this.onPendingMessageChange }
+          onKeyPress={ this.handleInputKeyPress }
+          onFocus={ () => setTimeout(this.scrollToBottom, 300) }
+        />
+        <IconButton
+          color="primary"
+          className={ classes.messageSend }
+          disabled={ waitingForBot } 
+          onClick={ this.onSendButtonClick }
+        >
+          <SendIcon/>
+        </IconButton>
+      </Box>
+    )
+
+    if (inputOnly) {
+      return input();
+    }
 
     return (
       <Box mt={ 2 } className={ classes.root }>  
         <Box className={ classes.messageInputContainer }>
-          <OutlinedInput
-            fullWidth
-            className={ classes.messageInput }
-            placeholder={ hint }
-            value={ pendingMessage }
-            onChange={ this.onPendingMessageChange }
-            onKeyPress={ this.handleInputKeyPress }
-            onFocus={ () => setTimeout(this.scrollToBottom, 300) }
-          />
-          <IconButton
-            color="primary"
-            className={ classes.messageSend }
-            disabled={ waitingForBot } 
-            onClick={ this.onSendButtonClick }
-          >
-            <SendIcon/>
-          </IconButton>
+          { input() }
         </Box>
         <Box>
           { this.renderGlobalQuickResponses() }

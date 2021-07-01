@@ -2,9 +2,20 @@ import { makeStyles } from "@material-ui/core/styles";
 
 export const useStoryPreviewViewStyles = makeStyles({
 
-  canvas: {
-    height: "100vh"
-  }
+  root: {
+    width: "100%",
+    alignSelf: "center"
+  },
+
+  messageListBox: {
+    background: "#fff",
+  },
+
+  messageInputBox: {
+    "& div div": {
+      background: "#fff"
+    }
+  },
 
 }, {
   name: "story-editor-view"

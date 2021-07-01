@@ -1,5 +1,5 @@
 import { createStyles } from "@material-ui/core";
-import theme from "metamind-metatavu-bot/src/theme/theme";
+import theme from "../../../theme/theme";
 
 export const styles = createStyles({
 
