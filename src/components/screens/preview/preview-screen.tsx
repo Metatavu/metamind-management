@@ -19,13 +19,14 @@ import { StoryData } from "../../../constants/types"
 import { selectStory, loadStory, unselectStory, setStoryData } from "../../../actions/story";
 import { MessageData } from "../../../../metamind-metatavu-bot/src/types";
 import StoryPreviewView from "../../views/story-preview-view";
+import Loading from "../../generic/loading-item/loading-item";
 
 /**
  * Interface describing component props
  */
 interface Props {
   history: History;
-  keycloak: KeycloakInstance;
+  keycloak?: KeycloakInstance;
   accessToken: AccessToken;
   selectedStoryId: string;
   storyData?: StoryData;
@@ -143,27 +144,36 @@ const  PreviewScreen: React.FC<Props> = ({
    * @param knot knot
    */
   const onKnotClick = (knot: Knot) => {
+    // TODO make bot responsive
     if (!knot?.coordinates?.x || !knot?.coordinates?.y) {
       return;
     }
     setStoryData({ ...storyData, selectedKnot: knot });
   }
 
-  if (storyLoading || !storyData) {
-    // TODO fix Loading
+
+  if (!keycloak) {
+    return null;
+  }
+
+  /**
+   * Renders loading
+   */
+  const renderLoading = () => {
     return (
       <AppLayout
         keycloak={ keycloak }
         pageTitle={ "Loading" }
       >
-        <Dialog open style={{ height: 100, width: 100 }}>
-          <CircularProgress style={{ height: 95, width: 95 }}/>
-        </Dialog>
-        {/* { renderLeftToolbar() }
-        { renderEditorContent() }
-        { renderRightToolbar() } */}
+        <Box style={{ height: "100%", width: "100%", alignItems: "center", justifyContent: "center", display: "flex" }}>
+          <Loading />
+        </Box>
       </AppLayout>
     );
+  }
+
+  if (storyLoading || !storyData) {
+    return renderLoading();
   }
 
   const { story, knots, selectedKnot, selectedIntent, intents, trainingMaterial } = storyData;

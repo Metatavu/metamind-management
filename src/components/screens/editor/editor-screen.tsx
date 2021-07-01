@@ -24,6 +24,7 @@ import QuickResponseButton from "../../intent-components/quick-response-button/q
 import EditorUtils from "../../../utils/editor";
 import { StoryData } from "../../../constants/types"
 import { selectStory, loadStory, unselectStory, setStoryData } from "../../../actions/story";
+import Loading from "../../generic/loading-item";
 
 /**
  * Component props
@@ -820,21 +821,24 @@ const EditorScreen: React.FC<Props> = ({
     return null;
   }
 
-  if (storyLoading || !storyData) {
-    // TODO fix Loading
+  /**
+   * Renders loading
+   */
+  const renderLoading = () => {
     return (
       <AppLayout
         keycloak={ keycloak }
         pageTitle={ "Loading" }
       >
-        <Dialog open style={{ height: 100, width: 100 }}>
-          <CircularProgress style={{ height: 95, width: 95 }}/>
-        </Dialog>
-        {/* { renderLeftToolbar() }
-        { renderEditorContent() }
-        { renderRightToolbar() } */}
+        <Box style={{ height: "100%", width: "100%", alignItems: "center", justifyContent: "center", display: "flex" }}>
+          <Loading />
+        </Box>
       </AppLayout>
     );
+  }
+
+  if (storyLoading || !storyData) {
+    return renderLoading();
   }
 
   const { story, knots, selectedKnot, selectedIntent, intents, trainingMaterial } = storyData;
