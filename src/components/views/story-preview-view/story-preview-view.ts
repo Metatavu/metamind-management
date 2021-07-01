@@ -18,5 +18,5 @@ export const useStoryPreviewViewStyles = makeStyles({
   },
 
 }, {
-  name: "story-editor-view"
+  name: "story-preview-view"
 });

@@ -63,14 +63,19 @@ const StoryPreviewView: React.FC<Props> = ({
    * Restart the converstation
    */
   const restartConversation = () => {
-    // TODO
+    // TODO 
   }
 
   /**
    * Load the story
    */
   const loadData = () => {
-    // TODO
+    console.log(messageDatas)
+    if (messageDatas.length != 0) {
+      return;
+    }
+    
+    // TODO load the actual data
     botOrUserResponse({
       content: "INIT",
       id: "5b097404-4c4d-4a32-8d64-87b1ebfca5d3-message",
