@@ -6,11 +6,7 @@ import MessageInput from "metamind-metatavu-bot/src/components/message-input/mes
 import { connect } from "react-redux";
 import { ReduxActions, ReduxState } from "../../../store";
 import { Dispatch } from "react";
-import { botInterrupted, 
-  botOrUserResponse, 
-  botReset, 
-  conversationStart, 
-  messagesEndUpdate,  } from "../../../actions/bot";
+import { botInterrupted, botOrUserResponse, botReset, conversationStart, messagesEndUpdate } from "../../../actions/bot";
 import { StoryData } from "../../../constants/types";
 import { Message } from "../../../generated/client";
 
@@ -119,7 +115,6 @@ const mapStateToProps = (state: ReduxState) => ({
   messageDatas: state.bot.messageDatas,
   conversationStarted: state.bot.conversationStarted,
   messagesEnd: state.bot.messagesEnd,
-  storyData: state.story.storyData
 });
 
 /**

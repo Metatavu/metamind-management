@@ -18,7 +18,7 @@ import { useParams } from "react-router-dom";
 import { StoryData } from "../../../constants/types"
 import { selectStory, loadStory, unselectStory, setStoryData } from "../../../actions/story";
 import { MessageData } from "../../../../metamind-metatavu-bot/src/types";
-// import StoryPreviewView from "../../views/story-preview-view";
+import StoryPreviewView from "../../views/story-preview-view";
 
 /**
  * Interface describing component props
@@ -129,21 +129,8 @@ const  PreviewScreen: React.FC<Props> = ({
       >
         <Toolbar/>
         <Box className={ classes.previewContainer }>
-          {/* <StoryPreviewView
-            knots={ knots }
-            intents={ intents }
-            // addingKnots={ addingKnots }
-            // centeredKnot={ centeredKnot }
-            // centeredIntent={ centeredIntent }
-            // onAddNode={ onAddNode }
-            // onMoveNode={ onMoveNode }
-            // onRemoveNode={ onRemoveNode }
-            // onAddLink={ onAddLink }
-            // onRemoveLink={ onRemoveLink }
-            // editingEntityInfo={ editingEntityInfo }
-            // onNodeSelectionChange={ onNodeSelectionChange }
-            // onLinkSelectionChange={ onLinkSelectionChange }
-          /> */}
+          <StoryPreviewView
+          storyData={ storyData }/>
         </Box>
       </Box>
     );
