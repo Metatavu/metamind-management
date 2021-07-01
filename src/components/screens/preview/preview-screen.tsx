@@ -177,7 +177,7 @@ const  PreviewScreen: React.FC<Props> = ({
     >
       { renderLeftToolbar() }
       <Box marginLeft="320px">
-        {/* <MessageList /> */}
+        { renderEditorContent() }
       </Box>
     </AppLayout>
   );
