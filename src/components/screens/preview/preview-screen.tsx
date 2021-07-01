@@ -17,6 +17,7 @@ import Api from "../../../api/api";
 import { useParams } from "react-router-dom";
 import { StoryData } from "../../../constants/types"
 import { selectStory, loadStory, unselectStory, setStoryData } from "../../../actions/story";
+import { MessageData } from "../../../../metamind-metatavu-bot/src/types";
 // import StoryPreviewView from "../../views/story-preview-view";
 
 /**
@@ -206,7 +207,7 @@ const mapStateToProps = (state: ReduxState) => ({
   keycloak: state.auth.keycloak as KeycloakInstance,
   selectedStoryId: state.story.selectedStoryId,
   storyData: state.story.storyData,
-  storyLoading: state.story.storyLoading
+  storyLoading: state.story.storyLoading,
 });
 
 /**
