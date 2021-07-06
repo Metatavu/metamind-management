@@ -1,5 +1,5 @@
 import * as ActionTypes from "../constants/actionTypes";
-import { StoryData } from "../constants/types";
+import { StoryData } from "../types";
 
 /**
  * Interface for select story type

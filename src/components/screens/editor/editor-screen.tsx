@@ -22,7 +22,7 @@ import AccordionItem from "../../generic/accordion-item";
 import TrainingSelectionOptions from "../../intent-components/training-selection-options/training-selection-options";
 import QuickResponseButton from "../../intent-components/quick-response-button/quick-response-button";
 import EditorUtils from "../../../utils/editor";
-import { StoryData } from "../../../constants/types"
+import { StoryData } from "../../../types"
 import { selectStory, loadStory, unselectStory, setStoryData } from "../../../actions/story";
 import Loading from "../../generic/loading-item";
 

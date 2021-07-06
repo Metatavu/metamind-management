@@ -15,7 +15,7 @@ import strings from "../../../localization/strings";
 import { Typography } from "@material-ui/core";
 import Api from "../../../api/api";
 import { useParams } from "react-router-dom";
-import { StoryData } from "../../../constants/types"
+import { StoryData } from "../../../types"
 import { selectStory, loadStory, unselectStory, setStoryData } from "../../../actions/story";
 import { MessageData } from "../../../../metamind-metatavu-bot/src/types";
 import StoryPreviewView from "../../views/story-preview-view";

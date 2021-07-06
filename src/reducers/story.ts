@@ -1,6 +1,6 @@
 import { StoryAction } from "../actions/story";
 import { LOAD_STORY, SELECT_STORY, SET_STORY, UNSELECT_STORY } from "../constants/actionTypes";
-import { StoryData } from "../constants/types";
+import { StoryData } from "../types";
 
 /**
  * Redux story state

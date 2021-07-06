@@ -7,8 +7,8 @@ import { connect } from "react-redux";
 import { ReduxActions, ReduxState } from "../../../store";
 import { Dispatch } from "react";
 import { botInterrupted, botOrUserResponse, botReset, conversationStart, messagesEndUpdate } from "../../../actions/bot";
-import { StoryData } from "../../../constants/types";
-import { Box } from "@material-ui/core";
+import { StoryData } from "../../../types/index";
+import { Box } from "@material-ui/core";  
 
 /**
  * Interface describing component props
