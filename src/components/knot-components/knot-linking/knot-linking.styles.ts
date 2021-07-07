@@ -1,7 +1,7 @@
-import { createStyles } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
 import theme from "../../../theme/theme";
 
-export const styles = createStyles({
+export const useKnotLinkingStyles = makeStyles({
 
   list: {
     width: "100%",
@@ -29,4 +29,6 @@ export const styles = createStyles({
     paddingBottom: 20
   }
 
+}, {
+  "name": "knot-linking"
 });

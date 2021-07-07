@@ -1,6 +1,6 @@
 import * as React from "react";
 import { IconButton, List, ListItem, TextField, withStyles, WithStyles, FormHelperText, Box } from "@material-ui/core";
-import { styles } from "./knot-linking.styles";
+import { useKnotLinkingStyles } from "./knot-linking.styles";
 import KnotIcon from "../../../resources/svg/knot-icon";
 import InteractiveListItem from "../../generic/list-items/interactive-list-item";
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -12,7 +12,7 @@ import AddIcon from '@material-ui/icons/Add';
 /**
  * Interface describing component props
  */
-interface Props extends WithStyles<typeof styles> {
+interface Props {
   selectedKnot?: Knot;
   knots: Knot[];
   intents: Intent[];
@@ -24,7 +24,9 @@ interface Props extends WithStyles<typeof styles> {
  * 
  * TODO: Ask Tuomas about implementation of removing a linking by clicking a knot
  */
-const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink, classes}) => {
+const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink}) => {
+
+  const classes = useKnotLinkingStyles();
   const [ incomingInputValue, setIncomingInputValue ] = React.useState("");
   const [ incomingKnot, setIncomingKnot ] = React.useState<Knot | null>();
   const [ outcomingInputValue, setOutcomingInputValue ] = React.useState("");
@@ -148,4 +150,4 @@ const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink,
   );
 }
 
-export default withStyles(styles)(KnotLinking);
+export default KnotLinking;
