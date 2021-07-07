@@ -14,6 +14,7 @@ export interface IStrings extends LocalizedStringsMethods {
     edit: string;
     edited: string;
     remove: string;
+    invalid: string;
   };
 
   /**

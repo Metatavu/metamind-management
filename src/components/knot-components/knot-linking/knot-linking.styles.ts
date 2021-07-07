@@ -9,9 +9,19 @@ export const styles = createStyles({
   },
 
   listItem: {
+    height: 70,
     display: "flex",
     padding: 0,
-    alignItems: "center"
+    alignItems: "start",
+    "& div div p.MuiFormHelperText-root": {
+      fontSize: 10,
+      marginTop:0
+    }
+  },
+
+  addButton: {
+    alignSelf: "start",
+    top: theme.spacing(1)
   },
 
   autoComplete: {

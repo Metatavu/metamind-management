@@ -4,7 +4,8 @@
     "cancel": "Peruuta",
     "edit": "Muokkaa",
     "edited": "Muokattu",
-    "remove": "Poista"
+    "remove": "Poista",
+    "invalid": "virheellinen"
   },
 
   "header": {

@@ -4,7 +4,8 @@
     "cancel": "Cancel",
     "edit": "Edit",
     "edited": "Edited",
-    "remove": "Remove"
+    "remove": "Remove",
+    "invalid": "invalid"
   },
 
   "header": {

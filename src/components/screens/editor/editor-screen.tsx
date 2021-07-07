@@ -814,6 +814,7 @@ const EditorScreen: React.FC<Props> = ({
         selectedKnot={ selectedKnot }
         knots={ knots }
         intents={ intents }
+        onAddLink={ onAddLink }
       />
     );
   }
