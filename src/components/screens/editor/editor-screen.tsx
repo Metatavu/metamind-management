@@ -23,7 +23,6 @@ import TrainingSelectionOptions from "../../intent-components/training-selection
 import QuickResponseButton from "../../intent-components/quick-response-button/quick-response-button";
 import EditorUtils from "../../../utils/editor";
 import { Cookies } from "react-cookie";
-import { LensTwoTone } from "@material-ui/icons";
 
 /**
  * Component props

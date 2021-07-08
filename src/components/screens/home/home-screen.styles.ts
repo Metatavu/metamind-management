@@ -22,10 +22,10 @@ export const styles = createStyles({
     padding: theme.spacing(4)
   },
 
-  list: { 
+  carousel: { 
     backgroundColor: "#090909", 
     height: 100, 
-    padding: "5px 20px",
+    padding: "5px 30px",
   },
 
   listItemText: {

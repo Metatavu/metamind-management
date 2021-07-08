@@ -161,7 +161,7 @@ class HomeScreen extends React.Component<Props, State> {
         </Box>
           <Carousel
             autoPlay = { false }
-            className={ classes.list }
+            className={ classes.carousel }
             navButtonsProps={{ style: { margin: 0 } }}
             indicatorContainerProps={{ style: { marginTop: 0 } }}
           >
