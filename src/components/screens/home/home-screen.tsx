@@ -2,13 +2,14 @@ import { Box, Button, List, ListItem, ListItemText, Typography, WithStyles, with
 import { History } from "history";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
+import { Cookies } from "react-cookie";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../../../api/api";
 import { Story, KnotType,TokenizerType, KnotScope } from "../../../generated/client";
 import strings from "../../../localization/strings";
 import { ReduxActions, ReduxState } from "../../../store";
-import { AccessToken } from "../../../types";
+import { AccessToken, RecentStory } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
 import { styles } from "./home-screen.styles";
 
@@ -27,6 +28,7 @@ interface Props extends WithStyles<typeof styles> {
 interface State {
   stories: Story[];
   selectedStoryId?: string;
+  recentStories?: RecentStory[];
 }
 
 /**
@@ -146,7 +148,8 @@ class HomeScreen extends React.Component<Props, State> {
    * Renders recent edited stories
    */
   private renderRecentStories = () => {
-    const { classes } = this.props;
+    const { classes, history } = this.props;
+    const { recentStories } = this.state;
 
     return (
       <Box mt={ 4 }>
@@ -155,14 +158,19 @@ class HomeScreen extends React.Component<Props, State> {
             { strings.homeScreen.lastEditedStories }
           </Typography>
         </Box>
-          <List dense style={{ backgroundColor: "#090909" }}>
-            <ListItem button>
-              <ListItemText
-                className={ classes.listItemText }
-                primary="Story name"
-                secondary={`${strings.generic.edited}: 12.4.2021 12:34`}
-              />
-            </ListItem>
+          <List dense style={{ backgroundColor: "#090909", height: 80, overflow: "auto" }}>
+            { recentStories && recentStories?.map(recentStory => (
+              <ListItem 
+                button
+                onClick={ () => history.push(`/editor/${recentStory.id}`) }
+              >
+                <ListItemText
+                  className={ classes.listItemText }
+                  primary={ recentStory.name }
+                  secondary={`${strings.generic.edited}: ${recentStory.lastEditedTime}`}
+                />
+              </ListItem>
+            )) }
           </List>
       </Box>
     );
@@ -250,6 +258,13 @@ class HomeScreen extends React.Component<Props, State> {
     try {
       const stories = await Api.getStoriesApi(accessToken).listStories();
       this.setState({ stories });
+
+      const cookies = new Cookies();
+      const recentStories = cookies.get("recentStories");
+
+      this.setState({
+        recentStories: recentStories 
+      });
     } catch (error) {
       console.error(error);
     }

@@ -9,7 +9,7 @@ import Api from "../../../api/api";
 import { TokenizerType, KnotType, Story, Knot, Intent, IntentType, TrainingMaterial, TrainingMaterialType, TrainingMaterialVisibility, IntentTrainingMaterials } from "../../../generated/client/models";
 import strings from "../../../localization/strings";
 import { ReduxActions, ReduxState } from "../../../store";
-import { AccessToken } from "../../../types";
+import { AccessToken, RecentStory } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
 import IntentPanel from "../../intent-components/intent-list/intent-list";
 import KnotPanel from "../../knot-components/knot-list/knot-list";
@@ -22,6 +22,8 @@ import AccordionItem from "../../generic/accordion-item";
 import TrainingSelectionOptions from "../../intent-components/training-selection-options/training-selection-options";
 import QuickResponseButton from "../../intent-components/quick-response-button/quick-response-button";
 import EditorUtils from "../../../utils/editor";
+import { Cookies } from "react-cookie";
+import { LensTwoTone } from "@material-ui/icons";
 
 /**
  * Component props
@@ -73,6 +75,11 @@ const EditorScreen: React.FC<Props> = ({
     fetchData();
     // eslint-disable-next-line
   }, []);
+
+  React.useEffect(() => {
+    setLastEdited();
+    // eslint-disable-next-line
+  }, [storyData]);
 
   /**
    * Event handler for on knot click
@@ -502,6 +509,41 @@ const EditorScreen: React.FC<Props> = ({
     }
 
     setEditedTrainingMaterial({ ...editedTrainingMaterial, [name]: value });
+  }
+
+  /**
+   * Set the last edited story to cookie
+   */
+  const setLastEdited = () => {
+    if (!storyData) {
+      return;
+    }
+
+    const cookies = new Cookies();
+    let recentStories: RecentStory[] = cookies.get("recentStories");
+    const currentStory: RecentStory = {
+      id: storyData.story?.id,
+      name: storyData.story?.name,
+      lastEditedTime: new Date().toLocaleString()
+    }
+
+    if (!currentStory.id) {
+      return;
+    }
+
+    if (recentStories) {
+      const idx = recentStories.findIndex(item => item.id === currentStory.id);
+
+      // eslint-disable-next-line no-unused-expressions
+      idx !== -1 && recentStories.splice(idx, 1)
+      
+      recentStories.unshift(currentStory);
+      recentStories = recentStories.slice(0, 5);
+      cookies.set("recentStories", recentStories, { secure: true, sameSite: true });
+      
+    } else {
+      cookies.set("recentStories", [currentStory], { secure: true, sameSite: true });
+    }
   }
 
   /**
