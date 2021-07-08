@@ -3,6 +3,7 @@ import { History } from "history";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
 import { Cookies } from "react-cookie";
+import Carousel from "react-material-ui-carousel";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../../../api/api";
@@ -158,7 +159,12 @@ class HomeScreen extends React.Component<Props, State> {
             { strings.homeScreen.lastEditedStories }
           </Typography>
         </Box>
-          <List dense style={{ backgroundColor: "#090909", height: 80, overflow: "auto" }}>
+          <Carousel
+            autoPlay = { false }
+            className={ classes.list }
+            navButtonsProps={{ style: { margin: 0 } }}
+            indicatorContainerProps={{ style: { marginTop: 0 } }}
+          >
             { recentStories && recentStories?.map(recentStory => (
               <ListItem 
                 button
@@ -171,7 +177,7 @@ class HomeScreen extends React.Component<Props, State> {
                 />
               </ListItem>
             )) }
-          </List>
+          </Carousel>
       </Box>
     );
   }
