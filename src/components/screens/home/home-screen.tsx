@@ -426,7 +426,10 @@ class HomeScreen extends React.Component<Props, State> {
     if (!value) {
       return;
     }
-    this.setState({ newStoryName: value });
+
+    this.setState({ 
+      newStoryName: value 
+    });
   }
 
   /**
@@ -439,7 +442,9 @@ class HomeScreen extends React.Component<Props, State> {
       return;
     }
 
-    this.setState({ storyFile: files[0] });
+    this.setState({ 
+      storyFile: files[0] 
+    });
   }
 
   /**
