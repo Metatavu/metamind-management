@@ -30,7 +30,7 @@ interface Props extends WithStyles<typeof styles> {
 interface State {
   stories: Story[];
   selectedStoryId?: string;
-  viewIndex: number;
+  cardShown: "SELECT" | "CREATE" | "IMPORT";
   newStoryName: string;
   storyFile?: File;
 }
@@ -50,7 +50,7 @@ class HomeScreen extends React.Component<Props, State> {
 
     this.state = {
       stories: [],
-      viewIndex: 0,
+      cardShown: "SELECT",
       newStoryName: ""
     }
   }
@@ -67,7 +67,6 @@ class HomeScreen extends React.Component<Props, State> {
    */
   public render = () => {
     const { classes, keycloak } = this.props;
-    const { viewIndex } = this.state;
 
     if (!keycloak) {
       return null;
@@ -81,19 +80,29 @@ class HomeScreen extends React.Component<Props, State> {
         <Box className={ classes.root }>
           <Toolbar />
           <Box className={ classes.cardWrapper }>
-            <Fade in={ viewIndex === 0 } >
-              { this.renderSelectStoryCard() }
-            </Fade>
-            <Fade in={ viewIndex === 1 } >
-              { this.renderCreateStory() }
-            </Fade>
-            <Fade in={ viewIndex === 2 } >
-              { this.renderImportStory() }
-            </Fade>
+            { this.renderCardShown() }
           </Box>
         </Box>
       </AppLayout>
     );
+  }
+
+  /**
+   * Renders card shown
+   */
+  public renderCardShown = () => {
+    const { cardShown } = this.state;
+
+    switch (cardShown) {
+      case "SELECT":
+        return this.renderSelectStoryCard();
+      case "CREATE":
+        return this.renderCreateStory()
+      case "IMPORT":
+        return this.renderImportStory()
+      default: 
+        return this.renderSelectStoryCard();
+    }
   }
 
   /**
@@ -331,10 +340,10 @@ class HomeScreen extends React.Component<Props, State> {
    */
   private onImportStoryClick = () => {
     const { accessToken } = this.props;
-    const { viewIndex } = this.state;
+    const { cardShown } = this.state;
 
-    if (viewIndex === 0 || !accessToken) {
-      this.setState({ viewIndex: 2 });
+    if (cardShown === "SELECT" || !accessToken) {
+      this.setState({ cardShown: "IMPORT" });
       return;
     }
     // TODO: implement importing of story from the .xml file
@@ -346,10 +355,10 @@ class HomeScreen extends React.Component<Props, State> {
    */
   private onCreateNewStoryClick = async () => {
     const { accessToken } = this.props;
-    const { viewIndex, newStoryName } = this.state;
+    const { cardShown, newStoryName } = this.state;
 
-    if (viewIndex === 0 || !accessToken) {
-      this.setState({ viewIndex: 1 });
+    if (cardShown === "SELECT" || !accessToken) {
+      this.setState({ cardShown: "CREATE" });
       return;
     }
     
@@ -398,9 +407,9 @@ class HomeScreen extends React.Component<Props, State> {
   /**
    * Event handler for return button click
    */
-  onReturnButtonClick = () => {
+  private onReturnButtonClick = () => {
     this.setState({
-      viewIndex: 0,
+      cardShown: "SELECT",
       newStoryName: "",
       storyFile: undefined
     });
@@ -411,7 +420,7 @@ class HomeScreen extends React.Component<Props, State> {
    * 
    * @param event change event
    */
-  onStoryNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  private onStoryNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
 
     if (!value) {
