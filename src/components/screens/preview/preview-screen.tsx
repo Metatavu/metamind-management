@@ -87,7 +87,7 @@ const  PreviewScreen: React.FC<Props> = ({
   React.useEffect(() => {
     fetchData();
     // eslint-disable-next-line
-  }, []);
+  }, [selectedStoryId]);
 
   /**
    * Renders left toolbar

@@ -76,6 +76,8 @@ const EditorScreen: React.FC<Props> = ({
    * Fetches knots list for the story
    */
   const fetchData = async () => {
+
+    console.log("fetching data");
     if (!accessToken || !selectedStoryId) {
       return;
     }
@@ -104,7 +106,7 @@ const EditorScreen: React.FC<Props> = ({
   React.useEffect(() => {
     fetchData();
     // eslint-disable-next-line
-  }, []);
+  }, [selectedStoryId]);
 
   /**
    * Event handler for on knot click
