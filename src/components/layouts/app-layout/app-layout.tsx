@@ -1,5 +1,4 @@
-import react, * as React from "react";
-import { connect } from "react-redux";
+import * as React from "react";
 import { AppBar, Toolbar, withStyles, WithStyles, Box, Button, IconButton, Typography } from "@material-ui/core";
 import { styles } from "./app-layout.styles";
 import Logo from "../../../resources/svg/logo";
@@ -10,7 +9,6 @@ import PreviewIcon from "@material-ui/icons/PlayArrow";
 import SaveIcon from "@material-ui/icons/Save";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { KeycloakInstance } from "keycloak-js";
-import { ReduxState } from "../../../store";
 
 /**
  * Interface describing component props
@@ -22,7 +20,6 @@ interface Props extends WithStyles<typeof styles> {
   pageTitle: string;
   storyId?: string;
   keycloak: KeycloakInstance;
-  children: react.ReactNode;
 }
 
 /**
