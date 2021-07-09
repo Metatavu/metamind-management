@@ -17,7 +17,6 @@ import Api from "../../../api/api";
 import { useParams } from "react-router-dom";
 import { StoryData } from "../../../types"
 import { loadStory, setStoryData } from "../../../actions/story";
-import { MessageData } from "../../../../metamind-metatavu-bot/src/types";
 import StoryPreviewView from "../../views/story-preview-view";
 import Loading from "../../generic/loading-item/loading-item";
 
