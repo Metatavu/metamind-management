@@ -538,10 +538,17 @@ const EditorScreen: React.FC<Props> = ({
       
       recentStories.unshift(currentStory);
       recentStories = recentStories.slice(0, 5);
-      cookies.set("recentStories", recentStories, { secure: true, sameSite: true });
-      
+      cookies.set("recentStories", recentStories, { 
+        secure: true, 
+        sameSite: true,
+        maxAge: 60*60*24*30 
+      });
     } else {
-      cookies.set("recentStories", [currentStory], { secure: true, sameSite: true });
+      cookies.set("recentStories", [currentStory], { 
+        secure: true, 
+        sameSite: true,
+        maxAge: 60*60*24*30 
+      });
     }
   }
 
