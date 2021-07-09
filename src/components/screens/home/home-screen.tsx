@@ -399,6 +399,7 @@ class HomeScreen extends React.Component<Props, State> {
         stories: [ ...this.state.stories, createdStory ],
         selectedStoryId: createdStory.id ?? this.state.selectedStoryId
       });
+      
       this.props.history.push(`editor/${createdStory.id}`);
     }
     
@@ -437,7 +438,7 @@ class HomeScreen extends React.Component<Props, State> {
    * 
    * @param file dropped file
    */
-  onFilesDropped = (files: File[]) => {
+  private onFilesDropped = (files: File[]) => {
     if (!files?.length) {
       return;
     }
