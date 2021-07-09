@@ -16,7 +16,7 @@ import { Typography } from "@material-ui/core";
 import Api from "../../../api/api";
 import { useParams } from "react-router-dom";
 import { StoryData } from "../../../types"
-import { selectStory, loadStory, unselectStory, setStoryData } from "../../../actions/story";
+import { loadStory, setStoryData } from "../../../actions/story";
 import { MessageData } from "../../../../metamind-metatavu-bot/src/types";
 import StoryPreviewView from "../../views/story-preview-view";
 import Loading from "../../generic/loading-item/loading-item";
@@ -28,10 +28,8 @@ interface Props {
   history: History;
   keycloak?: KeycloakInstance;
   accessToken: AccessToken;
-  selectedStoryId: string;
   storyData?: StoryData;
   storyLoading: boolean;
-  selectStory: (storyId: string) => void;
   loadStory: () => void;
   setStoryData: (storyData: StoryData) => void;
 }
@@ -42,10 +40,8 @@ interface Props {
 const  PreviewScreen: React.FC<Props> = ({   
   accessToken,
   keycloak,
-  selectedStoryId,
   storyData,
   storyLoading,
-  selectStory,
   loadStory,
   setStoryData
 }) => {
@@ -53,17 +49,15 @@ const  PreviewScreen: React.FC<Props> = ({
 
   const classes = usePreviewStyles(); 
 
-  storyId !== selectedStoryId && selectStory(storyId);
-
   /**
    * Fetches knots list for the story
    */
   const fetchData = async () => {
-    if (!accessToken || !selectedStoryId) {
+    if (!accessToken) {
       return;
     }
 
-    if (!storyLoading && storyData){
+    if (!storyLoading && storyData && storyData.story?.id === storyId){
       return;
     }
 
@@ -87,7 +81,7 @@ const  PreviewScreen: React.FC<Props> = ({
   React.useEffect(() => {
     fetchData();
     // eslint-disable-next-line
-  }, [selectedStoryId]);
+  }, []);
 
   /**
    * Renders left toolbar
@@ -180,7 +174,7 @@ const  PreviewScreen: React.FC<Props> = ({
   return (
     <AppLayout
       storySelected
-      storyId={ storyId }
+      storyId={ storyData.story?.id }
       keycloak={ keycloak }
       pageTitle={ storyData.story?.name ?? "" }
       dataChanged={ true }
@@ -200,7 +194,6 @@ const  PreviewScreen: React.FC<Props> = ({
 const mapStateToProps = (state: ReduxState) => ({
   accessToken: state.auth.accessToken as AccessToken,
   keycloak: state.auth.keycloak as KeycloakInstance,
-  selectedStoryId: state.story.selectedStoryId,
   storyData: state.story.storyData,
   storyLoading: state.story.storyLoading,
 });
@@ -211,10 +204,8 @@ const mapStateToProps = (state: ReduxState) => ({
  * @param dispatch dispatch method
  */
 const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({
-  selectStory: (storyId: string) => dispatch(selectStory(storyId)),
   loadStory: () => dispatch(loadStory()),
   setStoryData: (storyData: StoryData) => dispatch(setStoryData(storyData)),
-  unselectStory: () => dispatch(unselectStory())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PreviewScreen);

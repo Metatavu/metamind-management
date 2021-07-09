@@ -6,7 +6,6 @@ import { StoryData } from "../types";
  * Redux story state
  */
 export interface StoryState {
-  selectedStoryId: string;
   storyLoading: boolean;
   storyData?: StoryData
 }
@@ -16,7 +15,6 @@ export interface StoryState {
  * Initial story state
  */
 const initialState: StoryState = {
-  selectedStoryId: "",
   storyLoading: false,
   storyData: undefined
 }
@@ -30,15 +28,6 @@ const initialState: StoryState = {
  */
 export function storyReducer(state: StoryState = initialState, action: StoryAction): StoryState {
   switch (action.type) {
-    case SELECT_STORY:
-      const selectedStoryId = action.storyId;
-
-      return { 
-        ...state, 
-        selectedStoryId, 
-        storyLoading: false, 
-        storyData: undefined 
-      };
     case LOAD_STORY:
       return { 
         ...state, 
@@ -52,13 +41,6 @@ export function storyReducer(state: StoryState = initialState, action: StoryActi
         ...state,
         storyData,
         storyLoading: false 
-      };
-    case UNSELECT_STORY:
-      return { 
-        ...state, 
-        selectedStoryId: "", 
-        storyLoading: false, 
-        storyData: undefined 
       };
     default:
       return state;

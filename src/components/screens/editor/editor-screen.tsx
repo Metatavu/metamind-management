@@ -23,7 +23,7 @@ import TrainingSelectionOptions from "../../intent-components/training-selection
 import QuickResponseButton from "../../intent-components/quick-response-button/quick-response-button";
 import EditorUtils from "../../../utils/editor";
 import { StoryData } from "../../../types"
-import { selectStory, loadStory, unselectStory, setStoryData } from "../../../actions/story";
+import { loadStory, setStoryData } from "../../../actions/story";
 import Loading from "../../generic/loading-item";
 
 /**
@@ -32,10 +32,8 @@ import Loading from "../../generic/loading-item";
 interface Props {
   keycloak?: KeycloakInstance;
   accessToken?: AccessToken;
-  selectedStoryId: string;
   storyData?: StoryData;
   storyLoading: boolean;
-  selectStory: (storyId: string) => void;
   loadStory: () => void;
   setStoryData: (storyData: StoryData) => void;
 }
@@ -48,10 +46,8 @@ interface Props {
 const EditorScreen: React.FC<Props> = ({
   accessToken,
   keycloak,
-  selectedStoryId,
   storyData,
   storyLoading,
-  selectStory,
   loadStory,
   setStoryData,
 }) => {
@@ -70,29 +66,26 @@ const EditorScreen: React.FC<Props> = ({
   const [ selectedTrainingMaterialType, setSelectedTrainingMaterialType ] = React.useState<TrainingMaterialType | null>(null);
   const [ editedTrainingMaterial, setEditedTrainingMaterial ] = React.useState<TrainingMaterial>();
 
-  storyId !== selectedStoryId && selectStory(storyId);
-
   /**
    * Fetches knots list for the story
    */
   const fetchData = async () => {
 
-    console.log("fetching data");
-    if (!accessToken || !selectedStoryId) {
+    if (!accessToken) {
       return;
     }
 
-    if (!storyLoading && storyData){
+    if (!storyLoading && storyData && storyData.story?.id === storyId){
       return;
     }
 
     loadStory();
 
     const [ story, knotList, intentList, trainingMaterialList ] = await Promise.all([
-      Api.getStoriesApi(accessToken).findStory({ storyId: selectedStoryId }),
-      Api.getKnotsApi(accessToken).listKnots({ storyId: selectedStoryId }),
-      Api.getIntentsApi(accessToken).listIntents({ storyId: selectedStoryId }),
-      Api.getTrainingMaterialApi(accessToken).listTrainingMaterials({ storyId: selectedStoryId })
+      Api.getStoriesApi(accessToken).findStory({ storyId }),
+      Api.getKnotsApi(accessToken).listKnots({ storyId }),
+      Api.getIntentsApi(accessToken).listIntents({ storyId }),
+      Api.getTrainingMaterialApi(accessToken).listTrainingMaterials({ storyId })
     ]);
 
     setStoryData({
@@ -106,7 +99,7 @@ const EditorScreen: React.FC<Props> = ({
   React.useEffect(() => {
     fetchData();
     // eslint-disable-next-line
-  }, [selectedStoryId]);
+  }, []);
 
   /**
    * Event handler for on knot click
@@ -145,7 +138,7 @@ const EditorScreen: React.FC<Props> = ({
     }
 
     const createdKnot = await Api.getKnotsApi(accessToken).createKnot({
-      storyId: selectedStoryId,
+      storyId,
       knot: {
         name: "New Knot",
         content: "",
@@ -173,7 +166,7 @@ const EditorScreen: React.FC<Props> = ({
     }
 
     const updatedKnot = await Api.getKnotsApi(accessToken).updateKnot({
-      storyId: selectedStoryId,
+      storyId,
       knotId: knot.id,
       knot: { ...knot, coordinates: movedNode.getPosition() }
     });
@@ -195,7 +188,7 @@ const EditorScreen: React.FC<Props> = ({
     }
 
     await Api.getKnotsApi(accessToken).deleteKnot({
-      storyId: selectedStoryId,
+      storyId,
       knotId: removedNodeId,
     });
 
@@ -217,7 +210,7 @@ const EditorScreen: React.FC<Props> = ({
     }
 
     const createdIntent = await Api.getIntentsApi(accessToken).createIntent({
-      storyId: selectedStoryId,
+      storyId,
       intent: {
         name: "New intent name",
         global: false,
@@ -246,7 +239,7 @@ const EditorScreen: React.FC<Props> = ({
     }
 
     await Api.getIntentsApi(accessToken).deleteIntent({
-      storyId: selectedStoryId,
+      storyId,
       intentId: linkId
     });
 
@@ -267,7 +260,7 @@ const EditorScreen: React.FC<Props> = ({
     }
 
     const knot = await Api.getKnotsApi(accessToken).findKnot({
-      storyId: selectedStoryId,
+      storyId,
       knotId: node.getID()
     });
 
@@ -289,7 +282,7 @@ const EditorScreen: React.FC<Props> = ({
     }
 
     const intent = await Api.getIntentsApi(accessToken).findIntent({
-      storyId: selectedStoryId,
+      storyId,
       intentId: link.getID()
     });
 
@@ -327,7 +320,7 @@ const EditorScreen: React.FC<Props> = ({
       Api.getIntentsApi(accessToken).updateIntent({
         intentId: updatedIntent.id,
         intent: updatedIntent,
-        storyId: selectedStoryId
+        storyId
       });
     }    
     
@@ -352,7 +345,7 @@ const EditorScreen: React.FC<Props> = ({
     setSelectedTrainingMaterialType(name as keyof object);
     setEditedTrainingMaterial({
       type: name,
-      storyId: selectedStoryId,
+      storyId,
       name: "",
       text: "",
       visibility: TrainingMaterialVisibility.STORY
@@ -427,7 +420,7 @@ const EditorScreen: React.FC<Props> = ({
             [key]: editedTrainingMaterial.id
           }
         },
-        storyId: selectedStoryId
+        storyId
       });
     } catch (error) {
       throw error;
@@ -464,7 +457,7 @@ const EditorScreen: React.FC<Props> = ({
             [key]: editedTrainingMaterial.id
           }
         },
-        storyId: selectedStoryId
+        storyId
       });
     } catch (error) {
       throw error;
@@ -489,7 +482,7 @@ const EditorScreen: React.FC<Props> = ({
     }
 
     const updatedKnot = await Api.getKnotsApi(accessToken).updateKnot({
-      storyId: selectedStoryId,
+      storyId,
       knotId: selectedKnot.id,
       knot: { ...selectedKnot, [name]: value }
     });
@@ -512,7 +505,7 @@ const EditorScreen: React.FC<Props> = ({
     }
 
     const updatedIntent = await Api.getIntentsApi(accessToken).updateIntent({
-      storyId: selectedStoryId,
+      storyId,
       intentId: selectedIntent.id,
       intent: { ...selectedIntent, [name]: value }
     });
@@ -847,7 +840,7 @@ const EditorScreen: React.FC<Props> = ({
   return (
     <AppLayout
       storySelected
-      storyId={ selectedStoryId }
+      storyId={ storyData.story?.id }
       keycloak={ keycloak }
       pageTitle={ storyData.story?.name ?? "" }
       dataChanged={ dataChanged }
@@ -868,7 +861,6 @@ const EditorScreen: React.FC<Props> = ({
 const mapStateToProps = (state: ReduxState) => ({
   accessToken: state.auth.accessToken,
   keycloak: state.auth.keycloak,
-  selectedStoryId: state.story.selectedStoryId,
   storyData: state.story.storyData,
   storyLoading: state.story.storyLoading
 });
@@ -879,10 +871,8 @@ const mapStateToProps = (state: ReduxState) => ({
  * @param dispatch dispatch method
  */
 const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({
-  selectStory: (storyId: string) => dispatch(selectStory(storyId)),
   loadStory: () => dispatch(loadStory()),
   setStoryData: (storyData: StoryData) => dispatch(setStoryData(storyData)),
-  unselectStory: () => dispatch(unselectStory())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditorScreen);
