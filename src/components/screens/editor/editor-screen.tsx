@@ -91,7 +91,7 @@ const EditorScreen: React.FC<Props> = ({
       return;
     }
     setCenteredKnot(knot);
-    setStoryData({ ...storyData, selectedKnot: knot });
+    setStoryData({ ...storyData, selectedKnot: knot, selectedIntent: undefined });
   }
 
   /**
@@ -104,7 +104,7 @@ const EditorScreen: React.FC<Props> = ({
       return;
     }
     setCenteredIntent(intent);
-    setStoryData({ ...storyData, selectedIntent: intent });
+    setStoryData({ ...storyData, selectedIntent: intent, selectedKnot: undefined });
   }
 
   /**
@@ -166,8 +166,9 @@ const EditorScreen: React.FC<Props> = ({
 
     setStoryData({
       ...storyData,
-      knots: knots.map(item => item.id === updatedKnot.id ? updatedKnot : item),
-      selectedKnot: updatedKnot
+      selectedKnot: updatedKnot,
+      selectedIntent: undefined,
+      knots: knots.map(item => item.id === updatedKnot.id ? updatedKnot : item)
     });
 
     setDataChanged(true);
@@ -220,7 +221,9 @@ const EditorScreen: React.FC<Props> = ({
 
     setStoryData({
       ...storyData,
-      intents: [ ...intents, createdIntent ]
+      intents: [ ...intents, createdIntent ],
+      selectedIntent: createdIntent,
+      selectedKnot: undefined
     });
     setDataChanged(true);
   }
