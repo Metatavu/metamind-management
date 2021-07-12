@@ -528,11 +528,13 @@ const EditorScreen: React.FC<Props> = ({
       Promise.all(knotUpdatePromises)
       .then(updatedKnots => {
         currentKnots.map(currentKnot => updatedKnots.find(updatedKnot => updatedKnot.id === currentKnot.id) || currentKnot);
+        console.log("knotUpdatePromises")
       });
 
       Promise.all(knotCreatePromises)
       .then(createdKnots => {
         currentKnots = [ ...currentKnots, ...createdKnots ];
+        console.log("knotCreatePromises")
       });
 
       for (const knot of removedKnots) {
@@ -545,7 +547,10 @@ const EditorScreen: React.FC<Props> = ({
       }
 
       Promise.all(knotDeletePromises)
-      .then(() => setRemovedKnots([]))
+      .then(() => {
+        setRemovedKnots([])
+        console.log("knotDeletePromises")
+      })
 
       let currentIntents = intents ? intents : [];
       if (intents) {
