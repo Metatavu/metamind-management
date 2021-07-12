@@ -32,6 +32,7 @@ interface Props {
   editingEntityInfo: boolean;
   onNodeSelectionChange: (node: CustomNodeModel) => void;
   onLinkSelectionChange: (link: CustomLinkModel) => void;
+  onSelectedEntitiesAmountChange: (value: number) => void;
 }
 
 /**
@@ -52,7 +53,8 @@ const StoryEditorView: React.FC<Props> = ({
   onRemoveLink,
   editingEntityInfo,
   onNodeSelectionChange,
-  onLinkSelectionChange
+  onLinkSelectionChange,
+  onSelectedEntitiesAmountChange
 }) => {
   const classes = useStoryEditorViewStyles();
   const [ newPoint, setNewPoint ] = React.useState<Point>();
@@ -244,6 +246,7 @@ const StoryEditorView: React.FC<Props> = ({
     node.registerListener({
       selectionChanged: (selectionChangedEvent: any) => {
         onNodeSelectionChange(selectionChangedEvent.entity as CustomNodeModel);
+        onSelectedEntitiesAmountChange(engineRef.current.getModel().getSelectedEntities().length);
       },
       positionChanged: ({ entity }: any) => {
         setMovedNode(entity);
@@ -279,6 +282,7 @@ const StoryEditorView: React.FC<Props> = ({
     link.registerListener({
       selectionChanged: (selectionChangedEvent: any) => {
         onLinkSelectionChange(selectionChangedEvent.entity as CustomLinkModel);
+        onSelectedEntitiesAmountChange(engineRef.current.getModel().getSelectedEntities().length);
       }
     });
 
