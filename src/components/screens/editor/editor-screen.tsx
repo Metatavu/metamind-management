@@ -484,6 +484,7 @@ const EditorScreen: React.FC<Props> = ({
     if (!accessToken || !storyData.story) {
       return;
     }
+
     try {
       const knotsApi = Api.getKnotsApi(accessToken);
       const intentsApi = Api.getIntentsApi(accessToken);
