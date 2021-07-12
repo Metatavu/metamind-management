@@ -117,13 +117,6 @@ const StoryEditorView: React.FC<Props> = ({
     const engine = engineRef.current;
     const nodes = engine.getModel().getNodes();
 
-    if(knots[0] && knots[0].scope !== KnotScope.Global) {
-      knots[0].scope = KnotScope.Global;
-    }
-    if (knots[1] && knots[1].scope !== KnotScope.Home) {
-      knots[1].scope = KnotScope.Home;
-    }
-
     nodes.forEach(node => knots.every(knot => knot.id !== node.getID()) && engine.getModel().removeNode(node));
     knots.forEach(knot => translateToNode(knot));
 
