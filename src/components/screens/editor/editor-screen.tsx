@@ -491,6 +491,26 @@ const EditorScreen: React.FC<Props> = ({
   }
 
   /**
+   * Event handler for updating story info
+   * 
+   * @param event event from input change
+   */
+  const onUpdateStoryInfo = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event?.target;
+    if(!story) {
+      return;
+    }
+
+    setStoryData({
+      ...storyData,
+      story: {
+        ...story,
+        [name]: value
+      }
+    })
+  }
+
+  /**
    * Event handler for update edited training material
    * 
    * @param event event of input change
@@ -670,7 +690,9 @@ const EditorScreen: React.FC<Props> = ({
     return (
       <TextField
         label={ strings.editorScreen.rightBar.storyNameHelper }
-        defaultValue={ story?.name }
+        name="name"
+        value={ story?.name }
+        onChange={ onUpdateStoryInfo }
         onFocus={ () => setEditingEntityInfo(true) }
         onBlur={ () => setEditingEntityInfo(false) }
       />
