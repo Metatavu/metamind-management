@@ -80,6 +80,10 @@
     "confirm": {
       "knot": "Remove knot and all related intents?",
       "intent": "Remove selected intent?"
+    },
+    "save": {
+      "success": "Saved!",
+      "fail": "Fail to save!"
     }
   }
 }

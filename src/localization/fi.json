@@ -80,6 +80,10 @@
     "confirm": {
       "knot": "Poistetaanko valittu solmu ja kaikki siihen liitetyt aikomukset?",
       "intent": "Poistetaanko valittu aikomus?"
+    },
+    "save": {
+      "success": "Tallennettu!",
+      "fail": "Tallennus epäonnistui!"
     }
   }
 }

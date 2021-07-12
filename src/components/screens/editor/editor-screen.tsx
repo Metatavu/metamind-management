@@ -1,4 +1,5 @@
 import { Box, Drawer, Tab, Tabs, TextField, Button, MenuItem, InputLabel } from "@material-ui/core";
+import MuiAlert from '@material-ui/lab/Alert';
 import Divider from "@material-ui/core/Divider";
 import Toolbar from "@material-ui/core/Toolbar";
 import { KeycloakInstance } from "keycloak-js";
@@ -22,10 +23,6 @@ import AccordionItem from "../../generic/accordion-item";
 import TrainingSelectionOptions from "../../intent-components/training-selection-options/training-selection-options";
 import QuickResponseButton from "../../intent-components/quick-response-button/quick-response-button";
 import EditorUtils from "../../../utils/editor";
-import { resolve } from "dns";
-import { MemoVoidArrayIterator } from "lodash";
-import { TransformOptions } from "stream";
-import { current } from "immer";
 
 /**
  * Component props
@@ -74,6 +71,8 @@ const EditorScreen: React.FC<Props> = ({
   const [ editedTrainingMaterial, setEditedTrainingMaterial ] = React.useState<TrainingMaterial>();
   const [ removedKnots, setRemovedKnots ] = React.useState<Knot[]>([]);
   const [ removedIntents, setRemovedIntents ] = React.useState<Intent[]>([]);
+  const [ alertMessage, setAlertMessage ] = React.useState("");
+  const [ alertType, setAlertType ] = React.useState<"error" | "success">("success");
 
   React.useEffect(() => {
     fetchData();
@@ -153,6 +152,7 @@ const EditorScreen: React.FC<Props> = ({
       ...storyData,
       knots: knots.map(item => item.id === updatedKnot.id ? updatedKnot : item)
     });
+
     setDataChanged(true);
   }
 
@@ -494,141 +494,123 @@ const EditorScreen: React.FC<Props> = ({
       const intentsApi = Api.getIntentsApi(accessToken);
       const trainingMaterialsApi = Api.getTrainingMaterialApi(accessToken);
       const storyApi = Api.getStoriesApi(accessToken);
-      let currentStory = story;
       const knotUpdatePromises: Promise<Knot>[] = [];
-      const knotCreatePromises: Promise<Knot>[] = [];
       const knotDeletePromises: Promise<void>[] = [];
       const intentUpdatePromises: Promise<Intent>[] = [];
-      const intentCreatePromises: Promise<Intent>[] = [];
       const intentDeletePromises: Promise<void>[] = [];
       const trainingMaterialUpdatePromises: Promise<TrainingMaterial>[] = [];
-      const trainingMaterialCreatePromises: Promise<TrainingMaterial>[] = [];
 
-      story && storyApi.updateStory({ storyId: storyId, story: story })
-      .then(updatedStory => currentStory = updatedStory);
-
-      let currentKnots = knots ? knots : [];
+      const storyPromise = story? storyApi.updateStory({ storyId: storyId, story: story })
+      .then(updatedStory => {
+          setStoryData({
+            story: updatedStory
+          })
+        }
+      ) : undefined;
+      
       if (knots) {
         for (const knot of knots) {
-          knot.id? knotUpdatePromises.push(
-            knotsApi.updateKnot({
+          knotUpdatePromises.push(
+            knot.id? knotsApi.updateKnot({
               storyId: storyId,
               knotId: knot.id,
               knot: knot
-            })
-          ) : knotCreatePromises.push(
-            knotsApi.createKnot({
+            }) : knotsApi.createKnot({
               storyId: storyId,
               knot: knot
             })
-          )
+          );
         }
       }
 
-      Promise.all(knotUpdatePromises)
-      .then(updatedKnots => {
-        currentKnots.map(currentKnot => updatedKnots.find(updatedKnot => updatedKnot.id === currentKnot.id) || currentKnot);
-        console.log("knotUpdatePromises")
-      });
-
-      Promise.all(knotCreatePromises)
-      .then(createdKnots => {
-        currentKnots = [ ...currentKnots, ...createdKnots ];
-        console.log("knotCreatePromises")
-      });
-
       for (const knot of removedKnots) {
+        // eslint-disable-next-line no-unused-expressions
         knot.id && knotDeletePromises.push(
           knotsApi.deleteKnot({
             storyId: storyId,
             knotId: knot.id
           })
-        )
+        );
       }
 
-      Promise.all(knotDeletePromises)
-      .then(() => {
-        setRemovedKnots([])
-        console.log("knotDeletePromises")
-      })
+      const knotPromises = Promise.all(knotUpdatePromises)
+      .then(updatedKnots => { 
+        setStoryData({
+          ...storyData, 
+          knots: updatedKnots
+        });
+        Promise.all(knotDeletePromises)
+          .then(() => {
+            setRemovedKnots([]);
+          }) 
+        }
+      );
 
-      let currentIntents = intents ? intents : [];
       if (intents) {
         for (const intent of intents) {
-          intent.id? intentUpdatePromises.push(
-            intentsApi.updateIntent({
+          intentUpdatePromises.push(
+            intent.id? intentsApi.updateIntent({
               storyId: storyId,
               intentId: intent.id,
               intent: intent
-            })
-          ) : intentCreatePromises.push(
-            intentsApi.createIntent({
+            }) : intentsApi.createIntent({
               storyId: storyId,
               intent: intent
             })
-          )
+          );
         }
       }
 
-      Promise.all(intentUpdatePromises)
-      .then(updatedIntents => {
-        currentIntents.map(currentIntent => updatedIntents.find(updatedIntent => updatedIntent.id === currentIntent.id) || currentIntent);
-      });
-
-      Promise.all(intentCreatePromises)
-      .then(createdIntent => {
-        currentIntents = [ ...currentIntents, ...createdIntent ];
-      });
-
       for (const intent of removedIntents) {
+        // eslint-disable-next-line no-unused-expressions
         intent.id && intentDeletePromises.push(
           intentsApi.deleteIntent({
             storyId: storyId,
             intentId: intent.id
           })
-        ) 
+        );
       }
 
-      Promise.all(intentDeletePromises)
-      .then(() => setRemovedKnots([]))
+      const intentPromises = Promise.all(intentUpdatePromises)
+      .then(updatedIntents => {
+        setStoryData({
+          ...storyData, 
+          intents: updatedIntents
+        });
+        Promise.all(intentDeletePromises)
+        .then(() => setRemovedKnots([]));
+      });
 
-      setRemovedIntents([]);
-      
-      let currentMaterials = trainingMaterial ? trainingMaterial : [];
       if (trainingMaterial) {
         for (const material of trainingMaterial) {
-          material.id? trainingMaterialUpdatePromises.push(
-            trainingMaterialsApi.updateTrainingMaterial({
+          trainingMaterialUpdatePromises.push(
+            material.id? trainingMaterialsApi.updateTrainingMaterial({
               trainingMaterialId: material.id,
               trainingMaterial: material
-            })
-          ) : trainingMaterialCreatePromises.push(
-            trainingMaterialsApi.createTrainingMaterial({
+            }) : trainingMaterialsApi.createTrainingMaterial({
               trainingMaterial: material
             })
-          )
+          );
         }
       }
 
-      Promise.all(trainingMaterialUpdatePromises)
+      const materialPromise = Promise.all(trainingMaterialUpdatePromises)
       .then(updatedMaterials => {
-        currentMaterials.map(currentMaterial => updatedMaterials.find(updatedMaterial => updatedMaterial.id === currentMaterial.id) || currentMaterial);
+        setStoryData({
+          ...storyData,
+          trainingMaterial: updatedMaterials
+        });
       });
 
-      Promise.all(trainingMaterialCreatePromises)
-      .then(createdMaterials => {
-        currentMaterials = [ ...currentMaterials, ...createdMaterials ];
+      Promise.all([ storyPromise, knotPromises, intentPromises, materialPromise ])
+      .then(() => {
+        setAlertType("success");
+        setAlertMessage(strings.editorScreen.save.success);
       });
-
-      // setStoryData({
-      //   story: currentStory,
-      //   knots: currentKnots,
-      //   intents: currentIntents,
-      //   trainingMaterial: currentMaterials
-      // });
       setDataChanged(false);
     } catch (error) {
-      alert("Failed to save!")
+      setAlertType("error");
+      setAlertMessage(strings.editorScreen.save.fail);
       console.error(error);
     }
   }
@@ -654,6 +636,21 @@ const EditorScreen: React.FC<Props> = ({
       intents: intentList,
       trainingMaterial: trainingMaterialList
     });
+  }
+
+  /**
+   * Render alert message
+   */
+  const renderAlert = () => {
+    return alertMessage && (
+      <MuiAlert 
+        elevation={6} 
+        variant="filled"
+        severity={ alertType }
+        >
+          { alertMessage }
+      </MuiAlert>
+    );
   }
 
   /**
@@ -954,8 +951,9 @@ const EditorScreen: React.FC<Props> = ({
       pageTitle={ storyData.story?.name ?? "" }
       dataChanged={ dataChanged }
       storySelected
-      onSaveClick= { onSaveClick }
+      onSaveClick={ onSaveClick }
     >
+      { renderAlert() }
       { renderLeftToolbar() }
       { renderEditorContent() }
       { renderRightToolbar() }

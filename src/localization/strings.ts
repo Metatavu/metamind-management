@@ -71,14 +71,14 @@ export interface IStrings extends LocalizedStringsMethods {
         CONFUSED: string;
         REDIRECT: string;
         DEFAULT: string;
-      },
+      };
       trainingMaterialsHeader: string;
       trainingMaterials: {
         INTENTOPENNLPDOCCAT: string;
         INTENTREGEX: string;
         VARIABLEOPENNLPNER: string;
         VARIABLEOPENNLPREGEX: string;
-      },
+      };
       selectExisting: string;
       none: string;
       selectTrainingMaterial: string;
@@ -98,6 +98,10 @@ export interface IStrings extends LocalizedStringsMethods {
     confirm: {
       knot: string;
       intent: string;
+    };
+    save: {
+      success: string;
+      fail: string;
     }
   };
 
