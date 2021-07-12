@@ -83,7 +83,7 @@
     },
     "save": {
       "success": "Saved!",
-      "fail": "Fail to save!"
+      "fail": "Failed to save!"
     }
   }
 }

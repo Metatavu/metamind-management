@@ -1,4 +1,4 @@
-import { Box, Drawer, Tab, Tabs, TextField, Button, MenuItem, InputLabel } from "@material-ui/core";
+import { Box, Drawer, Tab, Tabs, TextField, Button, MenuItem, InputLabel, Snackbar } from "@material-ui/core";
 import MuiAlert from '@material-ui/lab/Alert';
 import Divider from "@material-ui/core/Divider";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -73,6 +73,8 @@ const EditorScreen: React.FC<Props> = ({
   const [ removedIntents, setRemovedIntents ] = React.useState<Intent[]>([]);
   const [ alertMessage, setAlertMessage ] = React.useState("");
   const [ alertType, setAlertType ] = React.useState<"error" | "success">("success");
+  const [ alertOpen, setAlertOpen ] = React.useState(false);
+
 
   React.useEffect(() => {
     fetchData();
@@ -104,6 +106,20 @@ const EditorScreen: React.FC<Props> = ({
     setCenteredIntent(intent);
     setStoryData({ ...storyData, selectedIntent: intent });
   }
+
+  /**
+   * Event handler for on intent click
+   * 
+   * @param event Synthetic event
+   * @param reason Reason of closing the alert
+   */
+  const handleAlertClose = (event?: React.SyntheticEvent, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setAlertOpen(false);
+  };
 
   /**
    * Event handler for add node
@@ -604,11 +620,20 @@ const EditorScreen: React.FC<Props> = ({
 
       Promise.all([ storyPromise, knotPromises, intentPromises, materialPromise ])
       .then(() => {
+        setAlertOpen(true);
         setAlertType("success");
         setAlertMessage(strings.editorScreen.save.success);
+      })
+      .catch(error => {
+        setAlertOpen(true);
+        setAlertType("error");
+        setAlertMessage(strings.editorScreen.save.fail);
+        console.error(error);
       });
+
       setDataChanged(false);
     } catch (error) {
+      setAlertOpen(true);
       setAlertType("error");
       setAlertMessage(strings.editorScreen.save.fail);
       console.error(error);
@@ -642,14 +667,21 @@ const EditorScreen: React.FC<Props> = ({
    * Render alert message
    */
   const renderAlert = () => {
-    return alertMessage && (
-      <MuiAlert 
-        elevation={6} 
-        variant="filled"
-        severity={ alertType }
+    return (
+      <Snackbar 
+        open={ alertOpen } 
+        autoHideDuration={ 6000 } 
+        onClose={ handleAlertClose }
+      >
+        <MuiAlert 
+          onClose={ handleAlertClose } 
+          severity={ alertType }
+          elevation={ 6 } 
+          variant="filled"
         >
-          { alertMessage }
-      </MuiAlert>
+        { alertMessage }
+        </MuiAlert>
+      </Snackbar>
     );
   }
 
@@ -946,18 +978,20 @@ const EditorScreen: React.FC<Props> = ({
   }
 
   return (
-    <AppLayout
-      keycloak={ keycloak }
-      pageTitle={ storyData.story?.name ?? "" }
-      dataChanged={ dataChanged }
-      storySelected
-      onSaveClick={ onSaveClick }
-    >
+    <>
+      <AppLayout
+        keycloak={ keycloak }
+        pageTitle={ storyData.story?.name ?? "" }
+        dataChanged={ dataChanged }
+        storySelected
+        onSaveClick={ onSaveClick }
+      >
+        { renderLeftToolbar() }
+        { renderEditorContent() }
+        { renderRightToolbar() }
+      </AppLayout>
       { renderAlert() }
-      { renderLeftToolbar() }
-      { renderEditorContent() }
-      { renderRightToolbar() }
-    </AppLayout>
+    </>
   );
 }
 
