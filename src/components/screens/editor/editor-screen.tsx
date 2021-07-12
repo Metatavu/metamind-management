@@ -22,6 +22,10 @@ import AccordionItem from "../../generic/accordion-item";
 import TrainingSelectionOptions from "../../intent-components/training-selection-options/training-selection-options";
 import QuickResponseButton from "../../intent-components/quick-response-button/quick-response-button";
 import EditorUtils from "../../../utils/editor";
+import { resolve } from "dns";
+import { MemoVoidArrayIterator } from "lodash";
+import { TransformOptions } from "stream";
+import { current } from "immer";
 
 /**
  * Component props
@@ -480,7 +484,7 @@ const EditorScreen: React.FC<Props> = ({
   /**
    * Event handler for save button click
    */
-  const onSaveClick = async () => {
+  const onSaveClick = () => {
     if (!accessToken || !storyData.story) {
       return;
     }
@@ -489,93 +493,139 @@ const EditorScreen: React.FC<Props> = ({
       const knotsApi = Api.getKnotsApi(accessToken);
       const intentsApi = Api.getIntentsApi(accessToken);
       const trainingMaterialsApi = Api.getTrainingMaterialApi(accessToken);
+      const storyApi = Api.getStoriesApi(accessToken);
       let currentStory = story;
-      if (story) {
-        currentStory = await Api.getStoriesApi(accessToken).updateStory({ storyId: storyId, story: story });  
-      }
+      const knotUpdatePromises: Promise<Knot>[] = [];
+      const knotCreatePromises: Promise<Knot>[] = [];
+      const knotDeletePromises: Promise<void>[] = [];
+      const intentUpdatePromises: Promise<Intent>[] = [];
+      const intentCreatePromises: Promise<Intent>[] = [];
+      const intentDeletePromises: Promise<void>[] = [];
+      const trainingMaterialUpdatePromises: Promise<TrainingMaterial>[] = [];
+      const trainingMaterialCreatePromises: Promise<TrainingMaterial>[] = [];
+
+      story && storyApi.updateStory({ storyId: storyId, story: story })
+      .then(updatedStory => currentStory = updatedStory);
 
       let currentKnots = knots ? knots : [];
       if (knots) {
         for (const knot of knots) {
-          if (knot.id) {
-            const updatedKnot = await knotsApi.updateKnot({
+          knot.id? knotUpdatePromises.push(
+            knotsApi.updateKnot({
               storyId: storyId,
               knotId: knot.id,
               knot: knot
-            });
-            currentKnots = [ ...currentKnots.filter(item => item.id !== updatedKnot.id), updatedKnot ];
-          } else {
-            const createdKnot = await knotsApi.createKnot({
+            })
+          ) : knotCreatePromises.push(
+            knotsApi.createKnot({
               storyId: storyId,
               knot: knot
-            });
-            currentKnots = [ ...currentKnots, createdKnot ];
-          }
+            })
+          )
         }
       }
+
+      Promise.all(knotUpdatePromises)
+      .then(updatedKnots => {
+        currentKnots.map(currentKnot => updatedKnots.find(updatedKnot => updatedKnot.id === currentKnot.id) || currentKnot);
+      });
+
+      Promise.all(knotCreatePromises)
+      .then(createdKnots => {
+        currentKnots = [ ...currentKnots, ...createdKnots ];
+      });
+
       for (const knot of removedKnots) {
-        knot.id && await knotsApi.deleteKnot({
-          storyId: storyId,
-          knotId: knot.id
-        });
+        knot.id && knotDeletePromises.push(
+          knotsApi.deleteKnot({
+            storyId: storyId,
+            knotId: knot.id
+          })
+        )
       }
-      setRemovedKnots([]);
+
+      Promise.all(knotDeletePromises)
+      .then(() => setRemovedKnots([]))
 
       let currentIntents = intents ? intents : [];
       if (intents) {
         for (const intent of intents) {
-          if (intent.id) {
-            const updatedIntent = await intentsApi.updateIntent({
+          intent.id? intentUpdatePromises.push(
+            intentsApi.updateIntent({
               storyId: storyId,
               intentId: intent.id,
               intent: intent
-            });
-            currentIntents = [ ...currentIntents.filter(item => item.id !== updatedIntent.id), updatedIntent ];
-          } else {
-            const createdIntent = await intentsApi.createIntent({
+            })
+          ) : intentCreatePromises.push(
+            intentsApi.createIntent({
               storyId: storyId,
               intent: intent
-            });
-            currentIntents = [ ...currentIntents, createdIntent ];
-          }
+            })
+          )
         }
       }
+
+      Promise.all(intentUpdatePromises)
+      .then(updatedIntents => {
+        currentIntents.map(currentIntent => updatedIntents.find(updatedIntent => updatedIntent.id === currentIntent.id) || currentIntent);
+      });
+
+      Promise.all(intentCreatePromises)
+      .then(createdIntent => {
+        currentIntents = [ ...currentIntents, ...createdIntent ];
+      });
+
       for (const intent of removedIntents) {
-        intent.id && await intentsApi.deleteIntent({
-          storyId: storyId,
-          intentId: intent.id
-        });
+        intent.id && intentDeletePromises.push(
+          intentsApi.deleteIntent({
+            storyId: storyId,
+            intentId: intent.id
+          })
+        ) 
       }
+
+      Promise.all(intentDeletePromises)
+      .then(() => setRemovedKnots([]))
+
       setRemovedIntents([]);
       
-      let currentMaterial = trainingMaterial ? trainingMaterial : [];
+      let currentMaterials = trainingMaterial ? trainingMaterial : [];
       if (trainingMaterial) {
         for (const material of trainingMaterial) {
-          if (material.id) {
-            const updatedMaterial = await trainingMaterialsApi.updateTrainingMaterial({
+          material.id? trainingMaterialUpdatePromises.push(
+            trainingMaterialsApi.updateTrainingMaterial({
               trainingMaterialId: material.id,
               trainingMaterial: material
-            });
-            currentMaterial = [ ...currentMaterial.filter(item => item.id !== updatedMaterial.id), updatedMaterial ];
-          } else {
-            const createdMaterial = await trainingMaterialsApi.createTrainingMaterial({
+            })
+          ) : trainingMaterialCreatePromises.push(
+            trainingMaterialsApi.createTrainingMaterial({
               trainingMaterial: material
-            });
-            currentMaterial = [ ...currentMaterial, createdMaterial ];
-          }
+            })
+          )
         }
       }
-      
-      setStoryData({
-        story: currentStory,
-        knots: currentKnots,
-        intents: currentIntents,
-        trainingMaterial: currentMaterial
+
+      Promise.all(trainingMaterialUpdatePromises)
+      .then(updatedMaterials => {
+        currentMaterials.map(currentMaterial => updatedMaterials.find(updatedMaterial => updatedMaterial.id === currentMaterial.id) || currentMaterial);
       });
+
+      Promise.all(trainingMaterialCreatePromises)
+      .then(createdMaterials => {
+        currentMaterials = [ ...currentMaterials, ...createdMaterials ];
+      });
+
+      // setStoryData({
+      //   story: currentStory,
+      //   knots: currentKnots,
+      //   intents: currentIntents,
+      //   trainingMaterial: currentMaterials
+      // });
       setDataChanged(false);
-  } catch (error) {
-    console.error(error);
-  }
+    } catch (error) {
+      alert("Failed to save!")
+      console.error(error);
+    }
   }
 
   /**
