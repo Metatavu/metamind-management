@@ -154,19 +154,20 @@ const EditorScreen: React.FC<Props> = ({
    * @param movedNode moved node
    * @param knot knot that needs update
    */
-  const onMoveNode = (movedNode: CustomNodeModel, knot?: Knot) => {
-    if (!knots || !knot?.id) {
+  const onMoveNode = (knotId: string, node: CustomNodeModel) => {
+    if (!knots) {
       return;
     }
 
     const updatedKnot: Knot = {
-      ...knot,
-      coordinates: movedNode.getPosition()
+      ...knots.find(knot => knot.id === knotId)!,
+      coordinates: node.getPosition()
     }
 
     setStoryData({
       ...storyData,
-      knots: knots.map(item => item.id === updatedKnot.id ? updatedKnot : item)
+      knots: knots.map(item => item.id === updatedKnot.id ? updatedKnot : item),
+      selectedKnot: updatedKnot
     });
 
     setDataChanged(true);

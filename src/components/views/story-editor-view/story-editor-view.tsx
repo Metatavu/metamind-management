@@ -25,7 +25,7 @@ interface Props {
   centeredKnot?: Knot;
   centeredIntent?: Intent;
   onAddNode: (node: CustomNodeModel) => void;
-  onMoveNode: (node: CustomNodeModel, knot?: Knot) => void;
+  onMoveNode: (knotId: string, node: CustomNodeModel) => void;
   onRemoveNode: (nodeId: string) => void;
   onAddLink: (sourceNodeId: string, targetNodeId: string) => void;
   onRemoveLink: (linkId: string) => void;
@@ -56,7 +56,6 @@ const StoryEditorView: React.FC<Props> = ({
 }) => {
   const classes = useStoryEditorViewStyles();
   const [ newPoint, setNewPoint ] = React.useState<Point>();
-  const [ movedNode, setMovedNode ] = React.useState<CustomNodeModel | HomeNodeModel | GlobalNodeModel>();
   const [ initialized, setInitialized ] = React.useState(false);
 
   const engineRef = React.useRef(createEngine());
@@ -148,15 +147,6 @@ const StoryEditorView: React.FC<Props> = ({
   }, [ editingEntityInfo ]);
 
   /**
-   * Effect that delays actual update of coordinates in knot when corresponding node is moved in diagram
-   */
-  React.useEffect(() => {
-    debounceTimer.current && clearTimeout(debounceTimer.current);
-    debounceTimer.current = setTimeout(() => moveNode(), 1000);
-    // eslint-disable-next-line
-  }, [ movedNode ]);
-
-  /**
    * Initializes react-diagrams engine
    *
    * @param engine diagram engine
@@ -246,7 +236,7 @@ const StoryEditorView: React.FC<Props> = ({
         onNodeSelectionChange(selectionChangedEvent.entity as CustomNodeModel);
       },
       positionChanged: ({ entity }: any) => {
-        setMovedNode(entity);
+        moveNode(entity);
       },
       entityRemoved: ({ entity }: any) => {
         onRemoveNode(entity.getID() as string);
@@ -306,12 +296,11 @@ const StoryEditorView: React.FC<Props> = ({
   /**
    * Event handler for node move
    */
-  const moveNode = () => {
-    if (movedNode) {
-      const id = movedNode.getID();
-      const foundKnot = knots.find(knot => knot.id === id);
-      onMoveNode(movedNode, foundKnot);
-    }
+  const moveNode = (node: CustomNodeModel) => {
+    debounceTimer.current && clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      onMoveNode(node.getID(), node);
+    }, 1000);
   }
 
   /**
