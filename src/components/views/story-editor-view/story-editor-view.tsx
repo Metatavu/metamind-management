@@ -56,6 +56,7 @@ const StoryEditorView: React.FC<Props> = ({
 }) => {
   const classes = useStoryEditorViewStyles();
   const [ newPoint, setNewPoint ] = React.useState<Point>();
+  const [ movedNode, setMovedNode ] = React.useState<CustomNodeModel | HomeNodeModel | GlobalNodeModel>();
   const [ initialized, setInitialized ] = React.useState(false);
 
   const engineRef = React.useRef(createEngine());
@@ -147,6 +148,22 @@ const StoryEditorView: React.FC<Props> = ({
   }, [ editingEntityInfo ]);
 
   /**
+   * Effect that delays actual update of coordinates in knot when corresponding node is moved in diagram
+   */
+  React.useEffect(() => {
+    debounceTimer.current && clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      if (!movedNode){
+        return;
+      }
+
+      onMoveNode(movedNode.getID(), movedNode);
+      setMovedNode(undefined);
+    }, 1000);
+    // eslint-disable-next-line
+  }, [ movedNode ]);
+
+  /**
    * Initializes react-diagrams engine
    *
    * @param engine diagram engine
@@ -236,7 +253,7 @@ const StoryEditorView: React.FC<Props> = ({
         onNodeSelectionChange(selectionChangedEvent.entity as CustomNodeModel);
       },
       positionChanged: ({ entity }: any) => {
-        moveNode(entity);
+        setMovedNode(entity);
       },
       entityRemoved: ({ entity }: any) => {
         onRemoveNode(entity.getID() as string);
@@ -291,16 +308,6 @@ const StoryEditorView: React.FC<Props> = ({
     }, []);
 
     engineRef.current.getModel().addAll(...nodes, ...links);
-  }
-
-  /**
-   * Event handler for node move
-   */
-  const moveNode = (node: CustomNodeModel) => {
-    debounceTimer.current && clearTimeout(debounceTimer.current);
-    debounceTimer.current = setTimeout(() => {
-      onMoveNode(node.getID(), node);
-    }, 1000);
   }
 
   /**
