@@ -478,7 +478,8 @@ const EditorScreen: React.FC<Props> = ({
 
     setStoryData({
       ...storyData,
-      knots: knots.map(item => item.id === updatedKnot.id ? updatedKnot : item)
+      knots: knots.map(item => item.id === updatedKnot.id ? updatedKnot : item),
+      selectedKnot: updatedKnot
     });
     setDataChanged(true);
   }
@@ -922,7 +923,7 @@ const EditorScreen: React.FC<Props> = ({
           <TextField
             label={ strings.editorScreen.rightBar.knotNameHelper }
             name="name"
-            defaultValue={ selectedKnot.name ?? "" }
+            value={ selectedKnot.name ?? "" }
             onFocus={ () => setEditingEntityInfo(true) }
             onBlur={ () => setEditingEntityInfo(false) }
             onChange={ onUpdateKnotInfo }
