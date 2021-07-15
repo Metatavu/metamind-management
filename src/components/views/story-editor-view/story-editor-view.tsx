@@ -25,13 +25,14 @@ interface Props {
   centeredKnot?: Knot;
   centeredIntent?: Intent;
   onAddNode: (node: CustomNodeModel) => void;
-  onMoveNode: (node: CustomNodeModel, knot?: Knot) => void;
+  onMoveNode: (knotId: string, node: CustomNodeModel) => void;
   onRemoveNode: (nodeId: string) => void;
   onAddLink: (sourceNodeId: string, targetNodeId: string) => void;
   onRemoveLink: (linkId: string) => void;
   editingEntityInfo: boolean;
   onNodeSelectionChange: (node: CustomNodeModel) => void;
   onLinkSelectionChange: (link: CustomLinkModel) => void;
+  onSelectedEntitiesAmountChange: (value: number) => void;
 }
 
 /**
@@ -52,7 +53,8 @@ const StoryEditorView: React.FC<Props> = ({
   onRemoveLink,
   editingEntityInfo,
   onNodeSelectionChange,
-  onLinkSelectionChange
+  onLinkSelectionChange,
+  onSelectedEntitiesAmountChange
 }) => {
   const classes = useStoryEditorViewStyles();
   const [ newPoint, setNewPoint ] = React.useState<Point>();
@@ -152,7 +154,14 @@ const StoryEditorView: React.FC<Props> = ({
    */
   React.useEffect(() => {
     debounceTimer.current && clearTimeout(debounceTimer.current);
-    debounceTimer.current = setTimeout(() => moveNode(), 1000);
+    debounceTimer.current = setTimeout(() => {
+      if (!movedNode){
+        return;
+      }
+
+      onMoveNode(movedNode.getID(), movedNode);
+      setMovedNode(undefined);
+    }, 1000);
     // eslint-disable-next-line
   }, [ movedNode ]);
 
@@ -244,6 +253,7 @@ const StoryEditorView: React.FC<Props> = ({
     node.registerListener({
       selectionChanged: (selectionChangedEvent: any) => {
         onNodeSelectionChange(selectionChangedEvent.entity as CustomNodeModel);
+        onSelectedEntitiesAmountChange(engineRef.current.getModel().getSelectedEntities().length);
       },
       positionChanged: ({ entity }: any) => {
         setMovedNode(entity);
@@ -263,7 +273,7 @@ const StoryEditorView: React.FC<Props> = ({
    * @param nodes list of nodes
    * @returns custom link model
    */
-  const translateToLink = (intent: Intent, nodes: Array<CustomNodeModel | HomeNodeModel | GlobalNodeModel>) => {
+  const translateToLink = (intent: Intent, nodes: (CustomNodeModel | HomeNodeModel | GlobalNodeModel)[]) => {
     const sourceNode = nodes.find(node => node.getID() === intent.sourceKnotId);
     const targetNode = nodes.find(node => node.getID() === intent.targetKnotId);
 
@@ -279,6 +289,7 @@ const StoryEditorView: React.FC<Props> = ({
     link.registerListener({
       selectionChanged: (selectionChangedEvent: any) => {
         onLinkSelectionChange(selectionChangedEvent.entity as CustomLinkModel);
+        onSelectedEntitiesAmountChange(engineRef.current.getModel().getSelectedEntities().length);
       }
     });
 
@@ -301,17 +312,6 @@ const StoryEditorView: React.FC<Props> = ({
     }, []);
 
     engineRef.current.getModel().addAll(...nodes, ...links);
-  }
-
-  /**
-   * Event handler for node move
-   */
-  const moveNode = () => {
-    if (movedNode) {
-      const id = movedNode.getID();
-      const foundKnot = knots.find(knot => knot.id === id);
-      onMoveNode(movedNode, foundKnot);
-    }
   }
 
   /**

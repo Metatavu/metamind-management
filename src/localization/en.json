@@ -4,6 +4,7 @@
     "cancel": "Cancel",
     "edit": "Edit",
     "edited": "Edited",
+    "ok": "OK",
     "remove": "Remove"
   },
 
@@ -20,9 +21,13 @@
     "myStories": "My stories",
     "selectStoryText": "Select a Story or create a new one.",
     "createNewStory": "Create a new story",
+    "dropFileHere": "Drop the story.json file here or click to select",
+    "importStory": "Import a story",
     "lastEditedStories": "Last edited",
+    "nameTheStory": "Name the story",
     "selectStory": "Select a story",
     "selectStoryToEdit": "Edit existing story",
+    "storyName": "Story name",
     "open": "Open"
   },
 
@@ -95,6 +100,10 @@
     "confirm": {
       "knot": "Remove knot and all related intents?",
       "intent": "Remove selected intent?"
+    },
+    "save": {
+      "success": "Saved!",
+      "fail": "Failed to save!"
     }
   }
 }

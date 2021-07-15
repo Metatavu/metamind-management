@@ -4,6 +4,7 @@
     "cancel": "Peruuta",
     "edit": "Muokkaa",
     "edited": "Muokattu",
+    "ok": "OK",
     "remove": "Poista"
   },
 
@@ -20,9 +21,13 @@
     "myStories": "Omat tarinat",
     "selectStoryText": "Valitse tarina tai luo uusi.",
     "createNewStory": "Luo uusi tarina",
+    "dropFileHere": "Pudota tarina.json -tiedosto tähän tai valitse klikkaamalla",
+    "importStory": "Tuo tarina",
     "lastEditedStories": "Viimeksi muokatut tarinat",
+    "nameTheStory": "Nimeä tarina",
     "selectStory": "Valitse tarina",
     "selectStoryToEdit": "Valitse jo olemassaoleva tarina editoitavaksi",
+    "storyName": "Tarinan nimi",
     "open": "Avaa"
   },
 
@@ -95,6 +100,10 @@
     "confirm": {
       "knot": "Poistetaanko valittu solmu ja kaikki siihen liitetyt aikomukset?",
       "intent": "Poistetaanko valittu aikomus?"
+    },
+    "save": {
+      "success": "Tallennettu!",
+      "fail": "Tallennus epäonnistui!"
     }
   }
 }
