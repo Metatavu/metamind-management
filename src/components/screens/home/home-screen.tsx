@@ -1,16 +1,19 @@
-import { Box, Button, List, ListItem, ListItemText, Typography, WithStyles, withStyles, TextField, Divider, MenuItem } from "@material-ui/core";
+import { Box, Button, Fade, IconButton, List, ListItem, ListItemText, Typography, WithStyles, withStyles, TextField, Divider, MenuItem, Toolbar } from "@material-ui/core";
 import { History } from "history";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../../../api/api";
-import { Story, KnotType,TokenizerType, KnotScope } from "../../../generated/client";
+import { KnotScope, KnotType, Story, TokenizerType } from "../../../generated/client";
 import strings from "../../../localization/strings";
 import { ReduxActions, ReduxState } from "../../../store";
 import { AccessToken } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
 import { styles } from "./home-screen.styles";
+import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
+import { DropzoneArea } from "material-ui-dropzone";
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 
 /**
  * Interface describing component props
@@ -27,6 +30,9 @@ interface Props extends WithStyles<typeof styles> {
 interface State {
   stories: Story[];
   selectedStoryId?: string;
+  cardShown: "SELECT" | "CREATE" | "IMPORT";
+  newStoryName: string;
+  storyFile?: File;
 }
 
 /**
@@ -43,7 +49,9 @@ class HomeScreen extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      stories: []
+      stories: [],
+      cardShown: "SELECT",
+      newStoryName: ""
     }
   }
 
@@ -70,9 +78,128 @@ class HomeScreen extends React.Component<Props, State> {
         keycloak={ keycloak }
       >
         <Box className={ classes.root }>
-          { this.renderSelectStoryCard() }
+          <Toolbar />
+          <Box className={ classes.cardWrapper }>
+            { this.renderCardShown() }
+          </Box>
         </Box>
       </AppLayout>
+    );
+  }
+
+  /**
+   * Renders card shown
+   */
+  public renderCardShown = () => {
+    const { cardShown } = this.state;
+
+    switch (cardShown) {
+      case "SELECT":
+        return this.renderSelectStoryCard();
+      case "CREATE":
+        return this.renderCreateStory()
+      case "IMPORT":
+        return this.renderImportStory()
+      default: 
+        return this.renderSelectStoryCard();
+    }
+  }
+
+  /**
+   * Renders import story card
+   */
+  private renderImportStory = () => {
+    const { classes } = this.props;
+    const { storyFile } = this.state;
+
+    return (
+      <Box className={ classes.cardContent }>
+        <Box className={ classes.cardHeader }>
+          <Box className={ classes.backButtonContainer }>
+            <IconButton
+              title={ strings.header.settings }
+              color="secondary"
+              onClick={ this.onReturnButtonClick }
+            >
+              <NavigateBeforeIcon/>
+            </IconButton>
+          </Box>
+          <Typography color="textSecondary" variant="h1">
+            { strings.homeScreen.importStory }
+          </Typography>
+        </Box>
+        { !storyFile &&
+          <Box p={ 2 } mb={ 2 }>
+            <DropzoneArea
+              acceptedFiles={ [ ".json" ] }
+              clearOnUnmount
+              dropzoneText={ strings.homeScreen.dropFileHere }
+              onDrop={ this.onFilesDropped }
+              dropzoneClass={ classes.dropzone }
+              showPreviewsInDropzone={ false }
+              maxFileSize={ 2 * 1000000 }
+              filesLimit={ 1 }
+            />
+          </Box>
+        }
+        { storyFile &&
+          <>
+            { this.renderPreview() }
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={ () => console.log("TODO") }
+            >
+              { strings.homeScreen.importStory }
+            </Button>
+          </>
+        }
+      </Box>
+    );
+  }
+
+  /**
+   * Renders create story card
+   */
+  private renderCreateStory = () => {
+    const { classes } = this.props;
+    const { newStoryName } = this.state;
+
+    return (
+      <Box className={ classes.cardContent }>
+        <Box className={ classes.cardHeader }>
+          <Box className={ classes.backButtonContainer }>
+            <IconButton
+              title={ strings.header.settings }
+              color="secondary"
+              onClick={ this.onReturnButtonClick }
+            >
+              <NavigateBeforeIcon/>
+            </IconButton>
+          </Box>
+          <Typography color="textSecondary" variant="h1">
+            { strings.homeScreen.nameTheStory }
+          </Typography>
+        </Box>
+        <Box p={ 2 } mb={ 2 }>
+          <TextField
+            className={ classes.textField }
+            InputProps={{ className: classes.textInput }}
+            label={ strings.homeScreen.storyName }
+            title={ strings.homeScreen.storyName }
+            value={ newStoryName }
+            onChange={ this.onStoryNameChange }
+            variant="outlined"
+          />
+        </Box>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={ this.onCreateNewStoryClick }
+        >
+          { strings.homeScreen.createNewStory }
+        </Button>
+      </Box>
     );
   }
 
@@ -84,8 +211,8 @@ class HomeScreen extends React.Component<Props, State> {
     const { selectedStoryId } = this.state;
 
     return (
-      <Box className={ classes.storySelectCard }>
-        <Box textAlign="center" mb={ 4 }>
+      <Box className={ classes.cardContent }>
+        <Box className={ classes.cardHeader }>
           <Typography color="textSecondary" variant="h1">
             { strings.homeScreen.selectStoryText }
           </Typography>
@@ -125,6 +252,17 @@ class HomeScreen extends React.Component<Props, State> {
           onClick={ this.onCreateNewStoryClick }
         >
           { strings.homeScreen.createNewStory }
+        </Button>
+        <Box 
+          mb={ 1 }
+          mt={ 1 }
+        ></Box>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={ this.onImportStoryClick }
+        >
+          { strings.homeScreen.importStory }
         </Button>
         { this.renderRecentStories() }
       </Box>
@@ -167,52 +305,147 @@ class HomeScreen extends React.Component<Props, State> {
       </Box>
     );
   }
+
+  /**
+   * Renders selected file  preview
+   */
+  private renderPreview = () => {
+    const { classes } = this.props;
+    const { storyFile } = this.state;
+    if (!storyFile) {
+      return null;
+    }
+
+    return (
+      <Box className={ classes.previewItem }>
+        <Typography variant="h4" color="textSecondary">
+          { storyFile.name }
+        </Typography>
+        <Box className={ classes.removeButtonContainer }>
+          <IconButton
+            color="secondary"
+            onClick={ () => this.setState({ storyFile: undefined }) }
+          >
+            <HighlightOffIcon/>
+          </IconButton>
+        </Box>
+      </Box>
+    );
+  }
+
+  /**
+   * Event handler for import story click
+   * 
+   * @returns 
+   */
+  private onImportStoryClick = () => {
+    const { accessToken } = this.props;
+    const { cardShown } = this.state;
+
+    if (cardShown === "SELECT" || !accessToken) {
+      this.setState({ cardShown: "IMPORT" });
+      return;
+    }
+    // TODO: implement importing of story from the .xml file
+    return;
+  }
   
   /**
    * Event handler for create new story click
    */
   private onCreateNewStoryClick = async () => {
-    //TODO: Proper implementation
     const { accessToken } = this.props;
+    const { cardShown, newStoryName } = this.state;
 
-    if (!accessToken) {
+    if (cardShown === "SELECT" || !accessToken) {
+      this.setState({ cardShown: "CREATE" });
       return;
     }
-
-    const story = await Api.getStoriesApi(accessToken).createStory({
+    
+    const createdStory = await Api.getStoriesApi(accessToken).createStory({
       story: {
-        name: "Global & home knots tester",
-        locale: "fi"
+        locale: strings.getLanguage(),
+        name: newStoryName
       }
     });
 
-    if (story.id) {
-      
+    if (createdStory.id) {
       const knotsApi = Api.getKnotsApi(accessToken);
       const globalKnot = await knotsApi.createKnot({
-        storyId: story.id,
+        storyId: createdStory.id,
         knot: {
           name: "Global",
           type: KnotType.TEXT,
           scope: KnotScope.Global,
-          tokenizer: TokenizerType.UNTOKENIZED,
-          content: ""
+          tokenizer: TokenizerType.WHITESPACE,
+          content: "",
+          coordinates: { x: 200, y: 100 }
         }
       });
 
       const homeKnot = await knotsApi.createKnot({
-        storyId: story.id,
+        storyId: createdStory.id,
         knot: {
           name: "Home",
           type: KnotType.TEXT,
           scope: KnotScope.Home,
-          tokenizer: TokenizerType.UNTOKENIZED,
-          content: ""
+          tokenizer: TokenizerType.WHITESPACE,
+          content: "",
+          coordinates: { x: 200, y: 400 }
         }
       });
 
-      this.setState({ selectedStoryId: story.id });
+      this.setState({
+        stories: [ ...this.state.stories, createdStory ],
+        selectedStoryId: createdStory.id ?? this.state.selectedStoryId
+      });
+      
+      this.props.history.push(`editor/${createdStory.id}`);
     }
+    
+  }
+
+  /**
+   * Event handler for return button click
+   */
+  private onReturnButtonClick = () => {
+    this.setState({
+      cardShown: "SELECT",
+      newStoryName: "",
+      storyFile: undefined
+    });
+  }
+
+  /**
+   * Event handler for story name change
+   * 
+   * @param event change event
+   */
+  private onStoryNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+
+    if (!value) {
+      return;
+    }
+
+    this.setState({ 
+      newStoryName: value 
+    });
+  }
+
+  /**
+   * Event handler for files drop
+   * 
+   * @param file dropped file
+   */
+  private onFilesDropped = (files: File[]) => {
+    if (!files?.length) {
+      return;
+    }
+
+    this.setState({ 
+      storyFile: files[0] 
+    });
   }
 
   /**

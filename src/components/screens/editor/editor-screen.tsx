@@ -23,6 +23,7 @@ import AccordionItem from "../../generic/accordion-item";
 import TrainingSelectionOptions from "../../intent-components/training-selection-options/training-selection-options";
 import QuickResponseButton from "../../intent-components/quick-response-button/quick-response-button";
 import EditorUtils from "../../../utils/editor";
+import KnotIcon from "../../../resources/svg/knot-icon";
 
 /**
  * Component props
@@ -74,7 +75,7 @@ const EditorScreen: React.FC<Props> = ({
   const [ alertMessage, setAlertMessage ] = React.useState("");
   const [ alertType, setAlertType ] = React.useState<"error" | "success">("success");
   const [ alertOpen, setAlertOpen ] = React.useState(false);
-
+  const [ selectedEntititiesLength, setSelectedEntitiesLength ] = React.useState(0);
 
   React.useEffect(() => {
     fetchData();
@@ -260,6 +261,15 @@ const EditorScreen: React.FC<Props> = ({
       return;
     }
 
+    if (selectedEntititiesLength !== 0) {
+      setStoryData({
+        ...storyData,
+        selectedIntent: undefined,
+        selectedKnot: undefined
+      });
+      return;
+    }
+
     const knot = knots.find(item => item.id === node.getID());
 
     setStoryData({
@@ -281,6 +291,15 @@ const EditorScreen: React.FC<Props> = ({
    */
   const onLinkSelectionChange = (link: CustomLinkModel) => {
     if (!intents) {
+      return;
+    }
+
+    if (selectedEntititiesLength !== 0) {
+      setStoryData({
+        ...storyData,
+        selectedIntent: undefined,
+        selectedKnot: undefined
+      });
       return;
     }
 
@@ -484,6 +503,26 @@ const EditorScreen: React.FC<Props> = ({
       intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
     });
     setDataChanged(true);
+  }
+
+  /**
+   * Event handler for updating story info
+   * 
+   * @param event event from input change
+   */
+  const onUpdateStoryInfo = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event?.target;
+    if(!story) {
+      return;
+    }
+
+    setStoryData({
+      ...storyData,
+      story: {
+        ...story,
+        [name]: value
+      }
+    })
   }
 
   /**
@@ -751,7 +790,7 @@ const EditorScreen: React.FC<Props> = ({
     return (
       <Box
         marginLeft="320px"
-        marginRight="320px"
+        marginRight={ selectedEntititiesLength !== 0 ? "320px" : "0px" }
         height="100%"
       >
         <Toolbar/>
@@ -774,6 +813,7 @@ const EditorScreen: React.FC<Props> = ({
             editingEntityInfo={ editingEntityInfo }
             onNodeSelectionChange={ onNodeSelectionChange }
             onLinkSelectionChange={ onLinkSelectionChange }
+            onSelectedEntitiesAmountChange = { setSelectedEntitiesLength }
           />
         </Box>
       </Box>
@@ -786,10 +826,18 @@ const EditorScreen: React.FC<Props> = ({
   const renderActionButtons = () => {
     return (
       <Button
+        className= { classes.knotButton }
         variant="contained"
         onClick={ () => setAddingKnots(!addingKnots) }
-      >
-        { strings.editorScreen.add.knot }
+      > 
+        <div className={ addingKnots ? classes.activeKnotButtonContainer : classes.inactiveKnotButtonContainer }>
+          <Box width="100%" color="inherit">
+            <KnotIcon htmlColor={ "inherit" }/>
+          </Box>
+          <Box width="100%">
+            { strings.editorScreen.add.knot }
+          </Box>
+        </div>
       </Button>
     );
   }
@@ -832,7 +880,9 @@ const EditorScreen: React.FC<Props> = ({
     return (
       <TextField
         label={ strings.editorScreen.rightBar.storyNameHelper }
-        defaultValue={ story?.name }
+        name="name"
+        value={ story?.name }
+        onChange={ onUpdateStoryInfo }
         onFocus={ () => setEditingEntityInfo(true) }
         onBlur={ () => setEditingEntityInfo(false) }
       />
@@ -992,7 +1042,7 @@ const EditorScreen: React.FC<Props> = ({
       >
         { renderLeftToolbar() }
         { renderEditorContent() }
-        { renderRightToolbar() }
+        { selectedEntititiesLength !== 0 && renderRightToolbar() }
       </AppLayout>
       { renderAlert() }
     </>
