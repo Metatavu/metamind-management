@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useStoryPreviewViewStyles } from "./story-preview-view";
-import { MessageData } from "metamind-metatavu-bot/src/types";
-import MessageList from "../../messages_temp/message-list"
-import MessageInput from "../../messages_temp/message-input"
+import { MessageData } from "metamind-metatavu-bot/dist/types";
+import MessageList from "metamind-metatavu-bot/dist/components/message-list/message-list"
+import MessageInput from "metamind-metatavu-bot/dist/components/message-input/message-input"
 import { connect } from "react-redux";
 import { ReduxActions, ReduxState } from "../../../store";
 import { Dispatch } from "react";

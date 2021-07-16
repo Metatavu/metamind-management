@@ -1,4 +1,4 @@
-import { MessageData } from "../../metamind-metatavu-bot/src/types";
+import { MessageData } from "metamind-metatavu-bot/dist/types";
 import * as ActionTypes from "../constants/actionTypes";
 
 /**

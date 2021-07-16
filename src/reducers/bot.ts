@@ -1,4 +1,4 @@
-import { MessageData } from "../../metamind-metatavu-bot/src/types";
+import { MessageData } from "metamind-metatavu-bot/dist/types";
 import { BotAction } from "../actions/bot";
 import { BOT_INTERRUPTED, BOT_OR_USER_RESPONSE, BOT_RESET, CONVERSATION_START, MESSAGES_END_UPDATE } from "../constants/actionTypes";
 
