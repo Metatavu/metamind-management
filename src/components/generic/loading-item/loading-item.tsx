@@ -8,6 +8,7 @@ import { useLoadingStyles } from "./loading-item.styles"
 const Loading: React.FC = () => {
   const classes = useLoadingStyles();
 
+  // TODO localization
   return (
     <Box className={ classes.root }>
       <CircularProgress />

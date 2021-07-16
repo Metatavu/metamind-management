@@ -13,6 +13,8 @@ interface Props extends WithStyles<typeof styles> {
   selectedIntent?: Intent;
   setEditingButtonFieldValue: React.Dispatch<React.SetStateAction<boolean>>;
   onUpdateFieldInfo: (event: React.ChangeEvent<any>) => void;
+  onFocus: () => void;
+  onBlur: () => void;
 }
 
 /**
@@ -25,7 +27,9 @@ const QuickResponseButton: React.FC<Props> = ({
   editing,
   selectedIntent,
   setEditingButtonFieldValue,
-  onUpdateFieldInfo
+  onUpdateFieldInfo,
+  onFocus,
+  onBlur
 }) => {
   return (
     <>
@@ -51,6 +55,8 @@ const QuickResponseButton: React.FC<Props> = ({
               placeholder={ strings.editorScreen.rightBar.quickResponseButtonDefault }
               InputProps={ { disableUnderline: true } }
               onChange={ onUpdateFieldInfo }
+              onFocus={ onFocus }
+              onBlur={ onBlur }
             />
             <ListItemSecondaryAction>
               <IconButton

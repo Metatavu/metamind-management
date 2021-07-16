@@ -1,4 +1,4 @@
-import { Intent, Knot, Story, TrainingMaterial } from "../generated/client/models";
+import { Intent, Knot, Story, TrainingMaterial, Script } from "../generated/client/models";
 
 /**
  * Interface describing an access token
@@ -18,4 +18,5 @@ export interface StoryData {
   selectedKnot?: Knot;
   selectedIntent? : Intent;
   trainingMaterial?: TrainingMaterial[];
+  scripts?: Script[];
 };
