@@ -556,23 +556,11 @@ const EditorScreen: React.FC<Props> = ({
       const intentsApi = Api.getIntentsApi(accessToken);
       const trainingMaterialsApi = Api.getTrainingMaterialApi(accessToken);
       const storyApi = Api.getStoriesApi(accessToken);
-      let knotUpdatePromises: Promise<Knot>[] = [];
-      const knotDeletePromises: Promise<void>[] = [];
-      let intentUpdatePromises: Promise<Intent>[] = [];
-      const intentDeletePromises: Promise<void>[] = [];
-      let trainingMaterialUpdatePromises: Promise<TrainingMaterial>[] = [];
 
-      const storyPromise = story? storyApi.updateStory({ storyId: storyId, story: story })
-      .then(updatedStory => {
-          setStoryData({
-            story: updatedStory
-          })
-        }
-      ) : undefined;
+      const storyPromise = story? storyApi.updateStory({ storyId: storyId, story: story }) : undefined;
       
-      // eslint-disable-next-line no-unused-expressions
-      knots && (
-        knotUpdatePromises = knots?.map(knot => (
+      const knotUpdatePromises = (knots || []).map(
+        knot => (
           knot.id? knotsApi.updateKnot({
             storyId: storyId,
             knotId: knot.id,
@@ -581,35 +569,20 @@ const EditorScreen: React.FC<Props> = ({
             storyId: storyId,
             knot: knot
           })
-        ))
+        )
       );
 
-      for (const knot of removedKnots) {
-        // eslint-disable-next-line no-unused-expressions
-        knot.id && knotDeletePromises.push(
+      const knotDeletePromises = removedKnots.map(
+        knot => (
           knotsApi.deleteKnot({
             storyId: storyId,
-            knotId: knot.id
+            knotId: knot.id!!
           })
-        );
-      }
-
-      const knotPromises = Promise.all(knotUpdatePromises)
-      .then(updatedKnots => { 
-        setStoryData({
-          ...storyData, 
-          knots: updatedKnots
-        });
-        Promise.all(knotDeletePromises)
-          .then(() => {
-            setRemovedKnots([]);
-          }) 
-        }
+        )
       );
 
-      // eslint-disable-next-line no-unused-expressions
-      intents && (
-        intentUpdatePromises = intents?.map(intent => (
+      const intentUpdatePromises = (intents || []).map(
+        intent => (
           intent.id? intentsApi.updateIntent({
             storyId: storyId,
             intentId: intent.id,
@@ -618,52 +591,49 @@ const EditorScreen: React.FC<Props> = ({
             storyId: storyId,
             intent: intent
           })
-        ))
+        )
       );
 
-      for (const intent of removedIntents) {
-        // eslint-disable-next-line no-unused-expressions
-        intent.id && intentDeletePromises.push(
+      const intentDeletePromises = removedIntents.map(
+        intent => (
           intentsApi.deleteIntent({
             storyId: storyId,
-            intentId: intent.id
+            intentId: intent.id!!
           })
-        );
-      }
+        )
+      );
 
-      const intentPromises = Promise.all(intentUpdatePromises)
-      .then(updatedIntents => {
-        setStoryData({
-          ...storyData, 
-          intents: updatedIntents
-        });
-        Promise.all(intentDeletePromises)
-        .then(() => setRemovedKnots([]));
-      });
-
-      // eslint-disable-next-line no-unused-expressions
-      trainingMaterial && (
-        trainingMaterialUpdatePromises = trainingMaterial.map(material => (
+      const trainingMaterialUpdatePromises = (trainingMaterial || []).map(
+        material => (
           material.id? trainingMaterialsApi.updateTrainingMaterial({
             trainingMaterialId: material.id,
             trainingMaterial: material
           }) : trainingMaterialsApi.createTrainingMaterial({
             trainingMaterial: material
           })
-        ))
-      );
-
-      const materialPromise = Promise.all(trainingMaterialUpdatePromises)
-      .then(updatedMaterials => {
-        setStoryData({
-          ...storyData,
-          trainingMaterial: updatedMaterials
-        });
-      });
+        )
+      )
 
       console.log("TODO Loading, prevent user from interacting");
-      await Promise.all([ storyPromise, knotPromises, intentPromises, materialPromise ])
+
+      const [ updatedStory, updatedKnots, updatedIntents, updatedMaterials ] = await Promise.all([ 
+        storyPromise, 
+        Promise.all(knotDeletePromises)
+          .then(() => Promise.all(knotUpdatePromises)),
+        Promise.all(intentDeletePromises)
+          .then(() => Promise.all(intentUpdatePromises)),
+        Promise.all(trainingMaterialUpdatePromises)
+      ])
       
+      setStoryData({
+        story: updatedStory!!,
+        knots: updatedKnots,
+        intents: updatedIntents,
+        trainingMaterial: updatedMaterials
+      });
+
+      setRemovedKnots([]);
+      setRemovedIntents([]);
     } catch (error) {
       setAlertOpen(true);
       setAlertType("error");
