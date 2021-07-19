@@ -12,6 +12,7 @@ import { DropzoneArea } from "material-ui-dropzone";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ReplayIcon from "@material-ui/icons/Replay";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import { ClassNameMap } from "@material-ui/core/styles/withStyles";
 
 /**
  * Interface describing component props
@@ -116,7 +117,7 @@ const DiscussionComponent: React.FC<Props> = ({
  * @param text text
  */
 const renderTextReply = (
-  classes: any,
+  classes: ClassNameMap,
   imageReply: boolean,
   setImageReply: (value: boolean) => void,
   textReply: boolean,
@@ -182,7 +183,7 @@ const renderTextReply = (
  * TODO: actual image upload
  */
 const renderImageReply = (
-  classes: any,
+  classes: ClassNameMap,
   imageReply: boolean,
   setImageReply: (value: boolean) => void,
   textReply: boolean,
@@ -260,7 +261,7 @@ const renderImageReply = (
  * TODO: actual script icons separation
  */
 const renderScripts = (
-  classes: any,
+  classes: ClassNameMap,
   onScriptClick: (value: string | undefined) => void,
   script?: string,
   scripts?: Script[]
