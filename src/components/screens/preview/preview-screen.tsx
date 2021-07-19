@@ -24,7 +24,6 @@ import Loading from "../../generic/loading-item/loading-item";
  * Interface describing component props
  */
 interface Props {
-  history: History;
   keycloak?: KeycloakInstance;
   accessToken: AccessToken;
   storyData?: StoryData;
@@ -164,7 +163,7 @@ const  PreviewScreen: React.FC<Props> = ({
     return (
       <AppLayout
       keycloak={ keycloak }
-      pageTitle={ "Loading" }
+      pageTitle={ strings.loading.loading }
     >
       { renderLoading() }
     </AppLayout>
@@ -175,8 +174,6 @@ const  PreviewScreen: React.FC<Props> = ({
 
   return (
     <AppLayout
-      storySelected
-      storyId={ storyData.story?.id }
       keycloak={ keycloak }
       pageTitle={ storyData.story?.name ?? "" }
       dataChanged={ true }

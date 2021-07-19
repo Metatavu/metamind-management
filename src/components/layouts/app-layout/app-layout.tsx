@@ -9,16 +9,19 @@ import PreviewIcon from "@material-ui/icons/PlayArrow";
 import SaveIcon from "@material-ui/icons/Save";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { KeycloakInstance } from "keycloak-js";
+import { ReduxState } from "../../../store";
+import { connect } from "react-redux";
+import { StoryData } from "../../../types";
 
 /**
  * Interface describing component props
  */
 interface Props extends WithStyles<typeof styles> {
+  children: React.ReactNode;
   onSaveClick?: () => void;
   dataChanged?: boolean;
-  storySelected?: boolean;
   pageTitle: string;
-  storyId?: string;
+  storyData?: StoryData;
   keycloak: KeycloakInstance;
 }
 
@@ -52,7 +55,7 @@ class AppLayout extends React.Component<Props, State> {
       children,
       onSaveClick,
       dataChanged,
-      storySelected,
+      storyData,
       keycloak
     } = this.props;
     const firstName = (keycloak.profile && keycloak.profile.firstName) ?? "";
@@ -65,7 +68,7 @@ class AppLayout extends React.Component<Props, State> {
             { this.renderNavigation() }
             { this.renderPageTitle() }
             <Box display="flex" alignItems="center">
-              { storySelected &&
+              { storyData &&
                 <Button
                   onClick={ onSaveClick }
                   disabled={ !dataChanged }
@@ -112,7 +115,7 @@ class AppLayout extends React.Component<Props, State> {
    * Renders navigation
    */
   private renderNavigation = () => {
-    const { storySelected, storyId } = this.props;
+    const { storyData } = this.props;
 
     return (
       <Box
@@ -123,9 +126,9 @@ class AppLayout extends React.Component<Props, State> {
         <Link to="/">
           <Logo />
         </Link>
-        { storySelected &&
+        { storyData &&
           <Box ml={ 2 }>
-            <NavLink exact to={ `/editor/${storyId}` }>
+            <NavLink exact to={ `/editor/${storyData.story?.id}` }>
               <Button
                 variant="text"
                 startIcon={ <EditorIcon/> }
@@ -134,7 +137,7 @@ class AppLayout extends React.Component<Props, State> {
                 { strings.header.editor }
               </Button>
             </NavLink>
-            <NavLink exact to={ `/preview/${storyId}` }>
+            <NavLink exact to={ `/preview/${storyData.story?.id}` }>
               <Button
                 variant="text"
                 startIcon={ <PreviewIcon/> }
@@ -193,4 +196,14 @@ class AppLayout extends React.Component<Props, State> {
   }
 }
 
-export default withStyles(styles)(AppLayout);
+/**
+ * Redux mapper for mapping store state to component props
+ *
+ * @param state store state
+ * @returns state from props
+ */
+const mapStateToProps = (state: ReduxState) => ({
+  storyData: state.story.storyData,
+});
+
+export default connect(mapStateToProps)(withStyles(styles)(AppLayout));

@@ -1105,7 +1105,7 @@ const EditorScreen: React.FC<Props> = ({
     return (
       <AppLayout
       keycloak={ keycloak }
-      pageTitle={ "Loading" }
+      pageTitle={ strings.loading.loading }
     >
       { renderLoading() }
     </AppLayout>
@@ -1117,9 +1117,7 @@ const EditorScreen: React.FC<Props> = ({
   return (
     <>
       <AppLayout
-        storySelected
         keycloak={ keycloak }
-        storyId={ storyData.story?.id }
         pageTitle={ storyData.story?.name ?? "" }
         dataChanged={ dataChanged }
         onSaveClick={ onSaveClick }

@@ -1,5 +1,5 @@
 import { StoryAction } from "../actions/story";
-import { LOAD_STORY, SELECT_STORY, SET_STORY, UNSELECT_STORY } from "../constants/actionTypes";
+import { LOAD_STORY, SET_STORY } from "../constants/actionTypes";
 import { StoryData } from "../types";
 
 /**

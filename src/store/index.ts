@@ -6,7 +6,6 @@ import { authReducer } from "../reducers/auth";
 import { botReducer } from "../reducers/bot";
 import { storyReducer } from "../reducers/story";
 
-
 /**
  * Root reducer that wraps all Redux reducers
  */

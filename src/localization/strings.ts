@@ -149,9 +149,10 @@ export interface IStrings extends LocalizedStringsMethods {
    * Translations related to loading
    */
   loading: {
+    loading: string;
     loadingStory: string;
     savingStory: string;
-  }
+  };
 
   /**
    * Translations related to story view

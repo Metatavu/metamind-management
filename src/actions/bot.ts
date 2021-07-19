@@ -42,6 +42,8 @@ export type BotAction = BotOrUserResponseAction | BotResetAction | BotInterrupte
 
 /**
  * Bot or user response method
+ * 
+ * @param messageData Message Data
  */
 export function botOrUserResponse(messageData: MessageData): BotOrUserResponseAction{
   return {
@@ -79,6 +81,8 @@ export function conversationStart(): ConversationStartAction {
 
 /**
  * Update message end method
+ * 
+ * @param messageData Message end div
  */
 export function messagesEndUpdate(messagesEnd?: HTMLDivElement): MessagesEndUpdateAction {
   return {
