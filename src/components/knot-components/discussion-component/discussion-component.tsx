@@ -191,7 +191,6 @@ const renderImageReply = (
   setImageFile: (value: File | undefined) => void,
   imageFile?: File
 ) => {
-
   return (
     <ListItem className={ classes.listItem } button={ false }>
       <div className={ classes.headerWrapper }>
