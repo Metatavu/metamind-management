@@ -614,12 +614,15 @@ const EditorScreen: React.FC<Props> = ({
         )
       )
 
+      await Promise.all([
+        Promise.all(knotDeletePromises),
+        Promise.all(intentDeletePromises)
+      ])
+
       console.log("TODO Loading, prevent user from interacting");
 
-      const [ updatedStory, _, __, updatedKnots, updatedIntents, updatedMaterials ] = await Promise.all([ 
+      const [ updatedStory, updatedKnots, updatedIntents, updatedMaterials ] = await Promise.all([ 
         storyPromise, 
-        await Promise.all(knotDeletePromises),
-        await Promise.all(intentDeletePromises),
         Promise.all(knotUpdatePromises),
         Promise.all(intentUpdatePromises),
         Promise.all(trainingMaterialUpdatePromises)
