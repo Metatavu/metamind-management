@@ -557,7 +557,7 @@ const EditorScreen: React.FC<Props> = ({
       const trainingMaterialsApi = Api.getTrainingMaterialApi(accessToken);
       const storyApi = Api.getStoriesApi(accessToken);
 
-      const storyPromise = story? storyApi.updateStory({ storyId: storyId, story: story }) : undefined;
+      const storyPromise = story ? storyApi.updateStory({ storyId: storyId, story: story }) : undefined;
       
       const knotUpdatePromises = (knots || []).map(
         knot => (
