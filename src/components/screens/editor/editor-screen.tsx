@@ -616,14 +616,14 @@ const EditorScreen: React.FC<Props> = ({
 
       console.log("TODO Loading, prevent user from interacting");
 
-      const [ updatedStory, updatedKnots, updatedIntents, updatedMaterials ] = await Promise.all([ 
+      const [ updatedStory, _, __, updatedKnots, updatedIntents, updatedMaterials ] = await Promise.all([ 
         storyPromise, 
-        Promise.all(knotDeletePromises)
-          .then(() => Promise.all(knotUpdatePromises)),
-        Promise.all(intentDeletePromises)
-          .then(() => Promise.all(intentUpdatePromises)),
+        await Promise.all(knotDeletePromises),
+        await Promise.all(intentDeletePromises),
+        Promise.all(knotUpdatePromises),
+        Promise.all(intentUpdatePromises),
         Promise.all(trainingMaterialUpdatePromises)
-      ])
+      ]);
       
       setStoryData({
         story: updatedStory!!,
