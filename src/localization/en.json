@@ -125,5 +125,10 @@
       "confusedIntents": "Confused intents",
       "redirectIntents": "Redirect intents"
     }
+  },
+
+  "loading": {
+    "loadingStory": "Loading story...",
+    "savingStory": "Saving story..."
   }
 }

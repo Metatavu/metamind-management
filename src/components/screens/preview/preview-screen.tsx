@@ -158,7 +158,7 @@ const  PreviewScreen: React.FC<Props> = ({
         pageTitle={ "Loading" }
       >
         <Box style={{ height: "100%", width: "100%", alignItems: "center", justifyContent: "center", display: "flex" }}>
-          <Loading />
+          <Loading text={ strings.loading.loadingStory }/>
         </Box>
       </AppLayout>
     );

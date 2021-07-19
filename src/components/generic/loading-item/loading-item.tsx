@@ -3,17 +3,24 @@ import React from "react"
 import { useLoadingStyles } from "./loading-item.styles"
 
 /**
+ * Interface describing component properties
+ */
+interface Props {
+  text: string;
+}
+
+/**
  * Loading item component
  */
-const Loading: React.FC = () => {
+const Loading: React.FC<Props> = ({
+  text
+}) => {
   const classes = useLoadingStyles();
-
-  // TODO localization
   return (
     <Box className={ classes.root }>
       <CircularProgress />
       <Typography>
-        Loading Story ...
+        { text }
       </Typography>
     </Box>
   );

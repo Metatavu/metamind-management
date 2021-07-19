@@ -125,5 +125,10 @@
       "confusedIntents": "Hämmentymiset",
       "redirectIntents": "Uudelleenohjaukset"
     }
+  },
+
+  "loading": {
+    "loadingStory": "Lataa tarinaa...",
+    "savingStory": "Tallennetaan tarinaa..."
   }
 }
