@@ -561,7 +561,7 @@ const EditorScreen: React.FC<Props> = ({
       const trainingMaterialsApi = Api.getTrainingMaterialApi(accessToken);
       const storyApi = Api.getStoriesApi(accessToken);
 
-      const storyPromise = story? storyApi.updateStory({ storyId: storyId, story: story }) : undefined;
+      const storyPromise = story ? storyApi.updateStory({ storyId: storyId, story: story }) : undefined;
       
       const knotUpdatePromises = (knots || []).map(
         knot => (
@@ -618,16 +618,19 @@ const EditorScreen: React.FC<Props> = ({
         )
       )
 
+      await Promise.all([
+        Promise.all(knotDeletePromises),
+        Promise.all(intentDeletePromises)
+      ])
+
       console.log("TODO Loading, prevent user from interacting");
 
       const [ updatedStory, updatedKnots, updatedIntents, updatedMaterials ] = await Promise.all([ 
         storyPromise, 
-        Promise.all(knotDeletePromises)
-          .then(() => Promise.all(knotUpdatePromises)),
-        Promise.all(intentDeletePromises)
-          .then(() => Promise.all(intentUpdatePromises)),
+        Promise.all(knotUpdatePromises),
+        Promise.all(intentUpdatePromises),
         Promise.all(trainingMaterialUpdatePromises)
-      ])
+      ]);
       
       setStoryData({
         story: updatedStory!!,
