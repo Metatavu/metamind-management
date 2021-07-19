@@ -48,6 +48,11 @@ const  PreviewScreen: React.FC<Props> = ({
 
   const classes = usePreviewStyles(); 
 
+  React.useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line
+  }, []);
+
   /**
    * Fetches knots list for the story
    */
@@ -77,10 +82,17 @@ const  PreviewScreen: React.FC<Props> = ({
     });
   }
 
-  React.useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line
-  }, []);
+  /**
+   * Renders loading
+   */
+  const renderLoading = () => {
+    return (
+
+      <Box style={{ height: "100%", width: "100%", alignItems: "center", justifyContent: "center", display: "flex" }}>
+        <Loading text={ strings.loading.loadingStory }/>
+      </Box>
+    );
+  }
 
   /**
    * Renders left toolbar
@@ -148,24 +160,15 @@ const  PreviewScreen: React.FC<Props> = ({
     return null;
   }
 
-  /**
-   * Renders loading
-   */
-  const renderLoading = () => {
+  if (storyLoading || !storyData) {
     return (
       <AppLayout
-        keycloak={ keycloak }
-        pageTitle={ "Loading" }
-      >
-        <Box style={{ height: "100%", width: "100%", alignItems: "center", justifyContent: "center", display: "flex" }}>
-          <Loading text={ strings.loading.loadingStory }/>
-        </Box>
-      </AppLayout>
+      keycloak={ keycloak }
+      pageTitle={ "Loading" }
+    >
+      { renderLoading() }
+    </AppLayout>
     );
-  }
-
-  if (storyLoading || !storyData) {
-    return renderLoading();
   }
 
   const { story, knots, selectedKnot, selectedIntent, intents, trainingMaterial } = storyData;
