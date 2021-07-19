@@ -9,24 +9,15 @@ export const styles = createStyles({
     marginRight: 320,
     marginLeft: 320,
     height: "100%",
-  },
-
-  cardWrapper: {
-    marginTop: theme.spacing(4),
-    position: "relative",
-    width: 460,
-    alignSelf: "center"
+    justifyContent: "center",
+    alignItems: "center"
   },
 
   cardContent: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
     borderRadius: theme.shape.borderRadius,
     display: "flex",
     flexDirection: "column",
-    widht: "100%",
+    width: 460,
     border: "1px solid rgba(255,255,255,0.2)",
     padding: theme.spacing(4)
   },

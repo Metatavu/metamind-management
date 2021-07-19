@@ -4,6 +4,7 @@
     "cancel": "Peruuta",
     "edit": "Muokkaa",
     "edited": "Muokattu",
+    "ok": "OK",
     "remove": "Poista"
   },
 
@@ -68,13 +69,29 @@
       "none": "Tyhjä",
       "selectTrainingMaterial": "Valitse harjoitusmateriaali",
       "createNew": "Luo uusi",
-      "name": "Nimi"
+      "name": "Nimi",
+      "tokenizerHeader": "Botin käyttäjän vastauksen tunnistus",
+      "tokenizerType": {
+        "UNTOKENIZED": "Ei käsittelyä",
+        "WHITESPACE": "Välilyönti"
+      }
     },
     "intents": {
       "normalIntents": "Normaalit aikomukset",
       "defaultIntents": "Oletusaikomukset",
       "confusedIntents": "Hämmentymiset",
       "redirectIntents": "Uudelleenohjaukset"
+    },
+    "knots": {
+      "discussion": "Keskustelu",
+      "linkedQuickResponses": "Linkatut pikavastaukset",
+      "advancedSettings": "Lisäasetukset",
+      "imageReply": "Kuvavastaus",
+      "textReply": "Tekstivastaus",
+      "availableScripts": "Toiminnot saatavilla",
+      "uploadHelperText": "Pudota kuva tähän tai valitse klikkaamalla",
+      "hint": "Vihje",
+      "hintHelper": "Botin käyttäjän vastauksen vihje"
     },
     "add": {
       "knot": "Lisää solmu",
@@ -83,6 +100,10 @@
     "confirm": {
       "knot": "Poistetaanko valittu solmu ja kaikki siihen liitetyt aikomukset?",
       "intent": "Poistetaanko valittu aikomus?"
+    },
+    "save": {
+      "success": "Tallennettu!",
+      "fail": "Tallennus epäonnistui!"
     }
   }
 }

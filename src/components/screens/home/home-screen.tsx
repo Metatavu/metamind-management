@@ -78,10 +78,7 @@ class HomeScreen extends React.Component<Props, State> {
         keycloak={ keycloak }
       >
         <Box className={ classes.root }>
-          <Toolbar />
-          <Box className={ classes.cardWrapper }>
-            { this.renderCardShown() }
-          </Box>
+          { this.renderCardShown() }
         </Box>
       </AppLayout>
     );

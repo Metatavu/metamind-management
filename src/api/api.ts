@@ -1,4 +1,4 @@
-import { Configuration, TrainingMaterialsApi } from "../generated/client";
+import { Configuration, ScriptsApi, TrainingMaterialsApi } from "../generated/client";
 import { AccessToken } from "../types";
 import { KnotsApi } from '../generated/client/apis/KnotsApi';
 import { StoriesApi } from '../generated/client/apis/StoriesApi';
@@ -60,5 +60,15 @@ export default class Api {
    */
   public static getTrainingMaterialApi(accessToken: AccessToken) {
     return new TrainingMaterialsApi(Api.getConfiguration(accessToken));
+  }
+
+  /**
+   * Gets initialized Scripts API
+   * 
+   * @param accessToken access token
+   * @returns initialized Scripts API
+   */
+  public static getScriptsApi(accessToken: AccessToken) {
+    return new ScriptsApi(Api.getConfiguration(accessToken));
   }
 }
