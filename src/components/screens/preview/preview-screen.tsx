@@ -19,6 +19,7 @@ import { StoryData } from "../../../types"
 import { loadStory, setStoryData } from "../../../actions/story";
 import StoryPreviewView from "../../views/story-preview-view";
 import Loading from "../../generic/loading-item/loading-item";
+import { MessageData } from "../../../../metamind-metatavu-bot/dist/types";
 
 /**
  * Interface describing component props
@@ -44,6 +45,10 @@ const  PreviewScreen: React.FC<Props> = ({
   setStoryData
 }) => {
   const { storyId } = useParams<{ storyId: string }>();
+  const [ messageDatas, setMessageDatas ] = React.useState<MessageData[]>([]);
+  const [ conversationStarted, setConversationStarted ] = React.useState(false);
+  const [ messagesEnd, setMessagesEnd ] = React.useState<HTMLDivElement | undefined>(undefined);
+
 
   const classes = usePreviewStyles(); 
 
@@ -51,6 +56,49 @@ const  PreviewScreen: React.FC<Props> = ({
     fetchData();
     // eslint-disable-next-line
   }, []);
+
+  /**
+   * Interrupt the bot before the bot response 
+   */
+  const botInterrupted = () => {
+    setMessageDatas(
+      messageDatas.filter(messageData => !messageData.id.startsWith("temp"))
+    )
+  }
+
+  /**
+   * Bot or user response 
+   */
+  const botOrUserResponse = (message: MessageData) => {
+    console.log("botOrUserResponse");
+    console.log(messageDatas);
+
+    setMessageDatas(
+      messageDatas.filter(messageData => !messageData.id.startsWith("temp")).concat([message])
+    )
+  }
+
+  /**
+   * Start the conversation 
+   */
+  const conversationStart = () => {
+    setConversationStarted(true)
+  }
+
+  /**
+   * Bot reset 
+   */
+  const botReset = () => {
+    setMessageDatas([]);
+    setConversationStarted(false);
+  }
+
+  /**
+   * Update the message end 
+   */
+    const messagesEndUpdate = (messagesEnd?: HTMLDivElement) => {
+      setMessagesEnd(messagesEnd);
+    }
 
   /**
    * Fetches knots list for the story
@@ -135,6 +183,14 @@ const  PreviewScreen: React.FC<Props> = ({
         <Box className={ classes.previewContainer }>
           <StoryPreviewView
             storyData={ storyData }
+            messageDatas={ messageDatas }
+            conversationStarted={ conversationStarted }
+            messagesEnd={ messagesEnd }
+            botOrUserResponse={ botOrUserResponse }
+            botInterrupted={ botInterrupted }
+            conversationStart={ conversationStart }
+            botReset={ botReset }
+            messagesEndUpdate={ messagesEndUpdate }
           />
         </Box>
       </Box>

@@ -1,9 +1,7 @@
 import { combineReducers } from "redux";
 import { AuthAction } from "../actions/auth";
-import { BotAction } from "../actions/bot";
 import { StoryAction } from "../actions/story";
 import { authReducer } from "../reducers/auth";
-import { botReducer } from "../reducers/bot";
 import { storyReducer } from "../reducers/story";
 
 /**
@@ -12,7 +10,6 @@ import { storyReducer } from "../reducers/story";
 export const rootReducer = combineReducers({
   auth: authReducer,
   story: storyReducer,
-  bot: botReducer
 });
 
 /**
@@ -23,4 +20,4 @@ export type ReduxState = ReturnType<typeof rootReducer>;
 /**
  * Union type for Redux actions
  */
-export type ReduxActions = AuthAction | StoryAction | BotAction;
+export type ReduxActions = AuthAction | StoryAction;

@@ -3,10 +3,6 @@ import { useStoryPreviewViewStyles } from "./story-preview-view";
 import { MessageData } from "metamind-metatavu-bot/dist/types";
 import MessageList from "metamind-metatavu-bot/dist/components/message-list/message-list"
 import MessageInput from "metamind-metatavu-bot/dist/components/message-input/message-input"
-import { connect } from "react-redux";
-import { ReduxActions, ReduxState } from "../../../store";
-import { Dispatch } from "react";
-import { botInterrupted, botOrUserResponse, botReset, conversationStart, messagesEndUpdate } from "../../../actions/bot";
 import { StoryData } from "../../../types/index";
 import { Box } from "@material-ui/core";  
 
@@ -20,8 +16,8 @@ interface Props {
   storyData?: StoryData;
   botOrUserResponse: (message: MessageData) => void;
   conversationStart: () => void;
-  onBotReset: () => void;
-  onBotInterrupt: () => void;
+  botReset: () => void;
+  botInterrupted: () => void;
   messagesEndUpdate: (messageEnd?: HTMLDivElement) => void;
 }
 
@@ -37,8 +33,8 @@ const StoryPreviewView: React.FC<Props> = ({
   storyData,
   botOrUserResponse,
   conversationStart,
-  onBotReset,
-  onBotInterrupt,
+  botReset,
+  botInterrupted,
   messagesEndUpdate
 }) => {
   const classes = useStoryPreviewViewStyles();
@@ -110,7 +106,7 @@ const StoryPreviewView: React.FC<Props> = ({
           quickResponses={ quickResponses }
           startConversation={ conversationStart }
           onSendMessage={ sendMessage }
-          onReset={ onBotReset }
+          onReset={ botReset }
           onWaitingForBotChange={ setWaitingForBot }
           userResponse={ botOrUserResponse }
           messagesEndUpdate={ messagesEndUpdate }
@@ -125,7 +121,7 @@ const StoryPreviewView: React.FC<Props> = ({
           hint={ hint || "Sano jotain..." }
           onSendMessage={ sendMessage }
           conversationStarted={ conversationStarted } 
-          onReset={ onBotReset }
+          onReset={ botReset }
           onRestartConversation={ restartConversation }
         />
       </Box>
@@ -133,28 +129,4 @@ const StoryPreviewView: React.FC<Props> = ({
   );
 }
 
-/**
- * Redux mapper for mapping store state to component properties
- * 
- * @param state store state
- */
-const mapStateToProps = (state: ReduxState) => ({
-  messageDatas: state.bot.messageDatas,
-  conversationStarted: state.bot.conversationStarted,
-  messagesEnd: state.bot.messagesEnd,
-});
-
-/**
- * Redux mapper for mapping component dispatches 
- * 
- * @param dispatch dispatch method
- */
-const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({
-  botOrUserResponse: (messageData: MessageData) => dispatch(botOrUserResponse(messageData)),
-  conversationStart: () => dispatch(conversationStart()),
-  onBotReset: () => dispatch(botReset()),
-  onBotInterrupt: () => dispatch(botInterrupted()),
-  messagesEndUpdate: (messagesEnd?: HTMLDivElement) => dispatch(messagesEndUpdate(messagesEnd))
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(StoryPreviewView);
+export default StoryPreviewView;
