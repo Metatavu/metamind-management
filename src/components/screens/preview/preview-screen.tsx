@@ -1,4 +1,4 @@
-import { Box, Drawer, Tabs, Tab, CircularProgress, Dialog, Divider } from "@material-ui/core";
+import { Box, Drawer } from "@material-ui/core";
 import Toolbar from "@material-ui/core/Toolbar";
 import * as React from "react";
 import { connect } from "react-redux";
@@ -7,7 +7,6 @@ import { ReduxActions, ReduxState } from "../../../store";
 import { AccessToken } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
 import { usePreviewStyles } from "./preview-screen.styles";
-import { History } from "history";
 import { KeycloakInstance } from 'keycloak-js';
 import KnotPanel from "../../knot-components/knot-list/knot-list";
 import { Story, Knot, Intent, TrainingMaterial } from "../../../generated/client/models";

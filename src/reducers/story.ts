@@ -7,7 +7,7 @@ import { StoryData } from "../types";
  */
 export interface StoryState {
   storyLoading: boolean;
-  storyData?: StoryData
+  storyData?: StoryData;
 }
 
 

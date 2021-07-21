@@ -62,7 +62,7 @@ export const useEditorScreenStyles = makeStyles({
     flexDirection: "column",
     color: "#fff"
   }
-  
+
 }, {
   name: "editor-screen"
 });
