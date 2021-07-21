@@ -54,16 +54,9 @@ const App: React.FC = () => {
               <Route exact path="/editor/:storyId">
                 <EditorScreen/>
               </Route>
-              <Route
-                exact
-                path="/preview/:storyId"
-                render={({ history, match }) => (
-                  <PreviewScreen
-                    history={ history }
-                    storyId={ match.params.storyId }
-                  />
-                )}
-              />
+              <Route exact path="/preview/:storyId">
+                <PreviewScreen/>
+              </Route>
             </Switch>
           </BrowserRouter>
         </AccessTokenRefresh>

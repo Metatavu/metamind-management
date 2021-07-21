@@ -125,6 +125,35 @@ export interface IStrings extends LocalizedStringsMethods {
     }
   };
 
+  previewScreen: {
+    storyKnots: string;
+    globalKnots: string;
+    storyEditor: string;
+    globalEditor: string;
+    leftBar: {
+      storyLeftTab: string;
+      knotsLeftTab: string;
+      intentsLeftTab: string;
+      knotSearchHelper: string;
+      intentSearchHelper: string;
+    };
+    intents: {
+      normalIntents: string;
+      defaultIntents: string;
+      confusedIntents: string;
+      redirectIntents: string;
+    };
+  };
+
+  /**
+   * Translations related to loading
+   */
+  loading: {
+    loading: string;
+    loadingStory: string;
+    savingStory: string;
+  };
+
   /**
    * Translations related to story view
    */
