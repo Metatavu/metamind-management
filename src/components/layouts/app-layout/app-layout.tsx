@@ -128,7 +128,7 @@ class AppLayout extends React.Component<Props, State> {
         </Link>
         { storyData &&
           <Box ml={ 2 }>
-            <NavLink exact to={ `/editor/${storyData.story?.id}` }>
+            <NavLink exact to={ `/editor/${storyData.story?.id}` } style={{ textDecoration: "none" }}>
               <Button
                 variant="text"
                 startIcon={ <EditorIcon/> }
@@ -137,7 +137,7 @@ class AppLayout extends React.Component<Props, State> {
                 { strings.header.editor }
               </Button>
             </NavLink>
-            <NavLink exact to={ `/preview/${storyData.story?.id}` }>
+            <NavLink exact to={ `/preview/${storyData.story?.id}` } style={{ textDecoration: "none" }}>
               <Button
                 variant="text"
                 startIcon={ <PreviewIcon/> }

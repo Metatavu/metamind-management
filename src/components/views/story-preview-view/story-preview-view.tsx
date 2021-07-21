@@ -66,8 +66,7 @@ const StoryPreviewView: React.FC<Props> = ({
    * Load the story
    */
   const loadData = () => {
-    console.log(messageDatas)
-    if (messageDatas.length != 0) {
+    if (messageDatas.length !== 0) {
       return;
     }
     
@@ -88,7 +87,7 @@ const StoryPreviewView: React.FC<Props> = ({
       content: "Kyllä",
       id: "2968ce0c-8d5e-4dec-9458-9a6ad2202c34-message",
       isBot: false
-    })
+    });
   }
 
   const globalQuickResponses: string[] = [];

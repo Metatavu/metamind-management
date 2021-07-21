@@ -45,12 +45,10 @@ const  PreviewScreen: React.FC<Props> = ({
   setStoryData
 }) => {
   const { storyId } = useParams<{ storyId: string }>();
+  const classes = usePreviewStyles();
   const [ messageDatas, setMessageDatas ] = React.useState<MessageData[]>([]);
   const [ conversationStarted, setConversationStarted ] = React.useState(false);
   const [ messagesEnd, setMessagesEnd ] = React.useState<HTMLDivElement | undefined>(undefined);
-
-
-  const classes = usePreviewStyles(); 
 
   React.useEffect(() => {
     fetchData();
@@ -61,7 +59,7 @@ const  PreviewScreen: React.FC<Props> = ({
    * Interrupt the bot before the bot response 
    */
   const botInterrupted = () => {
-    setMessageDatas(
+    setMessageDatas((messageDatas) =>
       messageDatas.filter(messageData => !messageData.id.startsWith("temp"))
     )
   }
@@ -70,34 +68,32 @@ const  PreviewScreen: React.FC<Props> = ({
    * Bot or user response 
    */
   const botOrUserResponse = (message: MessageData) => {
-    console.log("botOrUserResponse");
-    console.log(messageDatas);
-
-    setMessageDatas(
-      messageDatas.filter(messageData => !messageData.id.startsWith("temp")).concat([message])
-    )
+    setMessageDatas((messageDatas) => [
+      ...messageDatas.filter(messageData => !messageData.id.startsWith("temp")), 
+      message
+    ])
   }
 
   /**
    * Start the conversation 
    */
   const conversationStart = () => {
-    setConversationStarted(true)
+    setConversationStarted((conversationStarted) => true)
   }
 
   /**
    * Bot reset 
    */
   const botReset = () => {
-    setMessageDatas([]);
-    setConversationStarted(false);
+    setMessageDatas((messageDatas) => []);
+    setConversationStarted((conversationStarted) => false);
   }
 
   /**
    * Update the message end 
    */
     const messagesEndUpdate = (messagesEnd?: HTMLDivElement) => {
-      setMessagesEnd(messagesEnd);
+      setMessagesEnd((messageEndPrev) => messagesEnd);
     }
 
   /**
