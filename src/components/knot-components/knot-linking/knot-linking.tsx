@@ -1,5 +1,5 @@
 import * as React from "react";
-import { IconButton, List, ListItem, TextField, withStyles, WithStyles, FormHelperText, Box } from "@material-ui/core";
+import { IconButton, List, ListItem, TextField } from "@material-ui/core";
 import { useKnotLinkingStyles } from "./knot-linking.styles";
 import KnotIcon from "../../../resources/svg/knot-icon";
 import InteractiveListItem from "../../generic/list-items/interactive-list-item";
@@ -21,7 +21,7 @@ interface Props {
 
 /**
  * Knot linking component for editor screen right bar
- * 
+ *
  * TODO: Ask Tuomas about implementation of removing a linking by clicking a knot
  */
 const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink }) => {
@@ -75,52 +75,51 @@ const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink 
     <>
       <AccordionItem title={ strings.editorScreen.rightBar.intentsTab.incoming }>
         <List className={ classes.list }>
-          { incomingKnots && incomingKnots.map(knot => 
+          { incomingKnots && incomingKnots.map(knot =>
             <InteractiveListItem
               title={ knot?.name ?? "" }
               icon={ <KnotIcon htmlColor="#000"/> }
             />
           )}
-          <ListItem className={ classes.listItem } button={ false }>
+          <ListItem className={ classes.listItem }>
             <IconButton
               className={ classes.addButton }
               onClick={ onAddIntentIncomingClick }
-            > 
+            >
               <AddIcon htmlColor={ "#999" } />
             </IconButton>
             <Autocomplete
               className={ classes.autoComplete }
               inputValue={ incomingInputValue }
-              onChange={ (event, newValue) => {
-                setIncomingKnot(newValue);
-              }}
-              onInputChange={ (event, newInputValue) => {
-                setIncomingInputValue(newInputValue);
-              }}
+              onChange={ (event, newValue) => setIncomingKnot(newValue) }
+              onInputChange={ (event, newInputValue) => setIncomingInputValue(newInputValue) }
               options={ knots.filter(item =>
-                (!incomingKnots.find(knot => knot?.id === item.id) && !outcomingKnots.find(knot => knot?.id === item.id)) && !(item.id === selectedKnot.id)) }
-              getOptionLabel={ (knot: Knot) => knot.name }
-              renderInput={ (params) => (
-                <TextField 
-                  {...params} 
-                  error={ incomingInputLabel != "" }
+                !incomingKnots.find(knot => knot?.id === item.id) &&
+                !outcomingKnots.find(knot => knot?.id === item.id) &&
+                item.id !== selectedKnot.id
+              )}
+              getOptionLabel={ knot => knot.name }
+              renderInput={ params => (
+                <TextField
+                  { ...params }
+                  error={ incomingInputLabel !== "" }
                   helperText={ incomingInputLabel }
                   label={ strings.editorScreen.add.indent }
                 />
-              ) }
+              )}
             />
           </ListItem>
         </List>
       </AccordionItem>
       <AccordionItem title={ strings.editorScreen.rightBar.intentsTab.outcoming }>
         <List className={ classes.list }>
-          { outcomingKnots && outcomingKnots.map(knot => 
+          { outcomingKnots && outcomingKnots.map(knot =>
             <InteractiveListItem
               title={ knot?.name ?? "" }
               icon={ <KnotIcon htmlColor="#000"/> }
             />
           )}
-          <ListItem className={ classes.listItem } button={ false }>
+          <ListItem className={ classes.listItem }>
             <IconButton
               className={ classes.addButton }
               onClick={ onAddIntentOutcomingClick }
@@ -130,22 +129,20 @@ const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink 
             <Autocomplete
               className={ classes.autoComplete }
               inputValue={ outcomingInputValue }
-              onChange={ (event, newValue) => {
-                setOutcomingKnot(newValue);
-              }}
-              onInputChange={ (event, newInputValue) => {
-                setOutcomingInputValue(newInputValue);
-              }}
+              onChange={ (event, newValue) => setOutcomingKnot(newValue) }
+              onInputChange={ (event, newInputValue) => setOutcomingInputValue(newInputValue) }
               options={ knots.filter(item =>
-                (!incomingKnots.find(knot => knot?.id === item.id) && !outcomingKnots.find(knot => knot?.id === item.id)) && !(item.id === selectedKnot.id)) }
-              getOptionLabel={ (knot: Knot) => knot.name }
-              renderInput={(params) => (
-                <TextField 
-                  {...params} 
-                  error={ outcomingInputLabel != "" }
+                !incomingKnots.find(knot => knot?.id === item.id) &&
+                !outcomingKnots.find(knot => knot?.id === item.id) &&
+                item.id !== selectedKnot.id
+              )}
+              getOptionLabel={ knot => knot.name }
+              renderInput={ params => (
+                <TextField
+                  { ...params }
+                  error={ outcomingInputLabel !== "" }
                   helperText={ outcomingInputLabel }
                   label={ strings.editorScreen.add.indent }
-                
                 />
               )}
             />
