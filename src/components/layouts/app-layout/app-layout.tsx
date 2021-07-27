@@ -134,12 +134,10 @@ const AppLayout: React.FC<Props> = ({
               select
               className={ classes.languageSelect }
               value={ locale }
-              onChange={
-                event => { 
-                  strings.setLanguage(event.target.value)
-                  setLocale(event.target.value)
-                } 
-              }
+              onChange={ event => {
+                strings.setLanguage(event.target.value);
+                setLocale(event.target.value);
+              }}
             >
             {
               strings.getAvailableLanguages().map(language =>
