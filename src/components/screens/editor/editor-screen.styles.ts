@@ -34,11 +34,10 @@ export const useEditorScreenStyles = makeStyles({
     fontSize: 11
   },
 
-  zoomButton : {
+  zoomButton: {
     backgroundColor: "#121212",
     border: "1px solid #121212",
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
+    margin: `${theme.spacing(1)}px 0`,
     color: "#fff",
     "&:hover": {
       backgroundColor: "#121212",
@@ -47,7 +46,7 @@ export const useEditorScreenStyles = makeStyles({
     }
   },
 
-  zoomButtonContainer : {
+  zoomButtonContainer: {
     display: "flex",
     flexDirection: "column",
     color: "inherit"
