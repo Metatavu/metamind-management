@@ -7,7 +7,7 @@ import strings from "../localization/strings";
  * Locale state
  */
 interface LocaleState {
-  locale: string
+  locale: string;
 }
 
 /**
