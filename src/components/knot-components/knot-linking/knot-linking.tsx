@@ -53,6 +53,7 @@ const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink 
       setIncomingInputLabel(strings.generic.invalid);
       return;
     }
+
     onAddLink(incomingKnot.id!, selectedKnot.id!)
     setIncomingInputValue("");
   }
