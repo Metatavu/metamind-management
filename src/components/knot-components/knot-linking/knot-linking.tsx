@@ -24,7 +24,7 @@ interface Props {
  * 
  * TODO: Ask Tuomas about implementation of removing a linking by clicking a knot
  */
-const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink}) => {
+const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink }) => {
 
   const classes = useKnotLinkingStyles();
   const [ incomingInputValue, setIncomingInputValue ] = React.useState("");
