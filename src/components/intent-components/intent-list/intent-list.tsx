@@ -38,20 +38,24 @@ const IntentPanel: React.FC<Props> = ({ intents, onIntentClick }) => {
    * Renders a list of intents that match the search
    */
   const renderSearchedIntents = () => {
+    if (!intents) {
+      return null;
+    }
 
-    return intents ? (
+    return (
       <List>
-        {
-          intents.filter(item => item.name?.toLowerCase().includes(searchValue.toLowerCase())).map(intent => (
+        { intents
+          .filter(item => item.name?.toLowerCase().includes(searchValue.toLowerCase()))
+          .map(intent =>
             <InteractiveListItem
               icon={ <IntentIcon/> }
               title={ intent.name ?? "" }
               onClick={ () => onIntentClick(intent) }
             />
-          ))
+          )
         }
       </List>
-    ) : null;
+    );
   }
 
   /**
