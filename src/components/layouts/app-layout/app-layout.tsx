@@ -162,7 +162,11 @@ const AppLayout: React.FC<Props> = ({
                 { strings.generic.save }
               </Button>
             }
-            <Box ml={ 2 } display="flex" alignItems="center">
+            <Box
+              ml={ 2 }
+              display="flex"
+              alignItems="center"
+            >
               <Typography color="textSecondary">
                 { firstName } { lastName }
               </Typography>
