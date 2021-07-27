@@ -89,7 +89,7 @@ class PreviewScreen extends React.Component<Props, State> {
    * @param locale locale
    */
   private setLocale = (locale: string) => {
-    this.setState({ locale: locale });
+    this.setState({ locale });
   }
 }
 
