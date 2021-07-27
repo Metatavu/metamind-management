@@ -33,7 +33,7 @@ const InteractiveListItem: React.FC<Props> = ({
       <ListItemText>
         { title }
       </ListItemText>
-      { (onSecondaryActionClick && secondaryActionIcon) &&
+      { onSecondaryActionClick && secondaryActionIcon &&
           <ListItemSecondaryAction>
             <IconButton 
               edge="end"
