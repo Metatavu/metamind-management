@@ -129,7 +129,11 @@ const AppLayout: React.FC<Props> = ({
         <Toolbar>
           { renderNavigation() }
           { renderPageTitle() }
-          <Box display="flex" alignItems="center" width="fit-content">
+          <Box
+            display="flex"
+            alignItems="center"
+            width="fit-content"
+          >
             <TextField
               select
               className={ classes.languageSelect }
