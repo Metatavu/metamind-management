@@ -26,6 +26,8 @@ interface Props extends WithStyles<typeof styles> {
 
 /**
  * App layout component. Provides the basic page layout with a header
+ *
+ * @param props component properties
  */
 const AppLayout: React.FC<Props> = ({
   onSaveClick,
