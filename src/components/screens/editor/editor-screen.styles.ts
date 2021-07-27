@@ -15,7 +15,7 @@ export const useEditorScreenStyles = makeStyles({
     }
   },
 
-  headerButtonsContainer : {
+  headerButtonsContainer: {
     display: "flex",
     width: "100%",
     height: "100%",
