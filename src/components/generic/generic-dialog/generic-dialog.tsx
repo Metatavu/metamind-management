@@ -23,6 +23,8 @@ interface Props extends WithStyles<typeof styles> {
 
 /**
  * React component displaying confirm dialogs
+ *
+ * @param props component properties
  */
 const GenericDialog: React.FC<Props> = ({
   title,
