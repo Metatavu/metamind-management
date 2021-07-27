@@ -169,7 +169,7 @@ const AppLayout: React.FC<Props> = ({
               </Box>
               <Button
                 variant="text"
-                onClick={ () => onLogOutClick() }
+                onClick={ onLogOutClick }
               >
                 { strings.header.signOut }
               </Button>
