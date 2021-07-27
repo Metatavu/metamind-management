@@ -100,20 +100,24 @@ const KnotPanel: React.FC<Props> = ({ knots, onKnotClick }) => {
    * TODO: correct icons
    */
   const renderSearchedKnots = () => {
+    if (!knots) {
+      return null;
+    }
 
-    return knots ? (
+    return (
       <List>
-        {
-          knots.filter(item => item.name.toLowerCase().includes(searchValue.toLowerCase())).map(knot => (
+        { knots
+          .filter(item => item.name.toLowerCase().includes(searchValue.toLowerCase()))
+          .map(knot =>
             <InteractiveListItem
               icon={ <KnotIcon htmlColor="#000"/> }
               title={ knot.name }
               onClick={ () => onKnotClick(knot) }
             />
-          ))
+          )
         }
       </List>
-    ) : null;
+    );
   }
 
   /**
