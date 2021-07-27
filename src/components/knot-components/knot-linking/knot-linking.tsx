@@ -49,7 +49,7 @@ const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink 
    * Event handler for on add intent click with selected target
    */
   const onAddIntentIncomingClick = () => {
-    if(!incomingKnot || incomingKnot.name != incomingInputValue) {
+    if (!incomingKnot || incomingKnot.name !== incomingInputValue) {
       setIncomingInputLabel(strings.generic.invalid);
       return;
     }
