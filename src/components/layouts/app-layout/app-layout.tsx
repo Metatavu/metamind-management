@@ -21,7 +21,7 @@ interface Props extends WithStyles<typeof styles> {
   keycloak: KeycloakInstance;
   locale?: string;
   setLocale: (locale: string) => void;
-  children: any;
+  children: React.ReactNode;
 }
 
 /**
