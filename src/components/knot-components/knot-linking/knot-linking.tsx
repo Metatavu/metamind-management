@@ -62,11 +62,12 @@ const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink 
    * Event handler for on add intent click with selected source
    */
   const onAddIntentOutcomingClick = () => {
-    if(!outcomingKnot || outcomingKnot.name != outcomingInputValue) {
+    if (!outcomingKnot || outcomingKnot.name !== outcomingInputValue) {
       setOutcomingInputLabel(strings.generic.invalid);
       return;
     }
-    onAddLink(selectedKnot.id!, outcomingKnot.id!)
+
+    onAddLink(selectedKnot.id!, outcomingKnot.id!);
     setOutcomingInputValue("");
   }
 
