@@ -92,20 +92,20 @@ const IntentPanel: React.FC<Props> = ({ intents, onIntentClick }) => {
         />
       </Box>
       { searchValue.length === 0 &&
-      <>
-        <AccordionItem title={ strings.editorScreen.intents.normalIntents }>
-          { renderIntentGroups(IntentType.NORMAL) }
-        </AccordionItem>
-        <AccordionItem title={ strings.editorScreen.intents.defaultIntents }>
-          { renderIntentGroups(IntentType.DEFAULT) }
-        </AccordionItem>
-        <AccordionItem title={ strings.editorScreen.intents.confusedIntents }>
-          { renderIntentGroups(IntentType.CONFUSED) }
-        </AccordionItem>
-        <AccordionItem title={ strings.editorScreen.intents.redirectIntents }>
-          { renderIntentGroups(IntentType.REDIRECT) }
-        </AccordionItem>
-      </>
+        <>
+          <AccordionItem title={ strings.editorScreen.intents.normalIntents }>
+            { renderIntentGroups(IntentType.NORMAL) }
+          </AccordionItem>
+          <AccordionItem title={ strings.editorScreen.intents.defaultIntents }>
+            { renderIntentGroups(IntentType.DEFAULT) }
+          </AccordionItem>
+          <AccordionItem title={ strings.editorScreen.intents.confusedIntents }>
+            { renderIntentGroups(IntentType.CONFUSED) }
+          </AccordionItem>
+          <AccordionItem title={ strings.editorScreen.intents.redirectIntents }>
+            { renderIntentGroups(IntentType.REDIRECT) }
+          </AccordionItem>
+        </>
       }
       { searchValue.length > 0 && 
         renderSearchedIntents()
