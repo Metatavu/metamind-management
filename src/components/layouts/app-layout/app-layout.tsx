@@ -42,8 +42,8 @@ const AppLayout: React.FC<Props> = ({
   children
 }) => {
 
-  const firstName = (keycloak.profile && keycloak.profile.firstName) ?? "";
-  const lastName = (keycloak.profile && keycloak.profile.lastName) ?? "";
+  const firstName = keycloak.profile?.firstName ?? "";
+  const lastName =keycloak.profile?.lastName ?? "";
 
 
   /**
