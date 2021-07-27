@@ -54,7 +54,7 @@ const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink 
       return;
     }
 
-    onAddLink(incomingKnot.id!, selectedKnot.id!)
+    onAddLink(incomingKnot.id!, selectedKnot.id!);
     setIncomingInputValue("");
   }
 
