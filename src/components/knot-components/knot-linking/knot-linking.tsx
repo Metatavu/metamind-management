@@ -73,85 +73,85 @@ const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink 
 
   return (
     <>
-    <AccordionItem title={ strings.editorScreen.rightBar.intentsTab.incoming }>
-      <List className={ classes.list }>
-        { incomingKnots && incomingKnots.map(knot => 
-          <InteractiveListItem
-            title={ knot?.name ?? "" }
-            icon={ <KnotIcon htmlColor="#000"/> }
-          />
-        )}
-        <ListItem className={ classes.listItem } button={ false }>
-          <IconButton
-            className={ classes.addButton }
-            onClick={ onAddIntentIncomingClick }
-          > 
-            <AddIcon htmlColor={ "#999" } />
-          </IconButton>
-          <Autocomplete
-            className={ classes.autoComplete }
-            inputValue={ incomingInputValue }
-            onChange={ (event, newValue) => {
-              setIncomingKnot(newValue);
-            }}
-            onInputChange={ (event, newInputValue) => {
-              setIncomingInputValue(newInputValue);
-            }}
-            options={ knots.filter(item =>
-              (!incomingKnots.find(knot => knot?.id === item.id) && !outcomingKnots.find(knot => knot?.id === item.id)) && !(item.id === selectedKnot.id)) }
-            getOptionLabel={ (knot: Knot) => knot.name }
-            renderInput={ (params) => (
-              <TextField 
-                {...params} 
-                error={ incomingInputLabel != "" }
-                helperText={ incomingInputLabel }
-                label={ strings.editorScreen.add.indent }
-              />
-            ) }
-          />
-        </ListItem>
-      </List>
-    </AccordionItem>
-    <AccordionItem title={ strings.editorScreen.rightBar.intentsTab.outcoming }>
-      <List className={ classes.list }>
-        { outcomingKnots && outcomingKnots.map(knot => 
-          <InteractiveListItem
-            title={ knot?.name ?? "" }
-            icon={ <KnotIcon htmlColor="#000"/> }
-          />
-        )}
-        <ListItem className={ classes.listItem } button={ false }>
-          <IconButton
-            className={ classes.addButton }
-            onClick={ onAddIntentOutcomingClick }
-          >
-            <AddIcon htmlColor={ "#999" } />
-          </IconButton>
-          <Autocomplete
-            className={ classes.autoComplete }
-            inputValue={ outcomingInputValue }
-            onChange={ (event, newValue) => {
-              setOutcomingKnot(newValue);
-            }}
-            onInputChange={ (event, newInputValue) => {
-              setOutcomingInputValue(newInputValue);
-            }}
-            options={ knots.filter(item =>
-              (!incomingKnots.find(knot => knot?.id === item.id) && !outcomingKnots.find(knot => knot?.id === item.id)) && !(item.id === selectedKnot.id)) }
-            getOptionLabel={ (knot: Knot) => knot.name }
-            renderInput={(params) => (
-              <TextField 
-                {...params} 
-                error={ outcomingInputLabel != "" }
-                helperText={ outcomingInputLabel }
-                label={ strings.editorScreen.add.indent }
-              
-              />
-            )}
-          />
-        </ListItem>
-      </List>
-    </AccordionItem>
+      <AccordionItem title={ strings.editorScreen.rightBar.intentsTab.incoming }>
+        <List className={ classes.list }>
+          { incomingKnots && incomingKnots.map(knot => 
+            <InteractiveListItem
+              title={ knot?.name ?? "" }
+              icon={ <KnotIcon htmlColor="#000"/> }
+            />
+          )}
+          <ListItem className={ classes.listItem } button={ false }>
+            <IconButton
+              className={ classes.addButton }
+              onClick={ onAddIntentIncomingClick }
+            > 
+              <AddIcon htmlColor={ "#999" } />
+            </IconButton>
+            <Autocomplete
+              className={ classes.autoComplete }
+              inputValue={ incomingInputValue }
+              onChange={ (event, newValue) => {
+                setIncomingKnot(newValue);
+              }}
+              onInputChange={ (event, newInputValue) => {
+                setIncomingInputValue(newInputValue);
+              }}
+              options={ knots.filter(item =>
+                (!incomingKnots.find(knot => knot?.id === item.id) && !outcomingKnots.find(knot => knot?.id === item.id)) && !(item.id === selectedKnot.id)) }
+              getOptionLabel={ (knot: Knot) => knot.name }
+              renderInput={ (params) => (
+                <TextField 
+                  {...params} 
+                  error={ incomingInputLabel != "" }
+                  helperText={ incomingInputLabel }
+                  label={ strings.editorScreen.add.indent }
+                />
+              ) }
+            />
+          </ListItem>
+        </List>
+      </AccordionItem>
+      <AccordionItem title={ strings.editorScreen.rightBar.intentsTab.outcoming }>
+        <List className={ classes.list }>
+          { outcomingKnots && outcomingKnots.map(knot => 
+            <InteractiveListItem
+              title={ knot?.name ?? "" }
+              icon={ <KnotIcon htmlColor="#000"/> }
+            />
+          )}
+          <ListItem className={ classes.listItem } button={ false }>
+            <IconButton
+              className={ classes.addButton }
+              onClick={ onAddIntentOutcomingClick }
+            >
+              <AddIcon htmlColor={ "#999" } />
+            </IconButton>
+            <Autocomplete
+              className={ classes.autoComplete }
+              inputValue={ outcomingInputValue }
+              onChange={ (event, newValue) => {
+                setOutcomingKnot(newValue);
+              }}
+              onInputChange={ (event, newInputValue) => {
+                setOutcomingInputValue(newInputValue);
+              }}
+              options={ knots.filter(item =>
+                (!incomingKnots.find(knot => knot?.id === item.id) && !outcomingKnots.find(knot => knot?.id === item.id)) && !(item.id === selectedKnot.id)) }
+              getOptionLabel={ (knot: Knot) => knot.name }
+              renderInput={(params) => (
+                <TextField 
+                  {...params} 
+                  error={ outcomingInputLabel != "" }
+                  helperText={ outcomingInputLabel }
+                  label={ strings.editorScreen.add.indent }
+                
+                />
+              )}
+            />
+          </ListItem>
+        </List>
+      </AccordionItem>
     </>
   );
 }
