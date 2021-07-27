@@ -381,17 +381,13 @@ const EditorScreen: React.FC<Props> = ({
    * @param entity entity to be deleted
    */
   const onDeleteFromListClick = (entity: Knot | Intent) => {
-    (entity as Intent).sourceKnotId ?
-      setStoryData({
-        ...storyData,
-        selectedIntent: entity as Intent,
-        selectedKnot: undefined
-      }) :
-      setStoryData({
-        ...storyData,
-        selectedKnot: entity as Knot,
-        selectedIntent: undefined
-      });
+    setStoryData({
+      ...storyData,
+      selectedIntent: (entity as Intent).sourceKnotId ?
+        entity as Intent :
+        entity as Knot,
+      selectedKnot: undefined
+    });
 
     setDeleteConfirmDialogOpen(true);
   }
