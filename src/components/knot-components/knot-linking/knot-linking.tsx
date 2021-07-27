@@ -38,8 +38,12 @@ const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink 
     return null;
   }
 
-  const incomingKnots = intents.filter(item => item.targetKnotId === selectedKnot.id).map(intent => knots.find(item => item.id === intent.sourceKnotId));
-  const outcomingKnots = intents.filter(item => item.sourceKnotId === selectedKnot.id).map(intent => knots.find(item => item.id === intent.targetKnotId));
+  const incomingKnots = intents
+    .filter(item => item.targetKnotId === selectedKnot.id)
+    .map(intent => knots.find(item => item.id === intent.sourceKnotId));
+  const outcomingKnots = intents
+    .filter(item => item.sourceKnotId === selectedKnot.id)
+    .map(intent => knots.find(item => item.id === intent.targetKnotId));
 
   /**
    * Event handler for on add intent click with selected target
