@@ -74,22 +74,23 @@ const KnotPanel: React.FC<Props> = ({ knots, onKnotClick, classes, onKnotSeconda
       <AccordionItem title={ strings.editorScreen.storyKnots }>
         <List className={ classes.list }>
           {
-            knots.map(knot => {
-              return knot.scope === KnotScope.Home ?
-                <InteractiveListItem
-                  icon={ <HomeIcon htmlColor="#000"/> }
-                  title={ knot.name }
-                  onClick={ () => onKnotClick(knot) }
-                /> : 
-                <InteractiveListItem
-                  icon={ <KnotIcon htmlColor="#000"/> }
-                  title={ knot.name }
-                  onClick={ () => onKnotClick(knot) }
-                  onSecondaryActionClick={ () => onKnotSecondaryClick(knot) }
-                  secondaryActionIcon={ <DeleteOutlineIcon htmlColor="#000"/> }
-                />
-              
-            })
+            knots.map(knot =>
+              <InteractiveListItem
+                icon={ <KnotIcon htmlColor="#000"/> }
+                title={ knot.name }
+                onClick={ () => onKnotClick(knot) }
+                onSecondaryActionClick={
+                  knot.scope === KnotScope.Home ?
+                    () => onKnotSecondaryClick(knot) :
+                    undefined
+                }
+                secondaryActionIcon={
+                  knot.scope === KnotScope.Home ?
+                    <DeleteOutlineIcon htmlColor="#000"/> :
+                    undefined
+                }
+              />
+            )
           }
         </List>
       </AccordionItem>
