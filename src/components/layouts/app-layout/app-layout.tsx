@@ -163,7 +163,9 @@ const AppLayout: React.FC<Props> = ({
                 { firstName } { lastName }
               </Typography>
               <Box ml={ 1 }>
-                <Typography color="textSecondary">{ "//" }</Typography>
+                <Typography color="textSecondary">
+                  { "//" }
+                </Typography>
               </Box>
               <Button
                 variant="text"
