@@ -92,7 +92,7 @@ const  PreviewScreen: React.FC<Props> = ({
    * Update the message end 
    */
     const messagesEndUpdate = (messagesEnd?: HTMLDivElement) => {
-      setMessagesEnd((messageEndPrev) => messagesEnd);
+      setMessagesEnd(messagesEnd);
     }
 
   /**
