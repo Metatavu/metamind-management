@@ -60,7 +60,7 @@ const  PreviewScreen: React.FC<Props> = ({
   const botInterrupted = () => {
     setMessageDatas((messageDatas) =>
       messageDatas.filter(messageData => !messageData.id.startsWith("temp"))
-    )
+    );
   }
 
   /**
