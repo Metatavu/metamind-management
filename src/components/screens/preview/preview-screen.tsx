@@ -81,7 +81,7 @@ const  PreviewScreen: React.FC<Props> = ({
   }
 
   /**
-   * Bot reset 
+   * Bot reset
    */
   const botReset = () => {
     setMessageDatas((messageDatas) => []);
