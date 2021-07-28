@@ -690,7 +690,7 @@ const EditorScreen: React.FC<Props> = ({
       return;
     }
 
-    if (!storyLoading && storyData && storyData.story?.id === storyId){
+    if (!storyLoading && storyData?.story?.id === storyId) {
       return;
     }
 
