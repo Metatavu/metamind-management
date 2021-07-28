@@ -77,7 +77,7 @@ const  PreviewScreen: React.FC<Props> = ({
    * Start the conversation 
    */
   const conversationStart = () => {
-    setConversationStarted((conversationStarted) => true)
+    setConversationStarted(true);
   }
 
   /**
