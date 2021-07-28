@@ -70,7 +70,7 @@ const  PreviewScreen: React.FC<Props> = ({
     setMessageDatas((messageDatas) => [
       ...messageDatas.filter(messageData => !messageData.id.startsWith("temp")), 
       message
-    ])
+    ]);
   }
 
   /**
