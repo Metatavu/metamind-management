@@ -66,7 +66,7 @@ const StoryPreviewView: React.FC<Props> = ({
    * Load the story
    */
   const loadData = () => {
-    if (messageDatas.length !== 0) {
+    if (messageDatas.length) {
       return;
     }
     
