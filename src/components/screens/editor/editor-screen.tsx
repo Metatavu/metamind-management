@@ -1112,7 +1112,15 @@ const EditorScreen: React.FC<Props> = ({
     );
   }
 
-  const { story, knots, selectedKnot, selectedIntent, intents, trainingMaterial, scripts } = storyData;
+  const {
+    story,
+    knots,
+    selectedKnot,
+    selectedIntent,
+    intents,
+    trainingMaterial,
+    scripts
+  } = storyData;
 
   return (
     <>
