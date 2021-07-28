@@ -11,6 +11,14 @@ export const usePreviewStyles = makeStyles({
     width: "50%",
     display: "flex",
     margin: "auto"
+  },
+
+  loadingContainer: {
+    height: "100%", 
+    width: "100%", 
+    alignItems: "center", 
+    justifyContent: "center", 
+    display: "flex"
   }
 
 }, {

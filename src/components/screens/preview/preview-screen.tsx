@@ -34,6 +34,8 @@ interface Props {
 
 /**
  * Preview screen component
+ *  
+ * @param props component properties
  */
 const  PreviewScreen: React.FC<Props> = ({   
   accessToken,
@@ -47,7 +49,7 @@ const  PreviewScreen: React.FC<Props> = ({
   const classes = usePreviewStyles();
   const [ messageDatas, setMessageDatas ] = React.useState<MessageData[]>([]);
   const [ conversationStarted, setConversationStarted ] = React.useState(false);
-  const [ messagesEnd, setMessagesEnd ] = React.useState<HTMLDivElement | undefined>(undefined);
+  const [ messagesEnd, setMessagesEnd ] = React.useState<HTMLDivElement>();
 
   React.useEffect(() => {
     fetchData();
@@ -90,10 +92,12 @@ const  PreviewScreen: React.FC<Props> = ({
 
   /**
    * Update the message end 
+   * 
+   * @param messagesEnd message end
    */
-    const messagesEndUpdate = (messagesEnd?: HTMLDivElement) => {
-      setMessagesEnd(messagesEnd);
-    }
+  const messagesEndUpdate = (messagesEnd?: HTMLDivElement) => {
+    setMessagesEnd(messagesEnd);
+  }
 
   /**
    * Fetches knots list for the story
@@ -103,7 +107,7 @@ const  PreviewScreen: React.FC<Props> = ({
       return;
     }
 
-    if (!storyLoading && storyData && storyData.story?.id === storyId){
+    if (!storyLoading && storyData?.story?.id === storyId){
       return;
     }
 
@@ -130,7 +134,7 @@ const  PreviewScreen: React.FC<Props> = ({
   const renderLoading = () => {
     return (
 
-      <Box style={{ height: "100%", width: "100%", alignItems: "center", justifyContent: "center", display: "flex" }}>
+      <Box className={ classes.loadingContainer }>
         <Loading text={ strings.loading.loadingStory }/>
       </Box>
     );
@@ -146,7 +150,7 @@ const  PreviewScreen: React.FC<Props> = ({
         anchor="left"
       >
         <Toolbar/>
-        <Box height="49px" display="flex" borderBottom={1}>
+        <Box height="49px" display="flex" borderBottom={ 1 }>
           <Box margin="auto">
             <Typography component="h3">
               { strings.previewScreen.leftBar.knotsLeftTab }
@@ -163,6 +167,9 @@ const  PreviewScreen: React.FC<Props> = ({
     );
   }
 
+  /**
+   * Renders preview content
+   */
   const renderPreviewContent = () => {
     if (!knots || !intents) {
       return;
@@ -202,6 +209,7 @@ const  PreviewScreen: React.FC<Props> = ({
     if (!knot?.coordinates?.x || !knot?.coordinates?.y) {
       return;
     }
+
     setStoryData({ ...storyData, selectedKnot: knot });
   }
 
@@ -221,7 +229,13 @@ const  PreviewScreen: React.FC<Props> = ({
     );
   }
 
-  const { story, knots, selectedKnot, selectedIntent, intents, trainingMaterial } = storyData;
+  const { story, 
+    knots, 
+    selectedKnot, 
+    selectedIntent, 
+    intents, 
+    trainingMaterial 
+  } = storyData;
 
   return (
     <AppLayout

@@ -11,10 +11,10 @@ interface Props {
 
 /**
  * Loading item component
+ * 
+ * @param props component properties
  */
-const Loading: React.FC<Props> = ({
-  text
-}) => {
+const Loading: React.FC<Props> = ({ text }) => {
   const classes = useLoadingStyles();
   return (
     <Box className={ classes.root }>

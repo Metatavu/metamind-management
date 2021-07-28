@@ -122,9 +122,12 @@ export interface IStrings extends LocalizedStringsMethods {
     save: {
       success: string;
       fail: string;
-    }
+    };
   };
 
+  /**
+   * Translations related to preview screen
+   */
   previewScreen: {
     storyKnots: string;
     globalKnots: string;

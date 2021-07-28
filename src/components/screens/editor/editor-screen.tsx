@@ -718,7 +718,7 @@ const EditorScreen: React.FC<Props> = ({
    */
   const renderLoading = () => {
     return (
-      <Box style={{ height: "100%", width: "100%", alignItems: "center", justifyContent: "center", display: "flex" }}>
+      <Box className={ classes.loadingContainer }>
         <Loading text={ strings.loading.loadingStory }/>
       </Box>
     );

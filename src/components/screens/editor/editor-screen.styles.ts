@@ -61,6 +61,14 @@ export const useEditorScreenStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     color: "#fff"
+  },
+
+  loadingContainer: {
+    height: "100%", 
+    width: "100%", 
+    alignItems: "center", 
+    justifyContent: "center", 
+    display: "flex"
   }
 
 }, {

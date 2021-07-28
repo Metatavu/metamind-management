@@ -10,7 +10,6 @@ export interface StoryState {
   storyData?: StoryData;
 }
 
-
 /**
  * Initial story state
  */
@@ -35,11 +34,9 @@ export function storyReducer(state: StoryState = initialState, action: StoryActi
         storyData: undefined 
       };
     case SET_STORY:
-      const storyData = action.storyData;
-
       return { 
         ...state,
-        storyData,
+        storyData: action.storyData,
         storyLoading: false 
       };
     default:
