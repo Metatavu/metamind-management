@@ -14,7 +14,7 @@ import strings from "../../../localization/strings";
 import { Typography } from "@material-ui/core";
 import Api from "../../../api/api";
 import { useParams } from "react-router-dom";
-import { StoryData } from "../../../types"
+import { StoryData } from "../../../types";
 import { loadStory, setStoryData } from "../../../actions/story";
 import StoryPreviewView from "../../views/story-preview-view";
 import Loading from "../../generic/loading-item/loading-item";
