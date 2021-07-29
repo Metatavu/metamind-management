@@ -9,7 +9,6 @@ export interface StoryState {
   storyLoading: boolean;
   storyData?: StoryData;
 }
-
 /**
  * Initial story state
  */
