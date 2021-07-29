@@ -23,6 +23,9 @@ import AccordionItem from "../../generic/accordion-item";
 import TrainingSelectionOptions from "../../intent-components/training-selection-options/training-selection-options";
 import QuickResponseButton from "../../intent-components/quick-response-button/quick-response-button";
 import EditorUtils from "../../../utils/editor";
+import { StoryData } from "../../../types"
+import { loadStory, setStoryData } from "../../../actions/story";
+import Loading from "../../generic/loading-item";
 import DiscussionComponent from "../../knot-components/discussion-component/discussion-component";
 import KnotIcon from "../../../resources/svg/knot-icon";
 
@@ -32,19 +35,10 @@ import KnotIcon from "../../../resources/svg/knot-icon";
 interface Props {
   keycloak?: KeycloakInstance;
   accessToken?: AccessToken;
-}
-
-/**
- * Story data
- */
-interface StoryData {
-  story?: Story;
-  knots?: Knot[];
-  intents?: Intent[];
-  selectedKnot?: Knot;
-  selectedIntent? : Intent;
-  trainingMaterial?: TrainingMaterial[];
-  scripts?: Script[];
+  storyData?: StoryData;
+  storyLoading: boolean;
+  loadStory: () => void;
+  setStoryData: (storyData: StoryData) => void;
 }
 
 /**
@@ -54,15 +48,16 @@ interface StoryData {
  */
 const EditorScreen: React.FC<Props> = ({
   accessToken,
-  keycloak
+  keycloak,
+  storyData,
+  storyLoading,
+  loadStory,
+  setStoryData,
 }) => {
   const { storyId } = useParams<{ storyId: string }>();
   const classes = useEditorScreenStyles();
-
-  const [ storyData, setStoryData ] = React.useState<StoryData>({});
   const [ centeredKnot, setCenteredKnot ] = React.useState<Knot | undefined>(undefined);
   const [ centeredIntent, setCenteredIntent ] = React.useState<Intent | undefined>(undefined);
-  const { story, knots, selectedKnot, selectedIntent, intents, trainingMaterial, scripts } = storyData;
   const [ leftToolBarIndex, setLeftToolBarIndex ] = React.useState(0);
   const [ rightToolBarIndex, setRightToolBarIndex ] = React.useState(0);
   const [ addingKnots, setAddingKnots ] = React.useState(false);
@@ -336,6 +331,14 @@ const EditorScreen: React.FC<Props> = ({
         [EditorUtils.objectKeyConversion(name)]: foundMaterial?.id
       }
     };
+
+    if (accessToken && updatedIntent.id) {
+      Api.getIntentsApi(accessToken).updateIntent({
+        intentId: updatedIntent.id,
+        intent: updatedIntent,
+        storyId
+      });
+    }    
     
     setStoryData({
       ...storyData,
@@ -359,7 +362,7 @@ const EditorScreen: React.FC<Props> = ({
     setSelectedTrainingMaterialType(name as keyof object);
     setEditedTrainingMaterial({
       type: name,
-      storyId: storyId,
+      storyId,
       name: "",
       text: "",
       visibility: TrainingMaterialVisibility.STORY
@@ -442,6 +445,7 @@ const EditorScreen: React.FC<Props> = ({
     if (!editedTrainingMaterial?.type || !trainingMaterial || !selectedIntent?.id || !intents) {
       return;
     }
+
     const key = EditorUtils.objectKeyConversion(editedTrainingMaterial.type);
     const updatedIntent: Intent = {
       ...selectedIntent,
@@ -547,7 +551,7 @@ const EditorScreen: React.FC<Props> = ({
    * Event handler for save button click
    */
   const onSaveClick = async () => {
-    if (!accessToken || !storyData.story) {
+    if (!accessToken || !storyData!.story) {
       return;
     }
 
@@ -686,6 +690,12 @@ const EditorScreen: React.FC<Props> = ({
       return;
     }
 
+    if (!storyLoading && storyData?.story?.id === storyId) {
+      return;
+    }
+
+    loadStory();
+
     const [ story, knotList, intentList, trainingMaterialList, scriptList ] = await Promise.all([
       Api.getStoriesApi(accessToken).findStory({ storyId }),
       Api.getKnotsApi(accessToken).listKnots({ storyId }),
@@ -701,6 +711,17 @@ const EditorScreen: React.FC<Props> = ({
       trainingMaterial: trainingMaterialList,
       scripts: scriptList
     });
+  }
+
+  /**
+   * Renders loading
+   */
+  const renderLoading = () => {
+    return (
+      <Box className={ classes.loadingContainer }>
+        <Loading text={ strings.loading.loadingStory }/>
+      </Box>
+    );
   }
 
   /**
@@ -1080,13 +1101,33 @@ const EditorScreen: React.FC<Props> = ({
     return null;
   }
 
+  if (storyLoading || !storyData) {
+    return (
+      <AppLayout
+        keycloak={ keycloak }
+        pageTitle={ strings.loading.loading }
+      >
+        { renderLoading() }
+      </AppLayout>
+    );
+  }
+
+  const {
+    story,
+    knots,
+    selectedKnot,
+    selectedIntent,
+    intents,
+    trainingMaterial,
+    scripts
+  } = storyData;
+
   return (
     <>
       <AppLayout
         keycloak={ keycloak }
         pageTitle={ storyData.story?.name ?? "" }
         dataChanged={ dataChanged }
-        storySelected
         onSaveClick={ onSaveClick }
       >
         { renderLeftToolbar() }
@@ -1106,7 +1147,9 @@ const EditorScreen: React.FC<Props> = ({
  */
 const mapStateToProps = (state: ReduxState) => ({
   accessToken: state.auth.accessToken,
-  keycloak: state.auth.keycloak
+  keycloak: state.auth.keycloak,
+  storyData: state.story.storyData,
+  storyLoading: state.story.storyLoading
 });
 
 /**
@@ -1114,6 +1157,9 @@ const mapStateToProps = (state: ReduxState) => ({
  *
  * @param dispatch dispatch method
  */
-const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({});
+const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({
+  loadStory: () => dispatch(loadStory()),
+  setStoryData: (storyData: StoryData) => dispatch(setStoryData(storyData)),
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditorScreen);
