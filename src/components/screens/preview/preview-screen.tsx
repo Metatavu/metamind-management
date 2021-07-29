@@ -170,6 +170,9 @@ const  PreviewScreen: React.FC<Props> = ({
   /**
    * Renders preview content
    */
+  /**
+   * Renders preview content
+   */
   const renderPreviewContent = () => {
     if (!knots || !intents) {
       return;
