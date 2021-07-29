@@ -69,7 +69,7 @@ const  PreviewScreen: React.FC<Props> = ({
    * Bot or user response 
    */
   const botOrUserResponse = (message: MessageData) => {
-    setMessageDatas((messageDatas) => [
+    setMessageDatas(messageDatas => [
       ...messageDatas.filter(messageData => !messageData.id.startsWith("temp")), 
       message
     ]);
