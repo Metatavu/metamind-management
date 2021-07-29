@@ -1104,11 +1104,11 @@ const EditorScreen: React.FC<Props> = ({
   if (storyLoading || !storyData) {
     return (
       <AppLayout
-      keycloak={ keycloak }
-      pageTitle={ strings.loading.loading }
-    >
-      { renderLoading() }
-    </AppLayout>
+        keycloak={ keycloak }
+        pageTitle={ strings.loading.loading }
+      >
+        { renderLoading() }
+      </AppLayout>
     );
   }
 
