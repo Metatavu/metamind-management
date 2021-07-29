@@ -213,6 +213,7 @@ const  PreviewScreen: React.FC<Props> = ({
       return;
     }
 
+
     setStoryData({ ...storyData, selectedKnot: knot });
   }
 
