@@ -233,7 +233,8 @@ const  PreviewScreen: React.FC<Props> = ({
     );
   }
 
-  const { story, 
+  const {
+    story,
     knots, 
     selectedKnot, 
     selectedIntent, 
