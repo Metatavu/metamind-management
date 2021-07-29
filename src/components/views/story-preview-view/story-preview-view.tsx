@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useStoryPreviewViewStyles } from "./story-preview-view";
 import { MessageData } from "metamind-metatavu-bot/dist/types";
-import MessageList from "metamind-metatavu-bot/dist/components/message-list/message-list"
-import MessageInput from "metamind-metatavu-bot/dist/components/message-input/message-input"
+import MessageList from "metamind-metatavu-bot/dist/components/message-list/message-list";
+import MessageInput from "metamind-metatavu-bot/dist/components/message-input/message-input";
 import { StoryData } from "../../../types/index";
 import { Box } from "@material-ui/core";  
 
