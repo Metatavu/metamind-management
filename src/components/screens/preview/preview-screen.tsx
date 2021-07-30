@@ -18,7 +18,7 @@ import { StoryData } from "../../../types";
 import { loadStory, setStoryData } from "../../../actions/story";
 import StoryPreviewView from "../../views/story-preview-view";
 import Loading from "../../generic/loading-item/loading-item";
-import { MessageData } from "../../../../metamind-metatavu-bot/dist/types";
+// import { MessageData } from "../../../../metamind-metatavu-bot/dist/types";
 
 /**
  * Interface describing component props
@@ -47,7 +47,7 @@ const  PreviewScreen: React.FC<Props> = ({
 }) => {
   const { storyId } = useParams<{ storyId: string }>();
   const classes = usePreviewStyles();
-  const [ messageDatas, setMessageDatas ] = React.useState<MessageData[]>([]);
+  const [ messageDatas, setMessageDatas ] = React.useState<any[]>([]);
   const [ conversationStarted, setConversationStarted ] = React.useState(false);
   const [ messagesEnd, setMessagesEnd ] = React.useState<HTMLDivElement>();
 

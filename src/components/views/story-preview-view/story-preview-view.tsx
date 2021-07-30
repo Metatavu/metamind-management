@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useStoryPreviewViewStyles } from "./story-preview-view";
-import { MessageData } from "metamind-metatavu-bot/dist/types";
-import MessageList from "metamind-metatavu-bot/dist/components/message-list/message-list";
-import MessageInput from "metamind-metatavu-bot/dist/components/message-input/message-input";
+// import { MessageData } from "metamind-metatavu-bot/dist/types";
+// import MessageList from "metamind-metatavu-bot/dist/components/message-list/message-list";
+// import MessageInput from "metamind-metatavu-bot/dist/components/message-input/message-input";
 import { StoryData } from "../../../types/index";
 import { Box } from "@material-ui/core";  
 
@@ -10,11 +10,11 @@ import { Box } from "@material-ui/core";
  * Interface describing component props
  */
 interface Props {
-  messageDatas: MessageData[];
+  messageDatas: any[];
   conversationStarted: boolean;
   messagesEnd?: HTMLDivElement;
   storyData?: StoryData;
-  botOrUserResponse: (message: MessageData) => void;
+  botOrUserResponse: (message: any) => void;
   conversationStart: () => void;
   botReset: () => void;
   botInterrupted: () => void;
@@ -96,7 +96,7 @@ const StoryPreviewView: React.FC<Props> = ({
    */
   return (
     <div className={ classes.root }>
-      <Box className={ classes.messageListBox }>
+      {/* <Box className={ classes.messageListBox }>
         <MessageList
           messageDatas={ messageDatas }
           messagesEnd={ messagesEnd }
@@ -123,7 +123,7 @@ const StoryPreviewView: React.FC<Props> = ({
           onReset={ botReset }
           onRestartConversation={ restartConversation }
         />
-      </Box>
+      </Box> */}
     </div>
   );
 }
