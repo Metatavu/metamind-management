@@ -24,7 +24,6 @@
     "keycloak-js": "^11.0.2",
     "localized-strings": "^0.2.4",
     "lodash": "^4.17.21",
-    // "metamind-metatavu-bot": "file:metamind-metatavu-bot",
     "material-ui-dropzone": "^3.5.0",
     "moment": "^2.27.0",
     "pathfinding": "^0.4.18",
