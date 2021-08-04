@@ -866,8 +866,8 @@ const EditorScreen: React.FC<Props> = ({
         onClose={ () => setDeleteConfirmDialogOpen(false) }
         onCancel={ () => setDeleteConfirmDialogOpen(false) }
         onConfirm={ onDeleteConfirmClick }
-        open= { deleteConfirmDialogOpen }
-        error= { false }
+        open={ deleteConfirmDialogOpen }
+        error={ false }
       >
         { (selectedKnot || selectedIntent) &&
           <Typography variant="h4">
