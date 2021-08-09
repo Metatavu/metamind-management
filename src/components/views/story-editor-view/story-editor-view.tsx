@@ -24,6 +24,8 @@ interface Props {
   addingKnots: boolean;
   centeredKnot?: Knot;
   centeredIntent?: Intent;
+  zoom100: boolean;
+  setZoom100: (value: boolean) => void;
   deletedKnot?: Knot;
   deletedIntent?: Intent;
   onAddNode: (node: CustomNodeModel) => void;
@@ -48,6 +50,8 @@ const StoryEditorView: React.FC<Props> = ({
   addingKnots,
   centeredKnot,
   centeredIntent,
+  zoom100,
+  setZoom100,
   deletedKnot,
   deletedIntent,
   onAddNode,
@@ -76,6 +80,21 @@ const StoryEditorView: React.FC<Props> = ({
     addInitialData();
     // eslint-disable-next-line
   }, []);
+
+  /**
+   * Effect that zooms diagram to 100%
+   */
+  React.useEffect(() => {
+    if(!zoom100) {
+      return;
+    }
+    
+    engineRef.current.getModel().setZoomLevel(100);
+    engineRef.current.zoomToFit();
+    setZoom100(false);
+
+    // eslint-disable-next-line
+  }, [ zoom100 ]);
 
   /**
    * Effect that centers the canvas to certain coordinates and selects a knot
