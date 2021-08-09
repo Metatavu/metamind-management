@@ -1,14 +1,18 @@
 import * as React from "react";
-import { AppBar, Toolbar, withStyles, WithStyles, Box, Button, IconButton, Typography } from "@material-ui/core";
+import { AppBar, Toolbar, withStyles, WithStyles, Box, Button, Typography, TextField, MenuItem } from "@material-ui/core";
 import { styles } from "./app-layout.styles";
 import Logo from "../../../resources/svg/logo";
 import strings from "../../../localization/strings";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import EditorIcon from "@material-ui/icons/Edit";
 import PreviewIcon from "@material-ui/icons/PlayArrow";
 import SaveIcon from "@material-ui/icons/Save";
-import SettingsIcon from "@material-ui/icons/Settings";
 import { KeycloakInstance } from "keycloak-js";
+import { ReduxActions, ReduxState } from "../../../store";
+import { connect } from "react-redux";
+import { StoryData } from "../../../types";
+import { setLocale } from "../../../actions/locale";
+import { Dispatch } from "redux";
 
 /**
  * Interface describing component props
@@ -16,104 +20,39 @@ import { KeycloakInstance } from "keycloak-js";
 interface Props extends WithStyles<typeof styles> {
   onSaveClick?: () => void;
   dataChanged?: boolean;
-  storySelected?: boolean;
   pageTitle: string;
-  storyId?: string;
+  storyData?: StoryData;
   keycloak: KeycloakInstance;
-}
-
-/**
- * Interface describing component state
- */
-interface State {
+  locale: string;
+  storySelected: boolean;
+  setLocale: typeof setLocale;
 }
 
 /**
  * App layout component. Provides the basic page layout with a header
+ *
+ * @param props component properties
  */
-class AppLayout extends React.Component<Props, State> {
+const AppLayout: React.FC<Props> = ({
+  onSaveClick,
+  dataChanged,
+  storySelected,
+  storyData,
+  pageTitle,
+  keycloak,
+  locale,
+  setLocale,
+  classes,
+  children
+}) => {
 
-  /**
-   * Constructor
-   *
-   * @param props props
-   */
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {}
-  }
-  /**
-   * Component render method
-   */
-  public render = () => {
-    const {
-      classes,
-      children,
-      onSaveClick,
-      dataChanged,
-      storySelected,
-      keycloak
-    } = this.props;
-    const firstName = (keycloak.profile && keycloak.profile.firstName) ?? "";
-    const lastName = (keycloak.profile && keycloak.profile.lastName) ?? "";
-
-    return (
-      <>
-        <AppBar position="fixed">
-          <Toolbar>
-            { this.renderNavigation() }
-            { this.renderPageTitle() }
-            <Box display="flex" alignItems="center">
-              { storySelected &&
-                <Button
-                  onClick={ onSaveClick }
-                  disabled={ !dataChanged }
-                  variant="text"
-                  color="secondary"
-                  startIcon={ <SaveIcon/> }
-                >
-                  { strings.generic.save }
-                </Button>
-              }
-              <Box ml={ 2 } display="flex" alignItems="center">
-                <Typography color="textSecondary">
-                  { firstName } { lastName }
-                </Typography>
-                <Box ml={ 1 }>
-                  <Typography color="textSecondary">{ "//" }</Typography>
-                </Box>
-                <Button
-                  variant="text"
-                  onClick={ () => this.onLogOutClick() }
-                >
-                  { strings.header.signOut }
-                </Button>
-                <Box ml={ 2 }>
-                  <IconButton
-                    title={ strings.header.settings }
-                    color="secondary"
-                  >
-                    <SettingsIcon/>
-                  </IconButton>
-                </Box>
-              </Box>
-            </Box>
-          </Toolbar>
-        </AppBar>
-        <Box className={ classes.root }>
-          { children }
-        </Box>
-      </>
-    );
-  }
+  const firstName = keycloak.profile?.firstName ?? "";
+  const lastName = keycloak.profile?.lastName ?? "";
 
   /**
    * Renders navigation
    */
-  private renderNavigation = () => {
-    const { storySelected } = this.props;
-
+  const renderNavigation = () => {
     return (
       <Box
         display="flex"
@@ -123,22 +62,34 @@ class AppLayout extends React.Component<Props, State> {
         <Link to="/">
           <Logo />
         </Link>
-        { storySelected &&
+        { storyData &&
           <Box ml={ 2 }>
-            <Button
-              variant="text"
-              startIcon={ <EditorIcon/> }
-              color="secondary"
+            <NavLink
+              exact
+              to={ `/editor/${storyData.story?.id}` }
+              style={{ textDecoration: "none" }}
             >
-              { strings.header.editor }
-            </Button>
-            <Button
-              variant="text"
-              startIcon={ <PreviewIcon/> }
-              color="secondary"
-            > 
-              { strings.header.preview }
-            </Button>
+              <Button
+                variant="text"
+                startIcon={ <EditorIcon/> }
+                color="secondary"
+              >
+                { strings.header.editor }
+              </Button>
+            </NavLink>
+            <NavLink
+              exact
+              to={ `/preview/${storyData.story?.id}` }
+              style={{ textDecoration: "none" }}
+            >
+              <Button
+                variant="text"
+                startIcon={ <PreviewIcon/> }
+                color="secondary"
+              > 
+                { strings.header.preview }
+              </Button>
+            </NavLink>
           </Box>
         }
       </Box>
@@ -148,8 +99,7 @@ class AppLayout extends React.Component<Props, State> {
   /**
    * Renders title
    */
-  private renderPageTitle = () => {
-    const { pageTitle } = this.props;
+  const renderPageTitle = () => {
 
     return (
       <Box
@@ -180,13 +130,100 @@ class AppLayout extends React.Component<Props, State> {
   /**
    * Event handler for logout click
    */
-  private onLogOutClick = () => {
-    const { keycloak } = this.props;
+  const onLogOutClick = () => {
 
     if (keycloak) {
       keycloak.logout();
     }
   }
+
+  return (
+    <>
+      <AppBar position="fixed">
+        <Toolbar>
+          { renderNavigation() }
+          { renderPageTitle() }
+          <Box
+            display="flex"
+            alignItems="center"
+            width="fit-content"
+          >
+            <TextField
+              select
+              className={ classes.languageSelect }
+              value={ locale }
+              onChange={ event => {
+                strings.setLanguage(event.target.value);
+                setLocale(event.target.value);
+              }}
+            >
+            {
+              strings.getAvailableLanguages().map(language =>
+                <MenuItem key={ language } value={ language } className={ classes.languageOption }>
+                  { language }
+                </MenuItem>
+              )
+            }
+            </TextField>
+            { storySelected &&
+              <Button
+                onClick={ onSaveClick }
+                disabled={ !dataChanged }
+                variant="text"
+                color="secondary"
+                startIcon={ <SaveIcon/> }
+              >
+                { strings.generic.save }
+              </Button>
+            }
+            <Box
+              ml={ 2 }
+              display="flex"
+              alignItems="center"
+            >
+              <Typography color="textSecondary">
+                { firstName } { lastName }
+              </Typography>
+              <Box ml={ 1 }>
+                <Typography color="textSecondary">
+                  { "//" }
+                </Typography>
+              </Box>
+              <Button
+                variant="text"
+                onClick={ onLogOutClick }
+              >
+                { strings.header.signOut }
+              </Button>
+            </Box>
+          </Box>
+        </Toolbar>
+      </AppBar>
+      <Box className={ classes.root }>
+        { children }
+      </Box>
+    </>
+  );
 }
 
-export default withStyles(styles)(AppLayout);
+/**
+ * Redux mapper for mapping store state to component props
+ *
+ * @param state store state
+ * @returns state from props
+ */
+const mapStateToProps = (state: ReduxState) => ({
+  storyData: state.story.storyData,
+  locale: state.locale.locale
+});
+
+/**
+ * Redux mapper for mapping component dispatches
+ *
+ * @param dispatch dispatch method
+ */
+const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({
+  setLocale: (locale: string) => dispatch(setLocale(locale))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(AppLayout));

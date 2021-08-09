@@ -5,7 +5,8 @@
     "edit": "Muokkaa",
     "edited": "Muokattu",
     "remove": "Poista",
-    "invalid": "virheellinen"
+    "invalid": "virheellinen",
+    "ok": "OK"
   },
 
   "header": {
@@ -21,9 +22,13 @@
     "myStories": "Omat tarinat",
     "selectStoryText": "Valitse tarina tai luo uusi.",
     "createNewStory": "Luo uusi tarina",
+    "dropFileHere": "Pudota tarina.json -tiedosto tähän tai valitse klikkaamalla",
+    "importStory": "Tuo tarina",
     "lastEditedStories": "Viimeksi muokatut tarinat",
+    "nameTheStory": "Nimeä tarina",
     "selectStory": "Valitse tarina",
     "selectStoryToEdit": "Valitse jo olemassaoleva tarina editoitavaksi",
+    "storyName": "Tarinan nimi",
     "open": "Avaa"
   },
 
@@ -69,6 +74,11 @@
       "intentsTab": {
         "incoming": "Saapuvat",
         "outcoming": "Lähtevät"
+      },
+      "tokenizerHeader": "Botin käyttäjän vastauksen tunnistus",
+      "tokenizerType": {
+        "UNTOKENIZED": "Ei käsittelyä",
+        "WHITESPACE": "Välilyönti"
       }
     },
     "intents": {
@@ -77,13 +87,55 @@
       "confusedIntents": "Hämmentymiset",
       "redirectIntents": "Uudelleenohjaukset"
     },
+    "knots": {
+      "discussion": "Keskustelu",
+      "linkedQuickResponses": "Linkatut pikavastaukset",
+      "advancedSettings": "Lisäasetukset",
+      "imageReply": "Kuvavastaus",
+      "textReply": "Tekstivastaus",
+      "availableScripts": "Toiminnot saatavilla",
+      "uploadHelperText": "Pudota kuva tähän tai valitse klikkaamalla",
+      "hint": "Vihje",
+      "hintHelper": "Botin käyttäjän vastauksen vihje"
+    },
     "add": {
       "knot": "Lisää solmu",
       "indent": "Lisää aikomus"
     },
     "confirm": {
       "knot": "Poistetaanko valittu solmu ja kaikki siihen liitetyt aikomukset?",
-      "intent": "Poistetaanko valittu aikomus?"
+      "intent": "Poistetaanko valittu aikomus?",
+      "title": "Poista kappale"
+    },
+    "save": {
+      "success": "Tallennettu!",
+      "fail": "Tallennus epäonnistui!"
     }
+  },
+
+  "previewScreen": {
+    "storyKnots": "Tarinan solmut",
+    "globalKnots": "Globaalit solmut",
+    "storyEditor": "Tarinaeditori",
+    "globalEditor": "Globaalieditori",
+    "leftBar" : {
+      "storyLeftTab": "Tarina",
+      "knotsLeftTab": "Solmut",
+      "intentsLeftTab": "Aikomukset",
+      "knotSearchHelper": "Solmujen haku",
+      "intentSearchHelper": "Hae aikomuksia"
+    },
+    "intents": {
+      "normalIntents": "Normaalit aikomukset",
+      "defaultIntents": "Oletusaikomukset",
+      "confusedIntents": "Hämmentymiset",
+      "redirectIntents": "Uudelleenohjaukset"
+    }
+  },
+
+  "loading": {
+    "loading": "Ladataan",
+    "loadingStory": "Lataa tarinaa...",
+    "savingStory": "Tallennetaan tarinaa..."
   }
 }

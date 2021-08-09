@@ -5,7 +5,8 @@
     "edit": "Edit",
     "edited": "Edited",
     "remove": "Remove",
-    "invalid": "invalid"
+    "invalid": "invalid",
+    "ok": "OK"
   },
 
   "header": {
@@ -21,9 +22,13 @@
     "myStories": "My stories",
     "selectStoryText": "Select a Story or create a new one.",
     "createNewStory": "Create a new story",
+    "dropFileHere": "Drop the story.json file here or click to select",
+    "importStory": "Import a story",
     "lastEditedStories": "Last edited",
+    "nameTheStory": "Name the story",
     "selectStory": "Select a story",
     "selectStoryToEdit": "Edit existing story",
+    "storyName": "Story name",
     "open": "Open"
   },
 
@@ -69,6 +74,11 @@
       "intentsTab": {
         "incoming": "Incoming",
         "outcoming": "Outcoming"
+      },
+      "tokenizerHeader": "Bot user answer recognition",
+      "tokenizerType": {
+        "UNTOKENIZED": "Untokenized",
+        "WHITESPACE": "Whitespace"
       }
     },
     "intents": {
@@ -77,13 +87,55 @@
       "confusedIntents": "Confused intents",
       "redirectIntents": "Redirect intents"
     },
+    "knots": {
+      "discussion": "Discussion",
+      "linkedQuickResponses": "Linked quick responses",
+      "advancedSettings": "Advanced settings",
+      "imageReply": "Image reply",
+      "textReply": "Text reply",
+      "availableScripts": "Available scripts",
+      "uploadHelperText": "Drag & drop, or click to upload an image",
+      "hint": "Hint",
+      "hintHelper": "Bot user answer hint"
+    },
     "add": {
       "knot": "Add knot",
       "indent": "Add intent"
     },
     "confirm": {
       "knot": "Remove knot and all related intents?",
-      "intent": "Remove selected intent?"
+      "intent": "Remove selected intent?",
+      "title": "Remove entity"
+    },
+    "save": {
+      "success": "Saved!",
+      "fail": "Failed to save!"
     }
+  },
+
+  "previewScreen": {
+    "storyKnots": "Story knots",
+    "globalKnots": "Global knots",
+    "storyEditor": "Story editor",
+    "globalEditor": "Global editor",
+    "leftBar" : {
+      "storyLeftTab": "Story",
+      "knotsLeftTab": "Knots",
+      "intentsLeftTab": "Intents",
+      "knotSearchHelper": "Knot search",
+      "intentSearchHelper": "Search for an intent"
+    },
+    "intents": {
+      "normalIntents": "Normal intents",
+      "defaultIntents": "Default intents",
+      "confusedIntents": "Confused intents",
+      "redirectIntents": "Redirect intents"
+    }
+  },
+
+  "loading": {
+    "loading": "Loading",
+    "loadingStory": "Loading story...",
+    "savingStory": "Saving story..."
   }
 }
