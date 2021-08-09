@@ -8,9 +8,9 @@ import { AccessToken } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
 import { usePreviewStyles } from "./preview-screen.styles";
 import { KeycloakInstance } from 'keycloak-js';
-import KnotPanel from "../../knot-components/knot-list/knot-list";
-import { Story, Knot, Intent, TrainingMaterial } from "../../../generated/client/models";
 import strings from "../../../localization/strings";
+import KnotPanel from "../../knot-components/knot-list/knot-list";
+import { Knot } from "../../../generated/client/models";
 import { Typography } from "@material-ui/core";
 import Api from "../../../api/api";
 import { useParams } from "react-router-dom";
@@ -19,6 +19,7 @@ import { loadStory, setStoryData } from "../../../actions/story";
 import StoryPreviewView from "../../views/story-preview-view";
 import Loading from "../../generic/loading-item/loading-item";
 import { MessageData } from "../../../../metamind-metatavu-bot/dist/types";
+import { setLocale } from "../../../actions/locale";
 
 /**
  * Interface describing component props
@@ -27,8 +28,10 @@ interface Props {
   keycloak?: KeycloakInstance;
   accessToken: AccessToken;
   storyData?: StoryData;
+  locale: string;
   storyLoading: boolean;
   loadStory: () => void;
+  setLocale: typeof setLocale;
   setStoryData: (storyData: StoryData) => void;
 }
 
@@ -47,7 +50,7 @@ const  PreviewScreen: React.FC<Props> = ({
 }) => {
   const { storyId } = useParams<{ storyId: string }>();
   const classes = usePreviewStyles();
-  const [ messageDatas, setMessageDatas ] = React.useState<MessageData[]>([]);
+  const [ messageData, setMessageData ] = React.useState<MessageData[]>([]);
   const [ conversationStarted, setConversationStarted ] = React.useState(false);
   const [ messagesEnd, setMessagesEnd ] = React.useState<HTMLDivElement>();
 
@@ -60,8 +63,8 @@ const  PreviewScreen: React.FC<Props> = ({
    * Interrupt the bot before the bot response 
    */
   const botInterrupted = () => {
-    setMessageDatas(messageDatas =>
-      messageDatas.filter(messageData => !messageData.id.startsWith("temp"))
+    setMessageData(messageData =>
+      messageData.filter(messageData => !messageData.id.startsWith("temp"))
     );
   }
 
@@ -69,8 +72,8 @@ const  PreviewScreen: React.FC<Props> = ({
    * Bot or user response 
    */
   const botOrUserResponse = (message: MessageData) => {
-    setMessageDatas(messageDatas => [
-      ...messageDatas.filter(messageData => !messageData.id.startsWith("temp")), 
+    setMessageData(messageData => [
+      ...messageData.filter(messageData => !messageData.id.startsWith("temp")), 
       message
     ]);
   }
@@ -86,7 +89,7 @@ const  PreviewScreen: React.FC<Props> = ({
    * Bot reset
    */
   const botReset = () => {
-    setMessageDatas([]);
+    setMessageData([]);
     setConversationStarted(false);
   }
 
@@ -133,7 +136,6 @@ const  PreviewScreen: React.FC<Props> = ({
    */
   const renderLoading = () => {
     return (
-
       <Box className={ classes.loadingContainer }>
         <Loading text={ strings.loading.loadingStory }/>
       </Box>
@@ -161,6 +163,7 @@ const  PreviewScreen: React.FC<Props> = ({
           <KnotPanel 
             knots={ knots ?? [] }
             onKnotClick={ onKnotClick }
+            onKnotSecondaryClick={ onKnotClick }
           />
         </Box>
       </Drawer>
@@ -188,7 +191,7 @@ const  PreviewScreen: React.FC<Props> = ({
         <Box className={ classes.previewContainer }>
           <StoryPreviewView
             storyData={ storyData }
-            messageDatas={ messageDatas }
+            messageData={ messageData }
             conversationStarted={ conversationStarted }
             messagesEnd={ messagesEnd }
             botOrUserResponse={ botOrUserResponse }
@@ -213,7 +216,6 @@ const  PreviewScreen: React.FC<Props> = ({
       return;
     }
 
-
     setStoryData({ ...storyData, selectedKnot: knot });
   }
 
@@ -227,26 +229,21 @@ const  PreviewScreen: React.FC<Props> = ({
       <AppLayout
       keycloak={ keycloak }
       pageTitle={ strings.loading.loading }
+      storySelected={ false }
     >
       { renderLoading() }
     </AppLayout>
     );
   }
 
-  const {
-    story,
-    knots, 
-    selectedKnot, 
-    selectedIntent, 
-    intents, 
-    trainingMaterial 
-  } = storyData;
+  const { knots, intents } = storyData;
 
   return (
     <AppLayout
       keycloak={ keycloak }
       pageTitle={ storyData.story?.name ?? "" }
       dataChanged={ true }
+      storySelected={ true }
     >
       { renderLeftToolbar() }
       { renderPreviewContent() }
@@ -263,6 +260,7 @@ const  PreviewScreen: React.FC<Props> = ({
 const mapStateToProps = (state: ReduxState) => ({
   accessToken: state.auth.accessToken as AccessToken,
   keycloak: state.auth.keycloak as KeycloakInstance,
+  locale: state.locale.locale,
   storyData: state.story.storyData,
   storyLoading: state.story.storyLoading,
 });
@@ -274,6 +272,7 @@ const mapStateToProps = (state: ReduxState) => ({
  */
 const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({
   loadStory: () => dispatch(loadStory()),
+  setLocale: (locale: string) => dispatch(setLocale(locale)),
   setStoryData: (storyData: StoryData) => dispatch(setStoryData(storyData)),
 });
 
