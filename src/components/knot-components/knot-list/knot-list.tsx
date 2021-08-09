@@ -7,7 +7,6 @@ import GlobalKnotIcon from "../../../resources/svg/global-knot-icon";
 import KnotIcon from "../../../resources/svg/knot-icon";
 import AccordionItem from "../../generic/accordion-item/accordion-item";
 import InteractiveListItem from "../../generic/list-items/interactive-list-item";
-import HomeIcon from '@material-ui/icons/Home';
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import { styles } from "./knot-list.styles";
 
