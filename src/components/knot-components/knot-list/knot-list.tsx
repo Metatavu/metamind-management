@@ -1,5 +1,6 @@
 import { Box, Divider, List, TextField } from "@material-ui/core";
 import * as React from "react";
+import { KnotScope } from "../../../generated/client";
 import { Knot } from "../../../generated/client/models/Knot";
 import strings from "../../../localization/strings";
 import GlobalKnotIcon from "../../../resources/svg/global-knot-icon";
@@ -22,8 +23,8 @@ interface Props {
  */
 const KnotPanel: React.FC<Props> = ({ knots, onKnotClick }) => {
 
-  const globalKnot = knots[0];
   const [ searchValue, setSearchValue ] = React.useState("");
+  const globalKnots = knots.filter(item => item.scope === KnotScope.Global);
 
   React.useEffect(() => {
     // TODO: Add fetch logic
@@ -53,12 +54,13 @@ const KnotPanel: React.FC<Props> = ({ knots, onKnotClick }) => {
     return (
       <AccordionItem title={ strings.editorScreen.globalKnots } >
         <List>
-          { globalKnot &&
+          { globalKnots && globalKnots.map(globalKnot =>
             <InteractiveListItem
               title={ globalKnot.name }
               icon={ <GlobalKnotIcon htmlColor="#000"/> }
               onClick={ () => onKnotClick(globalKnot) }
             />
+          )
           }
           
         </List>

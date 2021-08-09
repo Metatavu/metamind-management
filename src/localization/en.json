@@ -4,6 +4,7 @@
     "cancel": "Cancel",
     "edit": "Edit",
     "edited": "Edited",
+    "ok": "OK",
     "remove": "Remove"
   },
 
@@ -20,9 +21,13 @@
     "myStories": "My stories",
     "selectStoryText": "Select a Story or create a new one.",
     "createNewStory": "Create a new story",
+    "dropFileHere": "Drop the story.json file here or click to select",
+    "importStory": "Import a story",
     "lastEditedStories": "Last edited",
+    "nameTheStory": "Name the story",
     "selectStory": "Select a story",
     "selectStoryToEdit": "Edit existing story",
+    "storyName": "Story name",
     "open": "Open"
   },
 
@@ -64,13 +69,29 @@
       "none": "None",
       "selectTrainingMaterial": "Select training material",
       "createNew": "Create new",
-      "name": "Name"
+      "name": "Name",
+      "tokenizerHeader": "Bot user answer recognition",
+      "tokenizerType": {
+        "UNTOKENIZED": "Untokenized",
+        "WHITESPACE": "Whitespace"
+      }
     },
     "intents": {
       "normalIntents": "Normal intents",
       "defaultIntents": "Default intents",
       "confusedIntents": "Confused intents",
       "redirectIntents": "Redirect intents"
+    },
+    "knots": {
+      "discussion": "Discussion",
+      "linkedQuickResponses": "Linked quick responses",
+      "advancedSettings": "Advanced settings",
+      "imageReply": "Image reply",
+      "textReply": "Text reply",
+      "availableScripts": "Available scripts",
+      "uploadHelperText": "Drag & drop, or click to upload an image",
+      "hint": "Hint",
+      "hintHelper": "Bot user answer hint"
     },
     "add": {
       "knot": "Add knot",
@@ -79,6 +100,36 @@
     "confirm": {
       "knot": "Remove knot and all related intents?",
       "intent": "Remove selected intent?"
+    },
+    "save": {
+      "success": "Saved!",
+      "fail": "Failed to save!"
     }
+  },
+
+  "previewScreen": {
+    "storyKnots": "Story knots",
+    "globalKnots": "Global knots",
+    "storyEditor": "Story editor",
+    "globalEditor": "Global editor",
+    "leftBar" : {
+      "storyLeftTab": "Story",
+      "knotsLeftTab": "Knots",
+      "intentsLeftTab": "Intents",
+      "knotSearchHelper": "Knot search",
+      "intentSearchHelper": "Search for an intent"
+    },
+    "intents": {
+      "normalIntents": "Normal intents",
+      "defaultIntents": "Default intents",
+      "confusedIntents": "Confused intents",
+      "redirectIntents": "Redirect intents"
+    }
+  },
+
+  "loading": {
+    "loading": "Loading",
+    "loadingStory": "Loading story...",
+    "savingStory": "Saving story..."
   }
 }
