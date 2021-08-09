@@ -99,7 +99,8 @@
     },
     "confirm": {
       "knot": "Remove knot and all related intents?",
-      "intent": "Remove selected intent?"
+      "intent": "Remove selected intent?",
+      "title": "Remove entity"
     },
     "save": {
       "success": "Saved!",

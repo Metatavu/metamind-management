@@ -10,7 +10,7 @@ import { Box } from "@material-ui/core";
  * Interface describing component props
  */
 interface Props {
-  messageDatas: MessageData[];
+  messageData: MessageData[];
   conversationStarted: boolean;
   messagesEnd?: HTMLDivElement;
   storyData?: StoryData;
@@ -27,14 +27,12 @@ interface Props {
  * @param props component properties
  */
 const StoryPreviewView: React.FC<Props> = ({
-  messageDatas,
+  messageData,
   conversationStarted,
   messagesEnd,
-  storyData,
   botOrUserResponse,
   conversationStart,
   botReset,
-  botInterrupted,
   messagesEndUpdate
 }) => {
   const classes = useStoryPreviewViewStyles();
@@ -44,7 +42,8 @@ const StoryPreviewView: React.FC<Props> = ({
 
   React.useEffect(() => {
     loadData();
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /**
    * Sending new messages
@@ -66,7 +65,7 @@ const StoryPreviewView: React.FC<Props> = ({
    * Load the story
    */
   const loadData = () => {
-    if (messageDatas.length) {
+    if (messageData.length) {
       return;
     }
     
@@ -98,7 +97,7 @@ const StoryPreviewView: React.FC<Props> = ({
     <div className={ classes.root }>
       <Box className={ classes.messageListBox }>
         <MessageList
-          messageDatas={ messageDatas }
+          messageDatas={ messageData }
           messagesEnd={ messagesEnd }
           waitingForBot={ waitingForBot }
           conversationStarted={ conversationStarted } 

@@ -1,4 +1,4 @@
-import { Box, Button, Fade, IconButton, List, ListItem, ListItemText, Typography, WithStyles, withStyles, TextField, Divider, MenuItem, Toolbar } from "@material-ui/core";
+import { Box, Button, IconButton, List, ListItem, ListItemText, Typography, WithStyles, withStyles, TextField, Divider, MenuItem } from "@material-ui/core";
 import { History } from "history";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
@@ -309,6 +309,7 @@ class HomeScreen extends React.Component<Props, State> {
   private renderPreview = () => {
     const { classes } = this.props;
     const { storyFile } = this.state;
+
     if (!storyFile) {
       return null;
     }
@@ -368,7 +369,7 @@ class HomeScreen extends React.Component<Props, State> {
 
     if (createdStory.id) {
       const knotsApi = Api.getKnotsApi(accessToken);
-      const globalKnot = await knotsApi.createKnot({
+      await knotsApi.createKnot({
         storyId: createdStory.id,
         knot: {
           name: "Global",
@@ -380,7 +381,7 @@ class HomeScreen extends React.Component<Props, State> {
         }
       });
 
-      const homeKnot = await knotsApi.createKnot({
+      await knotsApi.createKnot({
         storyId: createdStory.id,
         knot: {
           name: "Home",

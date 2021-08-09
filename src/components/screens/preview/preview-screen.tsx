@@ -9,7 +9,7 @@ import AppLayout from "../../layouts/app-layout/app-layout";
 import { usePreviewStyles } from "./preview-screen.styles";
 import { KeycloakInstance } from 'keycloak-js';
 import KnotPanel from "../../knot-components/knot-list/knot-list";
-import { Story, Knot, Intent, TrainingMaterial } from "../../../generated/client/models";
+import { Knot } from "../../../generated/client/models";
 import strings from "../../../localization/strings";
 import { Typography } from "@material-ui/core";
 import Api from "../../../api/api";
@@ -47,7 +47,7 @@ const  PreviewScreen: React.FC<Props> = ({
 }) => {
   const { storyId } = useParams<{ storyId: string }>();
   const classes = usePreviewStyles();
-  const [ messageDatas, setMessageDatas ] = React.useState<MessageData[]>([]);
+  const [ messageData, setMessageData ] = React.useState<MessageData[]>([]);
   const [ conversationStarted, setConversationStarted ] = React.useState(false);
   const [ messagesEnd, setMessagesEnd ] = React.useState<HTMLDivElement>();
 
@@ -60,8 +60,8 @@ const  PreviewScreen: React.FC<Props> = ({
    * Interrupt the bot before the bot response 
    */
   const botInterrupted = () => {
-    setMessageDatas(messageDatas =>
-      messageDatas.filter(messageData => !messageData.id.startsWith("temp"))
+    setMessageData(messageData =>
+      messageData.filter(messageData => !messageData.id.startsWith("temp"))
     );
   }
 
@@ -69,8 +69,8 @@ const  PreviewScreen: React.FC<Props> = ({
    * Bot or user response 
    */
   const botOrUserResponse = (message: MessageData) => {
-    setMessageDatas(messageDatas => [
-      ...messageDatas.filter(messageData => !messageData.id.startsWith("temp")), 
+    setMessageData(messageData => [
+      ...messageData.filter(messageData => !messageData.id.startsWith("temp")), 
       message
     ]);
   }
@@ -86,7 +86,7 @@ const  PreviewScreen: React.FC<Props> = ({
    * Bot reset
    */
   const botReset = () => {
-    setMessageDatas([]);
+    setMessageData([]);
     setConversationStarted(false);
   }
 
@@ -161,6 +161,7 @@ const  PreviewScreen: React.FC<Props> = ({
           <KnotPanel 
             knots={ knots ?? [] }
             onKnotClick={ onKnotClick }
+            onKnotSecondaryClick={ onKnotClick }
           />
         </Box>
       </Drawer>
@@ -188,7 +189,7 @@ const  PreviewScreen: React.FC<Props> = ({
         <Box className={ classes.previewContainer }>
           <StoryPreviewView
             storyData={ storyData }
-            messageDatas={ messageDatas }
+            messageData={ messageData }
             conversationStarted={ conversationStarted }
             messagesEnd={ messagesEnd }
             botOrUserResponse={ botOrUserResponse }
@@ -233,14 +234,7 @@ const  PreviewScreen: React.FC<Props> = ({
     );
   }
 
-  const {
-    story,
-    knots, 
-    selectedKnot, 
-    selectedIntent, 
-    intents, 
-    trainingMaterial 
-  } = storyData;
+  const { knots, intents } = storyData;
 
   return (
     <AppLayout
