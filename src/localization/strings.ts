@@ -15,6 +15,7 @@ export interface IStrings extends LocalizedStringsMethods {
     edited: string;
     ok: string;
     remove: string;
+    invalid: string;
   };
 
   /**
@@ -88,6 +89,10 @@ export interface IStrings extends LocalizedStringsMethods {
       selectTrainingMaterial: string;
       createNew: string;
       name: string;
+      intentsTab: {
+        incoming: string;
+        outcoming: string;
+      };
       tokenizerHeader: string;
       tokenizerType: {
         UNTOKENIZED: string;

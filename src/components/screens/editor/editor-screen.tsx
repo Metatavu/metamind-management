@@ -24,6 +24,7 @@ import AccordionItem from "../../generic/accordion-item";
 import TrainingSelectionOptions from "../../intent-components/training-selection-options/training-selection-options";
 import QuickResponseButton from "../../intent-components/quick-response-button/quick-response-button";
 import EditorUtils from "../../../utils/editor";
+import KnotLinking from "../../knot-components/knot-linking/knot-linking";
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import GenericDialog from "../../generic/generic-dialog/generic-dialog";
 import { StoryData } from "../../../types";
@@ -1198,7 +1199,18 @@ const EditorScreen: React.FC<Props> = ({
    * Renders right toolbar linking tab
    */
   const renderLinkingTab = () => {
-    return null;
+    if (!selectedKnot || !knots || !intents) {
+      return null;
+    }
+
+    return (
+      <KnotLinking
+        selectedKnot={ selectedKnot }
+        knots={ knots }
+        intents={ intents }
+        onAddLink={ onAddLink }
+      />
+    );
   }
 
   if (!keycloak) {

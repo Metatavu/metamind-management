@@ -4,8 +4,9 @@
     "cancel": "Cancel",
     "edit": "Edit",
     "edited": "Edited",
-    "ok": "OK",
-    "remove": "Remove"
+    "remove": "Remove",
+    "invalid": "invalid",
+    "ok": "OK"
   },
 
   "header": {
@@ -70,6 +71,10 @@
       "selectTrainingMaterial": "Select training material",
       "createNew": "Create new",
       "name": "Name",
+      "intentsTab": {
+        "incoming": "Incoming",
+        "outcoming": "Outcoming"
+      },
       "tokenizerHeader": "Bot user answer recognition",
       "tokenizerType": {
         "UNTOKENIZED": "Untokenized",

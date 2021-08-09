@@ -4,8 +4,9 @@
     "cancel": "Peruuta",
     "edit": "Muokkaa",
     "edited": "Muokattu",
-    "ok": "OK",
-    "remove": "Poista"
+    "remove": "Poista",
+    "invalid": "virheellinen",
+    "ok": "OK"
   },
 
   "header": {
@@ -70,6 +71,10 @@
       "selectTrainingMaterial": "Valitse harjoitusmateriaali",
       "createNew": "Luo uusi",
       "name": "Nimi",
+      "intentsTab": {
+        "incoming": "Saapuvat",
+        "outcoming": "Lähtevät"
+      },
       "tokenizerHeader": "Botin käyttäjän vastauksen tunnistus",
       "tokenizerType": {
         "UNTOKENIZED": "Ei käsittelyä",
