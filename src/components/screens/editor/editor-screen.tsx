@@ -1,4 +1,4 @@
-import { Box, Drawer, Tab, Tabs, TextField, Button, MenuItem, InputLabel, Snackbar } from "@material-ui/core";
+import { Box, Drawer, Tab, Tabs, TextField, Button, MenuItem, InputLabel, Snackbar, Typography } from "@material-ui/core";
 import MuiAlert from '@material-ui/lab/Alert';
 import Divider from "@material-ui/core/Divider";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -7,6 +7,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../../../api/api";
+// eslint-disable-next-line max-len
 import { TokenizerType, KnotType, Knot, Intent, IntentType, TrainingMaterial, TrainingMaterialType, TrainingMaterialVisibility, KnotScope } from "../../../generated/client/models";
 import strings from "../../../localization/strings";
 import { ReduxActions, ReduxState } from "../../../store";
@@ -23,6 +24,7 @@ import AccordionItem from "../../generic/accordion-item";
 import TrainingSelectionOptions from "../../intent-components/training-selection-options/training-selection-options";
 import QuickResponseButton from "../../intent-components/quick-response-button/quick-response-button";
 import EditorUtils from "../../../utils/editor";
+import GenericDialog from "../../generic/generic-dialog/generic-dialog";
 import { StoryData } from "../../../types"
 import { loadStory, setStoryData } from "../../../actions/story";
 import Loading from "../../generic/loading-item";
@@ -69,6 +71,9 @@ const EditorScreen: React.FC<Props> = ({
   const [ editedTrainingMaterial, setEditedTrainingMaterial ] = React.useState<TrainingMaterial>();
   const [ removedKnots, setRemovedKnots ] = React.useState<Knot[]>([]);
   const [ removedIntents, setRemovedIntents ] = React.useState<Intent[]>([]);
+  const [ deleteConfirmDialogOpen, setDeleteConfirmDialogOpen ] = React.useState(false);
+  const [ deletedKnotRef, setDeletedKnotRef ] = React.useState<Knot | undefined>(undefined);
+  const [ deletedIntentRef, setDeletedIntentRef ] = React.useState<Intent | undefined>(undefined);
   const [ alertMessage, setAlertMessage ] = React.useState("");
   const [ alertType, setAlertType ] = React.useState<"error" | "success">("success");
   const [ alertOpen, setAlertOpen ] = React.useState(false);
@@ -415,6 +420,54 @@ const EditorScreen: React.FC<Props> = ({
   }
 
   /**
+   * Event handler for delete from list click
+   * 
+   * @param entity entity to be deleted
+   */
+  const onDeleteFromListClick = (entity: Knot | Intent) => {
+    const intent = entity as Intent;
+    const sourceKnotId = intent.sourceKnotId;
+    if (!sourceKnotId) {
+      return;
+    }
+
+    setStoryData({
+      ...storyData,
+      selectedIntent: intent,
+      selectedKnot: undefined
+    });
+
+    setDeleteConfirmDialogOpen(true);
+  }
+
+  /**
+   * Event handler for delete confirm click
+   */
+  const onDeleteConfirmClick = () => {
+    if (selectedIntent && intents) {
+      setDeletedIntentRef(selectedIntent);
+      setRemovedIntents([ ...removedIntents, selectedIntent ]);
+      setStoryData({
+        ...storyData,
+        intents: intents.filter(intent => intent.id !== selectedIntent.id),
+        selectedIntent: undefined
+      });
+    }
+
+    if (selectedKnot && knots) {
+      setDeletedKnotRef(selectedKnot);
+      setRemovedKnots([ ...removedKnots, selectedKnot ]);
+      setStoryData({
+        ...storyData,
+        knots: knots.filter(knot => knot.id !== selectedKnot.id),
+        selectedKnot: undefined
+      });
+    }
+    
+    setDeleteConfirmDialogOpen(false);
+  }
+
+  /**
    * Updates training material
    */
   const updateTrainingMaterial = () => {
@@ -623,7 +676,7 @@ const EditorScreen: React.FC<Props> = ({
         Promise.all(intentDeletePromises)
       ])
 
-      console.log("TODO Loading, prevent user from interacting");
+      // TODO Loading, prevent user from interacting
 
       const [ updatedStory, updatedKnots, updatedIntents, updatedMaterials ] = await Promise.all([ 
         storyPromise, 
@@ -784,12 +837,14 @@ const EditorScreen: React.FC<Props> = ({
             <KnotPanel
               knots={ knots ?? [] }
               onKnotClick={ onKnotClick }
+              onKnotSecondaryClick={ onDeleteFromListClick }
             />
           }
           { leftToolBarIndex === 2 &&
             <IntentPanel
               intents={ intents ?? [] }
               onIntentClick={ onIntentClick }
+              onIntentSecondaryClick={ onDeleteFromListClick }
             />
           }
         </Box>
@@ -823,6 +878,8 @@ const EditorScreen: React.FC<Props> = ({
             addingKnots={ addingKnots }
             centeredKnot={ centeredKnot }
             centeredIntent={ centeredIntent }
+            deletedKnot={ deletedKnotRef }
+            deletedIntent={ deletedIntentRef }
             onAddNode={ onAddNode }
             onMoveNode={ onMoveNode }
             onRemoveNode={ onRemoveNode }
@@ -1091,6 +1148,30 @@ const EditorScreen: React.FC<Props> = ({
   }
 
   /**
+   * Renders delete confirm dialog
+   */
+  const renderDeleteConfirmDialog = () => {
+    return (
+      <GenericDialog
+        title={ strings.editorScreen.confirm.title }
+        positiveButtonText={ strings.generic.remove }
+        cancelButtonText={ strings.generic.cancel }
+        onClose={ () => setDeleteConfirmDialogOpen(false) }
+        onCancel={ () => setDeleteConfirmDialogOpen(false) }
+        onConfirm={ onDeleteConfirmClick }
+        open={ deleteConfirmDialogOpen }
+        error={ false }
+      >
+        { (selectedKnot || selectedIntent) &&
+          <Typography variant="h4">
+            { selectedIntent ? strings.editorScreen.confirm.intent : strings.editorScreen.confirm.knot }
+          </Typography>
+        }
+      </GenericDialog>
+    );
+  }
+
+  /**
    * Renders right toolbar linking tab
    */
   const renderLinkingTab = () => {
@@ -1123,19 +1204,16 @@ const EditorScreen: React.FC<Props> = ({
   } = storyData;
 
   return (
-    <>
-      <AppLayout
-        keycloak={ keycloak }
-        pageTitle={ storyData.story?.name ?? "" }
-        dataChanged={ dataChanged }
-        onSaveClick={ onSaveClick }
-      >
-        { renderLeftToolbar() }
-        { renderEditorContent() }
-        { selectedEntititiesLength !== 0 && renderRightToolbar() }
-      </AppLayout>
-      { renderAlert() }
-    </>
+    <AppLayout
+      keycloak={ keycloak }
+      pageTitle={ storyData.story?.name ?? "" }
+      dataChanged={ dataChanged }
+    >
+      { renderLeftToolbar() }
+      { renderEditorContent() }
+      { renderRightToolbar() }
+      { renderDeleteConfirmDialog() }
+    </AppLayout>
   );
 }
 

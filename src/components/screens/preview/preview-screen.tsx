@@ -161,6 +161,7 @@ const  PreviewScreen: React.FC<Props> = ({
           <KnotPanel 
             knots={ knots ?? [] }
             onKnotClick={ onKnotClick }
+            onKnotSecondaryClick={ onKnotClick }
           />
         </Box>
       </Drawer>

@@ -309,6 +309,7 @@ class HomeScreen extends React.Component<Props, State> {
   private renderPreview = () => {
     const { classes } = this.props;
     const { storyFile } = this.state;
+
     if (!storyFile) {
       return null;
     }

@@ -118,6 +118,7 @@ export interface IStrings extends LocalizedStringsMethods {
     confirm: {
       knot: string;
       intent: string;
+      title: string;
     };
     save: {
       success: string;
