@@ -189,7 +189,7 @@ const  PreviewScreen: React.FC<Props> = ({
         <Box className={ classes.previewContainer }>
           <StoryPreviewView
             storyData={ storyData }
-            messageData={ messageData }
+            messageDatas={ messageData }
             conversationStarted={ conversationStarted }
             messagesEnd={ messagesEnd }
             botOrUserResponse={ botOrUserResponse }
@@ -213,7 +213,6 @@ const  PreviewScreen: React.FC<Props> = ({
     if (!knot?.coordinates?.x || !knot?.coordinates?.y) {
       return;
     }
-
 
     setStoryData({ ...storyData, selectedKnot: knot });
   }

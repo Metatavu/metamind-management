@@ -25,6 +25,42 @@ interface Props extends WithStyles<typeof styles> {
  */
 const IntentPanel: React.FC<Props> = ({ intents, onIntentClick, classes, onIntentSecondaryClick }) => {
 
+  const [ searchValue, setSearchValue ] = React.useState("");
+
+  /**
+   * Event handler for search field change
+   * 
+   * @param event event
+   */
+  const onSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    setSearchValue(value);
+  }
+
+  /**
+   * Renders a list of intents that match the search
+   */
+  const renderSearchedIntents = () => {
+    if (!intents) {
+      return null;
+    }
+
+    return (
+      <List>
+        { intents
+          .filter(item => item.name?.toLowerCase().includes(searchValue.toLowerCase()))
+          .map(intent =>
+            <InteractiveListItem
+              icon={ <IntentIcon/> }
+              title={ intent.name ?? "" }
+              onClick={ () => onIntentClick(intent) }
+            />
+          )
+        }
+      </List>
+    );
+  }
+
   /**
    * Renders list of intents based on type for left toolbar second tab
    *
@@ -57,20 +93,28 @@ const IntentPanel: React.FC<Props> = ({ intents, onIntentClick, classes, onInten
         <TextField
           fullWidth
           label={ strings.editorScreen.leftBar.intentSearchHelper }
+          onChange={ onSearchChange }
         />
       </Box>
-      <AccordionItem title={ strings.editorScreen.intents.normalIntents }>
-        { renderIntentGroups(IntentType.NORMAL) }
-      </AccordionItem>
-      <AccordionItem title={ strings.editorScreen.intents.defaultIntents }>
-        { renderIntentGroups(IntentType.DEFAULT) }
-      </AccordionItem>
-      <AccordionItem title={ strings.editorScreen.intents.confusedIntents }>
-        { renderIntentGroups(IntentType.CONFUSED) }
-      </AccordionItem>
-      <AccordionItem title={ strings.editorScreen.intents.redirectIntents }>
-        { renderIntentGroups(IntentType.REDIRECT) }
-      </AccordionItem>
+      { searchValue.length === 0 &&
+        <>
+          <AccordionItem title={ strings.editorScreen.intents.normalIntents }>
+            { renderIntentGroups(IntentType.NORMAL) }
+          </AccordionItem>
+          <AccordionItem title={ strings.editorScreen.intents.defaultIntents }>
+            { renderIntentGroups(IntentType.DEFAULT) }
+          </AccordionItem>
+          <AccordionItem title={ strings.editorScreen.intents.confusedIntents }>
+            { renderIntentGroups(IntentType.CONFUSED) }
+          </AccordionItem>
+          <AccordionItem title={ strings.editorScreen.intents.redirectIntents }>
+            { renderIntentGroups(IntentType.REDIRECT) }
+          </AccordionItem>
+        </>
+      }
+      { searchValue.length > 0 && 
+        renderSearchedIntents()
+      }
     </Box>
   );
 }

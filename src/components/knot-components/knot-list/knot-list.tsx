@@ -26,11 +26,22 @@ interface Props extends WithStyles<typeof styles> {
  */
 const KnotPanel: React.FC<Props> = ({ knots, onKnotClick, classes, onKnotSecondaryClick }) => {
 
+  const [ searchValue, setSearchValue ] = React.useState("");
   const globalKnots = knots.filter(item => item.scope === KnotScope.Global);
 
   React.useEffect(() => {
     // TODO: Add fetch logic
   }, []);
+
+  /**
+   * Event handler for search field change
+   * 
+   * @param event event
+   */
+  const onSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    setSearchValue(value);
+  }
 
   /**
    * Render global knots
@@ -97,6 +108,32 @@ const KnotPanel: React.FC<Props> = ({ knots, onKnotClick, classes, onKnotSeconda
   }
 
   /**
+   * Renders a list of knots that match the search
+   * 
+   * TODO: correct icons
+   */
+  const renderSearchedKnots = () => {
+    if (!knots) {
+      return null;
+    }
+
+    return (
+      <List>
+        { knots
+          .filter(item => item.name.toLowerCase().includes(searchValue.toLowerCase()))
+          .map(knot =>
+            <InteractiveListItem
+              icon={ <KnotIcon htmlColor="#000"/> }
+              title={ knot.name }
+              onClick={ () => onKnotClick(knot) }
+            />
+          )
+        }
+      </List>
+    );
+  }
+
+  /**
    * Component render
    */
   return (
@@ -105,12 +142,20 @@ const KnotPanel: React.FC<Props> = ({ knots, onKnotClick, classes, onKnotSeconda
         <TextField 
           fullWidth
           label={ strings.editorScreen.leftBar.knotSearchHelper }
+          onChange={ onSearchChange }
         />
       </Box>
-      <Divider/>
-      { renderGlobalKnots() }
-      <Divider/>
-      { renderBasicKnots() }
+      { searchValue.length === 0 &&
+        <>
+          <Divider/>
+          { renderGlobalKnots() }
+          <Divider/>
+          { renderBasicKnots() }
+        </>
+      }
+      { searchValue.length > 0 && 
+        renderSearchedKnots()
+      }
     </Box>
   );
 }
