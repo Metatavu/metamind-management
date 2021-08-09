@@ -22,6 +22,12 @@ export const styles = createStyles({
     padding: theme.spacing(4)
   },
 
+  carousel: { 
+    backgroundColor: "#090909", 
+    height: 100, 
+    padding: "5px 30px"
+  },
+
   cardHeader: {
     display: "flex",
     position: "relative",

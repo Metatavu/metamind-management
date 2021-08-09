@@ -9,6 +9,15 @@ export interface AccessToken {
 };
 
 /**
+ * Interface describing a recent story 
+ */
+export interface RecentStory {
+  id?: string;
+  name?: string;
+  lastEditedTime: string;
+}
+
+/**
  * Story data
  */
 export interface StoryData {
