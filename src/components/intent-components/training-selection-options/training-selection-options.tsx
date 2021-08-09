@@ -20,6 +20,8 @@ interface Props extends WithStyles<typeof styles> {
   onUpdateEditedTrainingMaterial: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onDeleteTrainingMaterialClick: () => void;
   onSaveTrainingMaterialClick: () => void;
+  onFocus: () => void;
+  onBlur: () => void;
 }
 
 /**
@@ -39,7 +41,9 @@ const TrainingSelectionOptions: React.FC<Props> = ({
   editedTrainingMaterial,
   onUpdateEditedTrainingMaterial,
   onDeleteTrainingMaterialClick,
-  onSaveTrainingMaterialClick
+  onSaveTrainingMaterialClick,
+  onFocus,
+  onBlur
 }) => {
 
   return (
@@ -87,7 +91,15 @@ const TrainingSelectionOptions: React.FC<Props> = ({
                   </div>
                 }
                 { editingTrainingMaterial && selectedTrainingMaterialType === name as keyof object &&
-                  renderEditContent(classes, onUpdateEditedTrainingMaterial, onDeleteTrainingMaterialClick, onSaveTrainingMaterialClick, editedTrainingMaterial)
+                  renderEditContent(
+                    classes,
+                    onUpdateEditedTrainingMaterial,
+                    onDeleteTrainingMaterialClick,
+                    onSaveTrainingMaterialClick,
+                    onFocus,
+                    onBlur,
+                    editedTrainingMaterial
+                  )
                 }
               </CardContent>
             </Card>
@@ -153,6 +165,8 @@ const renderEditContent = (
     onUpdateEditedTrainingMaterial: (event: React.ChangeEvent<HTMLInputElement>) => void,
     onDeleteTrainingMaterialClick: () => void,
     onSaveTrainingMaterialClick: () => void,
+    onFocus: () => void,
+    onBlur: () => void,
     editedTrainingMaterial?: TrainingMaterial
   ) => {
   return (
@@ -165,6 +179,8 @@ const renderEditContent = (
         value={ editedTrainingMaterial?.name ?? "" }
         autoFocus
         onChange={ onUpdateEditedTrainingMaterial }
+        onFocus={ onFocus }
+        onBlur={ onBlur }
       />
       <TextField
         className={ classes.trainingSelectionField }
@@ -175,6 +191,8 @@ const renderEditContent = (
         multiline={ true }
         rows={ 3 }
         onChange={ onUpdateEditedTrainingMaterial }
+        onFocus={ onFocus }
+        onBlur={ onBlur }
       />
       <div className={ classes.actionButtons }>
         <Button
@@ -192,7 +210,7 @@ const renderEditContent = (
           disabled={ !editedTrainingMaterial?.name.length || !editedTrainingMaterial.text.length }
           onClick={ onSaveTrainingMaterialClick }
         >
-          { strings.generic.save }
+          { strings.generic.ok }
         </Button>
       </div>
     </>

@@ -3,11 +3,16 @@ import { AppBar, Toolbar, withStyles, WithStyles, Box, Button, Typography, TextF
 import { styles } from "./app-layout.styles";
 import Logo from "../../../resources/svg/logo";
 import strings from "../../../localization/strings";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import EditorIcon from "@material-ui/icons/Edit";
 import PreviewIcon from "@material-ui/icons/PlayArrow";
 import SaveIcon from "@material-ui/icons/Save";
 import { KeycloakInstance } from "keycloak-js";
+import { ReduxActions, ReduxState } from "../../../store";
+import { connect } from "react-redux";
+import { StoryData } from "../../../types";
+import { setLocale } from "../../../actions/locale";
+import { Dispatch } from "redux";
 
 /**
  * Interface describing component props
@@ -15,13 +20,12 @@ import { KeycloakInstance } from "keycloak-js";
 interface Props extends WithStyles<typeof styles> {
   onSaveClick?: () => void;
   dataChanged?: boolean;
-  storySelected?: boolean;
   pageTitle: string;
-  storyId?: string;
+  storyData?: StoryData;
   keycloak: KeycloakInstance;
-  locale?: string;
-  setLocale: (locale: string) => void;
-  children: React.ReactNode;
+  locale: string;
+  storySelected: boolean;
+  setLocale: typeof setLocale;
 }
 
 /**
@@ -33,8 +37,8 @@ const AppLayout: React.FC<Props> = ({
   onSaveClick,
   dataChanged,
   storySelected,
+  storyData,
   pageTitle,
-  storyId,
   keycloak,
   locale,
   setLocale,
@@ -43,14 +47,12 @@ const AppLayout: React.FC<Props> = ({
 }) => {
 
   const firstName = keycloak.profile?.firstName ?? "";
-  const lastName =keycloak.profile?.lastName ?? "";
-
+  const lastName = keycloak.profile?.lastName ?? "";
 
   /**
    * Renders navigation
    */
   const renderNavigation = () => {
-
     return (
       <Box
         display="flex"
@@ -60,22 +62,34 @@ const AppLayout: React.FC<Props> = ({
         <Link to="/">
           <Logo />
         </Link>
-        { storySelected &&
+        { storyData &&
           <Box ml={ 2 }>
-            <Button
-              variant="text"
-              startIcon={ <EditorIcon/> }
-              color="secondary"
+            <NavLink
+              exact
+              to={ `/editor/${storyData.story?.id}` }
+              style={{ textDecoration: "none" }}
             >
-              { strings.header.editor }
-            </Button>
-            <Button
-              variant="text"
-              startIcon={ <PreviewIcon/> }
-              color="secondary"
-            > 
-              { strings.header.preview }
-            </Button>
+              <Button
+                variant="text"
+                startIcon={ <EditorIcon/> }
+                color="secondary"
+              >
+                { strings.header.editor }
+              </Button>
+            </NavLink>
+            <NavLink
+              exact
+              to={ `/preview/${storyData.story?.id}` }
+              style={{ textDecoration: "none" }}
+            >
+              <Button
+                variant="text"
+                startIcon={ <PreviewIcon/> }
+                color="secondary"
+              > 
+                { strings.header.preview }
+              </Button>
+            </NavLink>
           </Box>
         }
       </Box>
@@ -192,4 +206,24 @@ const AppLayout: React.FC<Props> = ({
   );
 }
 
-export default withStyles(styles)(AppLayout);
+/**
+ * Redux mapper for mapping store state to component props
+ *
+ * @param state store state
+ * @returns state from props
+ */
+const mapStateToProps = (state: ReduxState) => ({
+  storyData: state.story.storyData,
+  locale: state.locale.locale
+});
+
+/**
+ * Redux mapper for mapping component dispatches
+ *
+ * @param dispatch dispatch method
+ */
+const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({
+  setLocale: (locale: string) => dispatch(setLocale(locale))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(AppLayout));

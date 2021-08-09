@@ -24,14 +24,17 @@ interface Props {
   addingKnots: boolean;
   centeredKnot?: Knot;
   centeredIntent?: Intent;
+  deletedKnot?: Knot;
+  deletedIntent?: Intent;
   onAddNode: (node: CustomNodeModel) => void;
-  onMoveNode: (node: CustomNodeModel, knot?: Knot) => void;
+  onMoveNode: (knotId: string, node: CustomNodeModel) => void;
   onRemoveNode: (nodeId: string) => void;
   onAddLink: (sourceNodeId: string, targetNodeId: string) => void;
   onRemoveLink: (linkId: string) => void;
   editingEntityInfo: boolean;
   onNodeSelectionChange: (node: CustomNodeModel) => void;
   onLinkSelectionChange: (link: CustomLinkModel) => void;
+  onSelectedEntitiesAmountChange: (value: number) => void;
 }
 
 /**
@@ -45,6 +48,8 @@ const StoryEditorView: React.FC<Props> = ({
   addingKnots,
   centeredKnot,
   centeredIntent,
+  deletedKnot,
+  deletedIntent,
   onAddNode,
   onMoveNode,
   onRemoveNode,
@@ -52,7 +57,8 @@ const StoryEditorView: React.FC<Props> = ({
   onRemoveLink,
   editingEntityInfo,
   onNodeSelectionChange,
-  onLinkSelectionChange
+  onLinkSelectionChange,
+  onSelectedEntitiesAmountChange
 }) => {
   const classes = useStoryEditorViewStyles();
   const [ newPoint, setNewPoint ] = React.useState<Point>();
@@ -111,18 +117,43 @@ const StoryEditorView: React.FC<Props> = ({
   }, [ centeredIntent ]);
 
   /**
+   * Effect that deletes a node related to a knot
+   */
+  React.useEffect(() => {
+    if(!deletedKnot || !deletedKnot.id) {
+      return;
+    }
+
+    const model = engineRef.current.getModel();
+    const node = model.getNodes().find(item => item.getID() === deletedKnot?.id);
+    if (node) {
+      node.remove();
+      model.removeNode(node);
+    }
+  }, [ deletedKnot ]);
+
+  /**
+   * Effect that deletes a link related to an intent
+   */
+  React.useEffect(() => {
+    if(!deletedIntent || !deletedIntent.id) {
+      return;
+    }
+
+    const model = engineRef.current.getModel();
+    const link = model.getLinks().find(item => item.getID() === deletedIntent?.id);
+    if (link) {
+      link.remove();
+      model.removeLink(link);
+    }
+  }, [ deletedIntent ]);
+
+  /**
    * Effect that syncs knots to diagram nodes when length of knots list is changed
    */
   React.useEffect(() => {
     const engine = engineRef.current;
     const nodes = engine.getModel().getNodes();
-
-    if(knots[0] && knots[0].scope !== KnotScope.Global) {
-      knots[0].scope = KnotScope.Global;
-    }
-    if (knots[1] && knots[1].scope !== KnotScope.Home) {
-      knots[1].scope = KnotScope.Home;
-    }
 
     nodes.forEach(node => knots.every(knot => knot.id !== node.getID()) && engine.getModel().removeNode(node));
     knots.forEach(knot => translateToNode(knot));
@@ -159,7 +190,14 @@ const StoryEditorView: React.FC<Props> = ({
    */
   React.useEffect(() => {
     debounceTimer.current && clearTimeout(debounceTimer.current);
-    debounceTimer.current = setTimeout(() => moveNode(), 1000);
+    debounceTimer.current = setTimeout(() => {
+      if (!movedNode){
+        return;
+      }
+
+      onMoveNode(movedNode.getID(), movedNode);
+      setMovedNode(undefined);
+    }, 1000);
     // eslint-disable-next-line
   }, [ movedNode ]);
 
@@ -251,6 +289,7 @@ const StoryEditorView: React.FC<Props> = ({
     node.registerListener({
       selectionChanged: (selectionChangedEvent: any) => {
         onNodeSelectionChange(selectionChangedEvent.entity as CustomNodeModel);
+        onSelectedEntitiesAmountChange(engineRef.current.getModel().getSelectedEntities().length);
       },
       positionChanged: ({ entity }: any) => {
         setMovedNode(entity);
@@ -270,7 +309,7 @@ const StoryEditorView: React.FC<Props> = ({
    * @param nodes list of nodes
    * @returns custom link model
    */
-  const translateToLink = (intent: Intent, nodes: Array<CustomNodeModel | HomeNodeModel | GlobalNodeModel>) => {
+  const translateToLink = (intent: Intent, nodes: (CustomNodeModel | HomeNodeModel | GlobalNodeModel)[]) => {
     const sourceNode = nodes.find(node => node.getID() === intent.sourceKnotId);
     const targetNode = nodes.find(node => node.getID() === intent.targetKnotId);
 
@@ -286,6 +325,11 @@ const StoryEditorView: React.FC<Props> = ({
     link.registerListener({
       selectionChanged: (selectionChangedEvent: any) => {
         onLinkSelectionChange(selectionChangedEvent.entity as CustomLinkModel);
+        
+      },
+      entityRemoved: ({ entity }: any) => {
+        onRemoveLink(entity.getID() as string);
+        onSelectedEntitiesAmountChange(engineRef.current.getModel().getSelectedEntities().length);
       }
     });
 
@@ -308,17 +352,6 @@ const StoryEditorView: React.FC<Props> = ({
     }, []);
 
     engineRef.current.getModel().addAll(...nodes, ...links);
-  }
-
-  /**
-   * Event handler for node move
-   */
-  const moveNode = () => {
-    if (movedNode) {
-      const id = movedNode.getID();
-      const foundKnot = knots.find(knot => knot.id === id);
-      onMoveNode(movedNode, foundKnot);
-    }
   }
 
   /**
