@@ -8,9 +8,9 @@ import { AccessToken } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
 import { usePreviewStyles } from "./preview-screen.styles";
 import { KeycloakInstance } from 'keycloak-js';
+import strings from "../../../localization/strings";
 import KnotPanel from "../../knot-components/knot-list/knot-list";
 import { Knot } from "../../../generated/client/models";
-import strings from "../../../localization/strings";
 import { Typography } from "@material-ui/core";
 import Api from "../../../api/api";
 import { useParams } from "react-router-dom";
@@ -19,6 +19,7 @@ import { loadStory, setStoryData } from "../../../actions/story";
 import StoryPreviewView from "../../views/story-preview-view";
 import Loading from "../../generic/loading-item/loading-item";
 import { MessageData } from "../../../../metamind-metatavu-bot/dist/types";
+import { setLocale } from "../../../actions/locale";
 
 /**
  * Interface describing component props
@@ -27,8 +28,10 @@ interface Props {
   keycloak?: KeycloakInstance;
   accessToken: AccessToken;
   storyData?: StoryData;
+  locale: string;
   storyLoading: boolean;
   loadStory: () => void;
+  setLocale: typeof setLocale;
   setStoryData: (storyData: StoryData) => void;
 }
 
@@ -133,7 +136,6 @@ const  PreviewScreen: React.FC<Props> = ({
    */
   const renderLoading = () => {
     return (
-
       <Box className={ classes.loadingContainer }>
         <Loading text={ strings.loading.loadingStory }/>
       </Box>
@@ -189,7 +191,7 @@ const  PreviewScreen: React.FC<Props> = ({
         <Box className={ classes.previewContainer }>
           <StoryPreviewView
             storyData={ storyData }
-            messageDatas={ messageData }
+            messageData={ messageData }
             conversationStarted={ conversationStarted }
             messagesEnd={ messagesEnd }
             botOrUserResponse={ botOrUserResponse }
@@ -227,6 +229,7 @@ const  PreviewScreen: React.FC<Props> = ({
       <AppLayout
       keycloak={ keycloak }
       pageTitle={ strings.loading.loading }
+      storySelected={ false }
     >
       { renderLoading() }
     </AppLayout>
@@ -240,6 +243,7 @@ const  PreviewScreen: React.FC<Props> = ({
       keycloak={ keycloak }
       pageTitle={ storyData.story?.name ?? "" }
       dataChanged={ true }
+      storySelected={ true }
     >
       { renderLeftToolbar() }
       { renderPreviewContent() }
@@ -256,6 +260,7 @@ const  PreviewScreen: React.FC<Props> = ({
 const mapStateToProps = (state: ReduxState) => ({
   accessToken: state.auth.accessToken as AccessToken,
   keycloak: state.auth.keycloak as KeycloakInstance,
+  locale: state.locale.locale,
   storyData: state.story.storyData,
   storyLoading: state.story.storyLoading,
 });
@@ -267,6 +272,7 @@ const mapStateToProps = (state: ReduxState) => ({
  */
 const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({
   loadStory: () => dispatch(loadStory()),
+  setLocale: (locale: string) => dispatch(setLocale(locale)),
   setStoryData: (storyData: StoryData) => dispatch(setStoryData(storyData)),
 });
 

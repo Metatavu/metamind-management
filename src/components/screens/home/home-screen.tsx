@@ -76,6 +76,8 @@ class HomeScreen extends React.Component<Props, State> {
       <AppLayout 
         pageTitle={ strings.homeScreen.title }
         keycloak={ keycloak }
+        dataChanged={ true }
+        storySelected={ true }
       >
         <Box className={ classes.root }>
           { this.renderCardShown() }
@@ -485,7 +487,6 @@ class HomeScreen extends React.Component<Props, State> {
       console.error(error);
     }
   }
-
 }
 
 /**

@@ -1187,6 +1187,7 @@ const EditorScreen: React.FC<Props> = ({
       <AppLayout
         keycloak={ keycloak }
         pageTitle={ strings.loading.loading }
+        storySelected={ true }
       >
         { renderLoading() }
       </AppLayout>
@@ -1208,6 +1209,7 @@ const EditorScreen: React.FC<Props> = ({
       keycloak={ keycloak }
       pageTitle={ storyData.story?.name ?? "" }
       dataChanged={ dataChanged }
+      storySelected
     >
       { renderLeftToolbar() }
       { renderEditorContent() }
