@@ -20,7 +20,9 @@ interface Props {
 /**
  * Component state
  */
-interface State {}
+interface State {
+  error?: any;
+}
 
 /**
  * Component for keeping authentication token fresh
@@ -87,6 +89,11 @@ class AccessTokenRefresh extends React.Component<Props, State> {
    */
   public render = () => {
     const { accessToken, children } = this.props;
+    const { error } = this.state;
+
+    if (error) {
+      return error;
+    }
 
     return accessToken ? children : null;
   };
@@ -106,8 +113,8 @@ class AccessTokenRefresh extends React.Component<Props, State> {
           onLogin(this.keycloak);
         }
       }
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      this.setState({ error: error });
     }
   };
 
