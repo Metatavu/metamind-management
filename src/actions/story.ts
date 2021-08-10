@@ -24,7 +24,7 @@ export type StoryAction = LoadStoryAction | SetStoryDataAction;
 export function loadStory(): LoadStoryAction {
   return {
     type: ActionTypes.LOAD_STORY
-  }
+  };
 }
 
 /**
@@ -36,5 +36,5 @@ export function setStoryData(storyData: StoryData): SetStoryDataAction {
   return {
     type: ActionTypes.SET_STORY,
     storyData: storyData
-  }
+  };
 }

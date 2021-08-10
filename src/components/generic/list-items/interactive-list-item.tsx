@@ -24,7 +24,6 @@ const InteractiveListItem: React.FC<Props> = ({
   onSecondaryActionClick,
   secondaryActionIcon
 }) => {
-
   return (
     <ListItem button onClick={ onClick }>
       <ListItemIcon>
@@ -34,17 +33,17 @@ const InteractiveListItem: React.FC<Props> = ({
         { title }
       </ListItemText>
       { onSecondaryActionClick && secondaryActionIcon &&
-          <ListItemSecondaryAction>
-            <IconButton 
-              edge="end"
-              onClick={ onSecondaryActionClick }
-            >
-              { secondaryActionIcon }
-            </IconButton>
-          </ListItemSecondaryAction>
-        }
+      <ListItemSecondaryAction>
+        <IconButton
+          edge="end"
+          onClick={ onSecondaryActionClick }
+        >
+          { secondaryActionIcon }
+        </IconButton>
+      </ListItemSecondaryAction>
+      }
     </ListItem>
   );
-}
+};
 
 export default InteractiveListItem;

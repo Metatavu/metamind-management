@@ -1,6 +1,6 @@
 import { Accordion, AccordionDetails, AccordionSummary, Typography, withStyles, WithStyles } from "@material-ui/core";
 import * as React from "react";
-import { styles } from "./accordion-item.styles";
+import styles from "./accordion-item.styles";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 /**
@@ -12,9 +12,10 @@ interface Props extends WithStyles<typeof styles> {
 
 /**
  * Functional accordion item component
+ *
+ * @param title title
  */
 const AccordionItem: React.FC<Props> = ({ title, children }) => {
-
   /**
    * Component render
    */
@@ -28,6 +29,6 @@ const AccordionItem: React.FC<Props> = ({ title, children }) => {
       </AccordionDetails>
     </Accordion>
   );
-}
+};
 
 export default withStyles(styles)(AccordionItem);

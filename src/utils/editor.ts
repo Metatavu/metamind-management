@@ -1,5 +1,8 @@
 import { IntentTrainingMaterials, TrainingMaterialType } from "../generated/client/models";
 
+/**
+ * Utility class for editor
+ */
 export default class EditorUtils {
 
   /**
@@ -16,4 +19,3 @@ export default class EditorUtils {
   })[name as TrainingMaterialType] ?? "intentOpenNlpDoccatId") as keyof IntentTrainingMaterials;
 
 }
-

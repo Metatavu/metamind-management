@@ -16,5 +16,6 @@ const Logo = (props: Props) => {
       <path fill="#fff" d="M15.28,2.62l-5,18.4h3.32L17,10.55l3,10.83h4L18.17,2.62Z"/>
     </SvgIcon>
   );
-}
+};
+
 export default Logo;

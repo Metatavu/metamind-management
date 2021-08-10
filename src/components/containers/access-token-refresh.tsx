@@ -5,8 +5,7 @@ import { Dispatch } from "redux";
 import { ReduxState } from "../../store";
 import { login } from "../../actions/auth";
 
-import { KeycloakInstance } from "keycloak-js";
-import Keycloak from "keycloak-js";
+import Keycloak, { KeycloakInstance } from "keycloak-js";
 import { AccessToken } from "../../types";
 
 /**
@@ -14,14 +13,14 @@ import { AccessToken } from "../../types";
  */
 interface Props {
   accessToken?: AccessToken;
-  login: typeof login;
+  onLogin: typeof login;
   children?: React.ReactNode;
 }
 
 /**
  * Component state
  */
-interface State { }
+interface State {}
 
 /**
  * Component for keeping authentication token fresh
@@ -41,17 +40,19 @@ class AccessTokenRefresh extends React.Component<Props, State> {
 
     this.keycloak = Keycloak({
       url: process.env.REACT_APP_KEYCLOAK_URL,
-      realm: process.env.REACT_APP_KEYCLOAK_REALM || "",
-      clientId: process.env.REACT_APP_KEYCLOAK_CLIENT_ID || ""
+      realm: process.env.REACT_APP_KEYCLOAK_REALM || "",
+      clientId: process.env.REACT_APP_KEYCLOAK_CLIENT_ID || ""
     });
 
-    this.state = { };
+    this.state = {};
   }
 
   /**
    * Component did mount life cycle event
    */
   public componentDidMount = async () => {
+    const { onLogin } = this.props;
+
     const auth = await this.keycloakInit();
 
     if (!auth) {
@@ -61,7 +62,7 @@ class AccessTokenRefresh extends React.Component<Props, State> {
 
       if (this.keycloak && tokenParsed && tokenParsed.sub && token) {
         this.keycloak.loadUserProfile();
-        this.props.login(this.keycloak);
+        onLogin(this.keycloak);
       }
 
       this.refreshAccessToken();
@@ -70,7 +71,7 @@ class AccessTokenRefresh extends React.Component<Props, State> {
         this.refreshAccessToken();
       }, 1000 * 60);
     }
-  }
+  };
 
   /**
    * Component will unmount life cycle event
@@ -79,47 +80,50 @@ class AccessTokenRefresh extends React.Component<Props, State> {
     if (this.timer) {
       clearInterval(this.timer);
     }
-  }
+  };
 
   /**
    * Component render method
    */
   public render = () => {
-    return this.props.accessToken ?
-      this.props.children :
-      null;
-  }
+    const { accessToken, children } = this.props;
+
+    return accessToken ? children : null;
+  };
 
   /**
    * Refreshes access token
    */
   private refreshAccessToken = async () => {
+    const { onLogin } = this.props;
+
     try {
       const refreshed = await this.keycloak.updateToken(70);
       if (refreshed) {
         const { token, tokenParsed } = this.keycloak;
 
         if (tokenParsed && tokenParsed.sub && token) {
-          this.props.login(this.keycloak);
+          onLogin(this.keycloak);
         }
       }
     } catch (e) {
-      this.setState({
-        error: e
-      });
+      console.error(e);
     }
-  }
+  };
 
   /**
    * Initializes Keycloak client
    */
   private keycloakInit = () => {
     return new Promise((resolve, reject) => {
-      this.keycloak.init({ onLoad: "login-required", checkLoginIframe: false })
+      this.keycloak.init({
+        onLoad: "login-required", checkLoginIframe: false
+      })
         .then(resolve)
         .catch(reject);
     });
-  }
+  };
+
 }
 
 /**
@@ -137,7 +141,7 @@ const mapStateToProps = (state: ReduxState) => ({
  * @param dispatch dispatch method
  */
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  login: (keycloak: KeycloakInstance) => dispatch(login(keycloak))
+  onLogin: (keycloak: KeycloakInstance) => dispatch(login(keycloak))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AccessTokenRefresh);

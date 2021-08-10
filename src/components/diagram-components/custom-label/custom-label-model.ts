@@ -9,12 +9,16 @@ interface CustomLabelOptions extends BaseModelOptions { }
 /**
  * Class for custom label model
  */
-export class CustomLabelModel extends LabelModel {
+export default class CustomLabelModel extends LabelModel {
 
-	constructor(options: CustomLabelOptions = { }) {
-		super({
-			...options,
-			type: "custom-label"
-		});
-	}
+  /**
+   * Constructor
+   */
+  constructor(options: CustomLabelOptions = {}) {
+    super({
+      ...options,
+      type: "custom-label"
+    });
+  }
+
 }

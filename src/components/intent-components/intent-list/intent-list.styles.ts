@@ -1,9 +1,11 @@
 import { createStyles } from "@material-ui/core";
 
-export const styles = createStyles({
+const intentListStyles = createStyles({
 
   list: {
     width: "100%"
   }
 
 });
+
+export default intentListStyles;

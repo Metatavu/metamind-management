@@ -42,7 +42,7 @@ class StoreInitializer extends React.Component<Props, State> {
    */
   public componentDidMount = async () => {
     await this.fetchData();
-  }
+  };
 
   /**
    * Component did update life cycle method
@@ -53,14 +53,14 @@ class StoreInitializer extends React.Component<Props, State> {
     if (!prevProps.accessToken && this.props.accessToken) {
       await this.fetchData();
     }
-  }
+  };
 
   /**
    * Component render method
    */
   public render = () => {
     return this.props.children;
-  }
+  };
 
   /**
    * Fetch app data
@@ -75,9 +75,9 @@ class StoreInitializer extends React.Component<Props, State> {
       
       // TODO: Add data fetch
     } catch (error) {
-      this.setState({ error });
+      this.setState({ error: error });
     }
-  }
+  };
 
 }
 
@@ -89,7 +89,7 @@ class StoreInitializer extends React.Component<Props, State> {
  */
 const mapStateToProps = (state: ReduxState) => ({
   accessToken: state.auth.accessToken as AccessToken,
-  keycloak: state.auth.keycloak as KeycloakInstance,
+  keycloak: state.auth.keycloak as KeycloakInstance
 });
 
 /**

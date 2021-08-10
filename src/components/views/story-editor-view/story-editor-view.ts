@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core/styles";
 
-export const useStoryEditorViewStyles = makeStyles({
+const useStoryEditorViewStyles = makeStyles({
 
   canvas: {
     height: "100vh"
@@ -9,3 +9,5 @@ export const useStoryEditorViewStyles = makeStyles({
 }, {
   name: "story-editor-view"
 });
+
+export default useStoryEditorViewStyles;

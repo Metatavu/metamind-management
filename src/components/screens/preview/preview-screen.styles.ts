@@ -3,7 +3,7 @@ import theme from "../../../theme/theme";
 
 const toolbarHeight = theme.mixins.toolbar.minHeight;
 
-export const usePreviewStyles = makeStyles({
+const usePreviewStyles = makeStyles({
 
   previewContainer: {
     // 100% height substracted with two toolbars and extra spacing for tight fit
@@ -14,13 +14,15 @@ export const usePreviewStyles = makeStyles({
   },
 
   loadingContainer: {
-    height: "100%", 
-    width: "100%", 
-    alignItems: "center", 
-    justifyContent: "center", 
+    height: "100%",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
     display: "flex"
   }
 
 }, {
   name: "preview-screen"
-})
+});
+
+export default usePreviewStyles;

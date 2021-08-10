@@ -34,7 +34,7 @@ namespace S {
   `;
 
   export const Path = styled.path<{ selected: boolean }>`
-    ${(p) => p.selected && selected};
+    ${p => p.selected && selected};
     fill: none;
     pointer-events: all;
   `;
@@ -47,7 +47,7 @@ class CustomLinkSegment extends React.Component<Props> {
 
   private path = React.createRef<SVGPathElement>();
 
-	public render = () => {
+  public render = () => {
     const { model, classes, path, selected } = this.props;
     const options = model.getOptions();
 
@@ -77,7 +77,8 @@ class CustomLinkSegment extends React.Component<Props> {
         }
       </>
     );
-	}
+  };
+
 }
 
-export default withStyles(styles)(CustomLinkSegment)
+export default withStyles(styles)(CustomLinkSegment);

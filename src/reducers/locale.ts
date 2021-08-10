@@ -15,7 +15,7 @@ interface LocaleState {
  */
 const initialState: LocaleState = {
   locale: "fi"
-}
+};
 
 /**
  * Redux reducer for locale
@@ -24,7 +24,7 @@ const initialState: LocaleState = {
  * @param action action of locale
  * @returns updated locale state
  */
-export const localeReducer: Reducer<LocaleState, LocaleAction> = (state = initialState, action): LocaleState => {
+const localeReducer: Reducer<LocaleState, LocaleAction> = (state = initialState, action): LocaleState => {
   switch (action.type) {
     case SET_LOCALE:
       strings.setLanguage(action.locale);
@@ -35,4 +35,6 @@ export const localeReducer: Reducer<LocaleState, LocaleAction> = (state = initia
     default:
       return state;
   }
-}
+};
+
+export default localeReducer;

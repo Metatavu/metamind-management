@@ -1,7 +1,7 @@
 import { createStyles } from "@material-ui/core";
 import theme from "../../../theme/theme";
 
-export const styles = createStyles({
+const quickResponseButtonStyles = createStyles({
 
   button: {
     marginTop: theme.spacing(2),
@@ -17,7 +17,7 @@ export const styles = createStyles({
     "&:hover": {
       borderColor: "#36B0F4",
       color: "#36B0F4"
-    },
+    }
   },
 
   buttonIcon: {
@@ -35,3 +35,5 @@ export const styles = createStyles({
   }
 
 });
+
+export default quickResponseButtonStyles;

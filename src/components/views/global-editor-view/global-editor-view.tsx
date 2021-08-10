@@ -13,7 +13,6 @@ interface Props extends WithStyles<typeof styles> {
  * Global editor component
  */
 const GlobalEditorView: React.FC<Props> = () => {
-
   React.useEffect(() => {
     // TODO: Add fetch logic
   }, []);
@@ -28,6 +27,6 @@ const GlobalEditorView: React.FC<Props> = () => {
       </Typography>
     </Box>
   );
-}
+};
 
 export default withStyles(styles)(GlobalEditorView);

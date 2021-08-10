@@ -6,7 +6,7 @@ import { Intent, Knot, Story, TrainingMaterial, Script } from "../generated/clie
 export interface AccessToken {
   token: string;
   userId: string;
-};
+}
 
 /**
  * Interface describing a recent story 
@@ -28,4 +28,4 @@ export interface StoryData {
   selectedIntent? : Intent;
   trainingMaterial?: TrainingMaterial[];
   scripts?: Script[];
-};
+}

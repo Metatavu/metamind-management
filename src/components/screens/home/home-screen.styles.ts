@@ -1,7 +1,7 @@
 import { createStyles } from "@material-ui/core/styles";
 import theme from "../../../theme/theme";
 
-export const styles = createStyles({
+const homeScreenStyles = createStyles({
 
   root: {
     display: "flex",
@@ -22,9 +22,9 @@ export const styles = createStyles({
     padding: theme.spacing(4)
   },
 
-  carousel: { 
-    backgroundColor: "#090909", 
-    height: 100, 
+  carousel: {
+    backgroundColor: "#090909",
+    height: 100,
     padding: "5px 30px"
   },
 
@@ -75,7 +75,7 @@ export const styles = createStyles({
     }
   },
 
-  textField : {
+  textField: {
     "& .MuiInputLabel-outlined": {
       color: "rgba(255,255,255,0.54)",
       "&.Mui-focused": {
@@ -132,4 +132,6 @@ export const styles = createStyles({
     justifyContent: "center",
     alignItems: "center"
   }
-})
+});
+
+export default homeScreenStyles;

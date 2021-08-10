@@ -1,13 +1,13 @@
 import * as React from "react";
 import { IconButton, List, ListItem, TextField } from "@material-ui/core";
-import { useKnotLinkingStyles } from "./knot-linking.styles";
+import useKnotLinkingStyles from "./knot-linking.styles";
 import KnotIcon from "../../../resources/svg/knot-icon";
 import InteractiveListItem from "../../generic/list-items/interactive-list-item";
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import Autocomplete from "@material-ui/lab/Autocomplete";
 import { Intent, Knot } from "../../../generated/client";
 import AccordionItem from "../../generic/accordion-item";
 import strings from "../../../localization/strings";
-import AddIcon from '@material-ui/icons/Add';
+import AddIcon from "@material-ui/icons/Add";
 
 /**
  * Interface describing component props
@@ -25,7 +25,6 @@ interface Props {
  * TODO: Ask Tuomas about implementation of removing a linking by clicking a knot
  */
 const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink }) => {
-
   const classes = useKnotLinkingStyles();
   const [ incomingInputValue, setIncomingInputValue ] = React.useState("");
   const [ incomingKnot, setIncomingKnot ] = React.useState<Knot | null>();
@@ -34,7 +33,7 @@ const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink 
   const [ incomingInputLabel, setIncomingInputLabel ] = React.useState("");
   const [ outcomingInputLabel, setOutcomingInputLabel ] = React.useState("");
 
-  if (!selectedKnot || !knots || !intents) {
+  if (!selectedKnot || !knots || !intents) {
     return null;
   }
 
@@ -56,7 +55,7 @@ const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink 
 
     onAddLink(incomingKnot.id!, selectedKnot.id!);
     setIncomingInputValue("");
-  }
+  };
 
   /**
    * Event handler for on add intent click with selected source
@@ -69,7 +68,7 @@ const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink 
 
     onAddLink(selectedKnot.id!, outcomingKnot.id!);
     setOutcomingInputValue("");
-  }
+  };
 
   return (
     <>
@@ -79,14 +78,13 @@ const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink 
             <InteractiveListItem
               title={ knot?.name ?? "" }
               icon={ <KnotIcon htmlColor="#000"/> }
-            />
-          )}
+            />)}
           <ListItem className={ classes.listItem }>
             <IconButton
               className={ classes.addButton }
               onClick={ onAddIntentIncomingClick }
             >
-              <AddIcon htmlColor={ "#999" } />
+              <AddIcon htmlColor="#999"/>
             </IconButton>
             <Autocomplete
               className={ classes.autoComplete }
@@ -96,8 +94,7 @@ const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink 
               options={ knots.filter(item =>
                 !incomingKnots.find(knot => knot?.id === item.id) &&
                 !outcomingKnots.find(knot => knot?.id === item.id) &&
-                item.id !== selectedKnot.id
-              )}
+                item.id !== selectedKnot.id)}
               getOptionLabel={ knot => knot.name }
               renderInput={ params => (
                 <TextField
@@ -117,14 +114,13 @@ const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink 
             <InteractiveListItem
               title={ knot?.name ?? "" }
               icon={ <KnotIcon htmlColor="#000"/> }
-            />
-          )}
+            />)}
           <ListItem className={ classes.listItem }>
             <IconButton
               className={ classes.addButton }
               onClick={ onAddIntentOutcomingClick }
             >
-              <AddIcon htmlColor={ "#999" } />
+              <AddIcon htmlColor="#999"/>
             </IconButton>
             <Autocomplete
               className={ classes.autoComplete }
@@ -134,8 +130,7 @@ const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink 
               options={ knots.filter(item =>
                 !incomingKnots.find(knot => knot?.id === item.id) &&
                 !outcomingKnots.find(knot => knot?.id === item.id) &&
-                item.id !== selectedKnot.id
-              )}
+                item.id !== selectedKnot.id)}
               getOptionLabel={ knot => knot.name }
               renderInput={ params => (
                 <TextField
@@ -151,6 +146,6 @@ const KnotLinking: React.FC<Props> = ({ selectedKnot, knots, intents, onAddLink 
       </AccordionItem>
     </>
   );
-}
+};
 
 export default KnotLinking;

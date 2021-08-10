@@ -8,12 +8,12 @@ import KnotIcon from "../../../resources/svg/knot-icon";
 import AccordionItem from "../../generic/accordion-item/accordion-item";
 import InteractiveListItem from "../../generic/list-items/interactive-list-item";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import { styles } from "./knot-list.styles";
+import knotListStyles from "./knot-list.styles";
 
 /**
  * Interface describing component props
  */
-interface Props extends WithStyles<typeof styles> {
+interface Props extends WithStyles<typeof knotListStyles> {
   knots: Knot[];
   onKnotClick: (knot: Knot) => void;
   onKnotSecondaryClick: (knot: Knot) => void;
@@ -25,7 +25,6 @@ interface Props extends WithStyles<typeof styles> {
  * @param props component properties
  */
 const KnotPanel: React.FC<Props> = ({ knots, onKnotClick, classes, onKnotSecondaryClick }) => {
-
   const [ searchValue, setSearchValue ] = React.useState("");
   const globalKnots = knots.filter(item => item.scope === KnotScope.Global);
 
@@ -41,7 +40,7 @@ const KnotPanel: React.FC<Props> = ({ knots, onKnotClick, classes, onKnotSeconda
   const onSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setSearchValue(value);
-  }
+  };
 
   /**
    * Render global knots
@@ -49,7 +48,6 @@ const KnotPanel: React.FC<Props> = ({ knots, onKnotClick, classes, onKnotSeconda
    * TODO: fetch global knots
    */
   const renderGlobalKnots = () => {
-
     if (!knots) {
       return null;
     }
@@ -58,24 +56,22 @@ const KnotPanel: React.FC<Props> = ({ knots, onKnotClick, classes, onKnotSeconda
       <AccordionItem title={ strings.editorScreen.globalKnots } >
         <List className={ classes.list }>
           { globalKnots && globalKnots.map(globalKnot =>
-              <InteractiveListItem
-                title={ globalKnot.name }
-                icon={ <GlobalKnotIcon htmlColor="#000"/> }
-                onClick={ () => onKnotClick(globalKnot) }
-              />
-            )
+            <InteractiveListItem
+              title={ globalKnot.name }
+              icon={ <GlobalKnotIcon htmlColor="#000"/> }
+              onClick={ () => onKnotClick(globalKnot) }
+            />)
           }
           
         </List>
       </AccordionItem>
     );
-  }
+  };
 
   /**
    * Render basic and home knots
    */
   const renderBasicKnots = () => {
-
     if (!knots) {
       return null;
     }
@@ -99,13 +95,12 @@ const KnotPanel: React.FC<Props> = ({ knots, onKnotClick, classes, onKnotSeconda
                     <DeleteOutlineIcon htmlColor="#000"/> :
                     undefined
                 }
-              />
-            )
+              />)
           }
         </List>
       </AccordionItem>
     );
-  }
+  };
 
   /**
    * Renders a list of knots that match the search
@@ -126,12 +121,11 @@ const KnotPanel: React.FC<Props> = ({ knots, onKnotClick, classes, onKnotSeconda
               icon={ <KnotIcon htmlColor="#000"/> }
               title={ knot.name }
               onClick={ () => onKnotClick(knot) }
-            />
-          )
+            />)
         }
       </List>
     );
-  }
+  };
 
   /**
    * Component render
@@ -139,7 +133,7 @@ const KnotPanel: React.FC<Props> = ({ knots, onKnotClick, classes, onKnotSeconda
   return (
     <Box>
       <Box p={ 2 }>
-        <TextField 
+        <TextField
           fullWidth
           label={ strings.editorScreen.leftBar.knotSearchHelper }
           onChange={ onSearchChange }
@@ -153,11 +147,11 @@ const KnotPanel: React.FC<Props> = ({ knots, onKnotClick, classes, onKnotSeconda
           { renderBasicKnots() }
         </>
       }
-      { searchValue.length > 0 && 
+      { searchValue.length > 0 &&
         renderSearchedKnots()
       }
     </Box>
   );
-}
+};
 
-export default withStyles(styles)(KnotPanel);
+export default withStyles(knotListStyles)(KnotPanel);

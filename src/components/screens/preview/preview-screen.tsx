@@ -1,25 +1,22 @@
-import { Box, Drawer } from "@material-ui/core";
+import { Box, Drawer, Typography } from "@material-ui/core";
 import Toolbar from "@material-ui/core/Toolbar";
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { ReduxActions, ReduxState } from "../../../store";
-import { AccessToken } from "../../../types";
+import { AccessToken, StoryData } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
-import { usePreviewStyles } from "./preview-screen.styles";
-import { KeycloakInstance } from 'keycloak-js';
+import usePreviewStyles from "./preview-screen.styles";
+import { KeycloakInstance } from "keycloak-js";
 import strings from "../../../localization/strings";
 import KnotPanel from "../../knot-components/knot-list/knot-list";
 import { Knot } from "../../../generated/client/models";
-import { Typography } from "@material-ui/core";
 import Api from "../../../api/api";
 import { useParams } from "react-router-dom";
-import { StoryData } from "../../../types";
 import { loadStory, setStoryData } from "../../../actions/story";
 import StoryPreviewView from "../../views/story-preview-view";
 import Loading from "../../generic/loading-item/loading-item";
 import { MessageData } from "../../../../metamind-metatavu-bot/dist/types";
-import { setLocale } from "../../../actions/locale";
 
 /**
  * Interface describing component props
@@ -30,9 +27,8 @@ interface Props {
   storyData?: StoryData;
   locale: string;
   storyLoading: boolean;
-  loadStory: () => void;
-  setLocale: typeof setLocale;
-  setStoryData: (storyData: StoryData) => void;
+  onLoadStory: typeof loadStory;
+  onSetStoryData: typeof setStoryData;
 }
 
 /**
@@ -40,13 +36,13 @@ interface Props {
  *  
  * @param props component properties
  */
-const  PreviewScreen: React.FC<Props> = ({   
+const PreviewScreen: React.FC<Props> = ({
   accessToken,
   keycloak,
   storyData,
   storyLoading,
-  loadStory,
-  setStoryData
+  onLoadStory,
+  onSetStoryData
 }) => {
   const { storyId } = useParams<{ storyId: string }>();
   const classes = usePreviewStyles();
@@ -54,36 +50,35 @@ const  PreviewScreen: React.FC<Props> = ({
   const [ conversationStarted, setConversationStarted ] = React.useState(false);
   const [ messagesEnd, setMessagesEnd ] = React.useState<HTMLDivElement>();
 
-  React.useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line
-  }, []);
+  if (!storyData) {
+    return null;
+  }
+
+  const { knots, intents } = storyData;
 
   /**
    * Interrupt the bot before the bot response 
    */
   const botInterrupted = () => {
-    setMessageData(messageData =>
-      messageData.filter(messageData => !messageData.id.startsWith("temp"))
-    );
-  }
+    setMessageData(prevMessageData => prevMessageData.filter(data => !data.id.startsWith("temp")));
+  };
 
   /**
    * Bot or user response 
    */
   const botOrUserResponse = (message: MessageData) => {
-    setMessageData(messageData => [
-      ...messageData.filter(messageData => !messageData.id.startsWith("temp")), 
+    setMessageData(prevMessageData => [
+      ...prevMessageData.filter(data => !data.id.startsWith("temp")),
       message
     ]);
-  }
+  };
 
   /**
    * Start the conversation 
    */
   const conversationStart = () => {
     setConversationStarted(true);
-  }
+  };
 
   /**
    * Bot reset
@@ -91,16 +86,16 @@ const  PreviewScreen: React.FC<Props> = ({
   const botReset = () => {
     setMessageData([]);
     setConversationStarted(false);
-  }
+  };
 
   /**
    * Update the message end 
    * 
-   * @param messagesEnd message end
+   * @param end message end
    */
-  const messagesEndUpdate = (messagesEnd?: HTMLDivElement) => {
-    setMessagesEnd(messagesEnd);
-  }
+  const messagesEndUpdate = (end?: HTMLDivElement) => {
+    setMessagesEnd(end);
+  };
 
   /**
    * Fetches knots list for the story
@@ -110,26 +105,40 @@ const  PreviewScreen: React.FC<Props> = ({
       return;
     }
 
-    if (!storyLoading && storyData?.story?.id === storyId){
+    if (!storyLoading && storyData?.story?.id === storyId) {
       return;
     }
 
-    loadStory();
+    onLoadStory();
 
     const [ story, knotList, intentList, trainingMaterialList ] = await Promise.all([
-      Api.getStoriesApi(accessToken).findStory({ storyId }),
-      Api.getKnotsApi(accessToken).listKnots({ storyId }),
-      Api.getIntentsApi(accessToken).listIntents({ storyId }),
-      Api.getTrainingMaterialApi(accessToken).listTrainingMaterials({ storyId })
+      Api.getStoriesApi(accessToken).findStory({ storyId: storyId }),
+      Api.getKnotsApi(accessToken).listKnots({ storyId: storyId }),
+      Api.getIntentsApi(accessToken).listIntents({ storyId: storyId }),
+      Api.getTrainingMaterialApi(accessToken).listTrainingMaterials({ storyId: storyId })
     ]);
 
-    setStoryData({
+    onSetStoryData({
       story: story,
       knots: knotList,
       intents: intentList,
       trainingMaterial: trainingMaterialList
     });
-  }
+  };
+
+  /**
+   * Event handler for on knot click
+   * 
+   * @param knot knot
+   */
+  const onKnotClick = (knot: Knot) => {
+    // TODO make bot responsive
+    if (!knot?.coordinates?.x || !knot?.coordinates?.y) {
+      return;
+    }
+
+    onSetStoryData({ ...storyData, selectedKnot: knot });
+  };
 
   /**
    * Renders loading
@@ -140,7 +149,7 @@ const  PreviewScreen: React.FC<Props> = ({
         <Loading text={ strings.loading.loadingStory }/>
       </Box>
     );
-  }
+  };
 
   /**
    * Renders left toolbar
@@ -160,7 +169,7 @@ const  PreviewScreen: React.FC<Props> = ({
           </Box>
         </Box>
         <Box>
-          <KnotPanel 
+          <KnotPanel
             knots={ knots ?? [] }
             onKnotClick={ onKnotClick }
             onKnotSecondaryClick={ onKnotClick }
@@ -168,7 +177,7 @@ const  PreviewScreen: React.FC<Props> = ({
         </Box>
       </Drawer>
     );
-  }
+  };
 
   /**
    * Renders preview content
@@ -178,7 +187,7 @@ const  PreviewScreen: React.FC<Props> = ({
    */
   const renderPreviewContent = () => {
     if (!knots || !intents) {
-      return;
+      return null;
     }
 
     return (
@@ -203,22 +212,12 @@ const  PreviewScreen: React.FC<Props> = ({
         </Box>
       </Box>
     );
-  }
+  };
 
-  /**
-   * Event handler for on knot click
-   * 
-   * @param knot knot
-   */
-  const onKnotClick = (knot: Knot) => {
-    // TODO make bot responsive
-    if (!knot?.coordinates?.x || !knot?.coordinates?.y) {
-      return;
-    }
-
-    setStoryData({ ...storyData, selectedKnot: knot });
-  }
-
+  React.useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line
+  }, []);
 
   if (!keycloak) {
     return null;
@@ -227,16 +226,14 @@ const  PreviewScreen: React.FC<Props> = ({
   if (storyLoading || !storyData) {
     return (
       <AppLayout
-      keycloak={ keycloak }
-      pageTitle={ strings.loading.loading }
-      storySelected={ false }
-    >
-      { renderLoading() }
-    </AppLayout>
+        keycloak={ keycloak }
+        pageTitle={ strings.loading.loading }
+        storySelected={ false }
+      >
+        { renderLoading() }
+      </AppLayout>
     );
   }
-
-  const { knots, intents } = storyData;
 
   return (
     <AppLayout
@@ -249,7 +246,7 @@ const  PreviewScreen: React.FC<Props> = ({
       { renderPreviewContent() }
     </AppLayout>
   );
-}
+};
 
 /**
  * Redux mapper for mapping store state to component props
@@ -262,7 +259,7 @@ const mapStateToProps = (state: ReduxState) => ({
   keycloak: state.auth.keycloak as KeycloakInstance,
   locale: state.locale.locale,
   storyData: state.story.storyData,
-  storyLoading: state.story.storyLoading,
+  storyLoading: state.story.storyLoading
 });
 
 /**
@@ -271,9 +268,8 @@ const mapStateToProps = (state: ReduxState) => ({
  * @param dispatch dispatch method
  */
 const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({
-  loadStory: () => dispatch(loadStory()),
-  setLocale: (locale: string) => dispatch(setLocale(locale)),
-  setStoryData: (storyData: StoryData) => dispatch(setStoryData(storyData)),
+  onLoadStory: () => dispatch(loadStory()),
+  onSetStoryData: (storyData: StoryData) => dispatch(setStoryData(storyData))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PreviewScreen);

@@ -1,9 +1,9 @@
-import { createMuiTheme } from "@material-ui/core";
+import { createTheme } from "@material-ui/core";
 
-const theme = createMuiTheme();
+const theme = createTheme();
 const { spacing, breakpoints, zIndex, palette } = theme;
 
-export default createMuiTheme({
+export default createTheme({
 
   palette: {
     type: "light",
@@ -121,7 +121,7 @@ export default createMuiTheme({
     MuiDialogContent: {
       root: {
         minWidth: 480,
-        padding: spacing(4),
+        padding: spacing(4)
       }
     },
     MuiDialogActions: {
@@ -139,8 +139,8 @@ export default createMuiTheme({
         borderRight: 0
       },
       paper: {
-        width: 320,
-      },
+        width: 320
+      }
     },
     MuiTab: {
       root: {
@@ -153,7 +153,7 @@ export default createMuiTheme({
           fontWeight: 700
         }
       },
-      selected: {},
+      selected: {}
     },
     MuiTabs: {
       flexContainer: {
@@ -166,10 +166,10 @@ export default createMuiTheme({
     MuiListItem: {
       root: {
         "&$selected": {
-          backgroundColor: "#EEE",
+          backgroundColor: "#EEE"
         }
       },
-      selected: {},
+      selected: {}
     },
     MuiListItemText: {
       primary: {
@@ -183,7 +183,7 @@ export default createMuiTheme({
     },
     MuiButton: {
       root: {
-        minWidth: 100,
+        minWidth: 100
       },
       outlined: {
         border: "1px solid #121212",
@@ -217,10 +217,10 @@ export default createMuiTheme({
       root: {
         color: "#555",
         "&$focused": {
-          color: "#121212",
+          color: "#121212"
         }
       },
-      focused: {},
+      focused: {}
     },
     MuiDivider: {
       light: {
@@ -247,7 +247,7 @@ export default createMuiTheme({
     },
     MuiButton: {
       variant: "outlined",
-      color: "primary",
+      color: "primary"
     },
     MuiAppBar: {
       color: "inherit",
@@ -266,7 +266,7 @@ export default createMuiTheme({
       variant: "fullWidth"
     },
     MuiTab: {
-      fullWidth: true, 
+      fullWidth: true
     },
     MuiTypography: {
       color: "textPrimary"
