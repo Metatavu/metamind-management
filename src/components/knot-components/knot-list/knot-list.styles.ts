@@ -1,9 +1,11 @@
 import { createStyles } from "@material-ui/core";
 
-export const styles = createStyles({
+const knotListStyles = createStyles({
 
   list: {
     width: "100%"
   }
 
 });
+
+export default knotListStyles;

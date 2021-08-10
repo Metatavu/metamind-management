@@ -1,6 +1,6 @@
+/* eslint-disable react/jsx-no-comment-textnodes */
 import * as React from "react";
 import { AppBar, Toolbar, withStyles, WithStyles, Box, Button, Typography, TextField, MenuItem } from "@material-ui/core";
-import { styles } from "./app-layout.styles";
 import Logo from "../../../resources/svg/logo";
 import strings from "../../../localization/strings";
 import { Link, NavLink } from "react-router-dom";
@@ -13,11 +13,12 @@ import { connect } from "react-redux";
 import { StoryData } from "../../../types";
 import { setLocale } from "../../../actions/locale";
 import { Dispatch } from "redux";
+import appLayoutStyles from "./app-layout.styles";
 
 /**
  * Interface describing component props
  */
-interface Props extends WithStyles<typeof styles> {
+interface Props extends WithStyles<typeof appLayoutStyles> {
   onSaveClick?: () => void;
   dataChanged?: boolean;
   pageTitle: string;
@@ -25,7 +26,7 @@ interface Props extends WithStyles<typeof styles> {
   keycloak: KeycloakInstance;
   locale: string;
   storySelected: boolean;
-  setLocale: typeof setLocale;
+  onSetLocale: typeof setLocale;
 }
 
 /**
@@ -41,11 +42,10 @@ const AppLayout: React.FC<Props> = ({
   pageTitle,
   keycloak,
   locale,
-  setLocale,
+  onSetLocale,
   classes,
   children
 }) => {
-
   const firstName = keycloak.profile?.firstName ?? "";
   const lastName = keycloak.profile?.lastName ?? "";
 
@@ -60,7 +60,7 @@ const AppLayout: React.FC<Props> = ({
         alignItems="center"
       >
         <Link to="/">
-          <Logo />
+          <Logo/>
         </Link>
         { storyData &&
           <Box ml={ 2 }>
@@ -86,7 +86,7 @@ const AppLayout: React.FC<Props> = ({
                 variant="text"
                 startIcon={ <PreviewIcon/> }
                 color="secondary"
-              > 
+              >
                 { strings.header.preview }
               </Button>
             </NavLink>
@@ -94,13 +94,12 @@ const AppLayout: React.FC<Props> = ({
         }
       </Box>
     );
-  }
+  };
 
   /**
    * Renders title
    */
   const renderPageTitle = () => {
-
     return (
       <Box
         display="flex"
@@ -116,7 +115,7 @@ const AppLayout: React.FC<Props> = ({
           </Typography>
           <Box ml={ 2 } mr={ 2 }>
             <Typography color="textSecondary">
-              { "//" }
+              //
             </Typography>
           </Box>
           <Typography color="textSecondary">
@@ -125,17 +124,16 @@ const AppLayout: React.FC<Props> = ({
         </Box>
       </Box>
     );
-  }
+  };
 
   /**
    * Event handler for logout click
    */
   const onLogOutClick = () => {
-
     if (keycloak) {
       keycloak.logout();
     }
-  }
+  };
 
   return (
     <>
@@ -154,16 +152,15 @@ const AppLayout: React.FC<Props> = ({
               value={ locale }
               onChange={ event => {
                 strings.setLanguage(event.target.value);
-                setLocale(event.target.value);
+                onSetLocale(event.target.value);
               }}
             >
-            {
-              strings.getAvailableLanguages().map(language =>
-                <MenuItem key={ language } value={ language } className={ classes.languageOption }>
-                  { language }
-                </MenuItem>
-              )
-            }
+              {
+                strings.getAvailableLanguages().map(language =>
+                  <MenuItem key={ language } value={ language } className={ classes.languageOption }>
+                    { language }
+                  </MenuItem>)
+              }
             </TextField>
             { storySelected &&
               <Button
@@ -182,11 +179,13 @@ const AppLayout: React.FC<Props> = ({
               alignItems="center"
             >
               <Typography color="textSecondary">
-                { firstName } { lastName }
+                { firstName }
+                {" "}
+                { lastName }
               </Typography>
               <Box ml={ 1 }>
                 <Typography color="textSecondary">
-                  { "//" }
+                  //
                 </Typography>
               </Box>
               <Button
@@ -204,7 +203,7 @@ const AppLayout: React.FC<Props> = ({
       </Box>
     </>
   );
-}
+};
 
 /**
  * Redux mapper for mapping store state to component props
@@ -223,7 +222,7 @@ const mapStateToProps = (state: ReduxState) => ({
  * @param dispatch dispatch method
  */
 const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({
-  setLocale: (locale: string) => dispatch(setLocale(locale))
+  onSetLocale: (locale: string) => dispatch(setLocale(locale))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(AppLayout));
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(appLayoutStyles)(AppLayout));

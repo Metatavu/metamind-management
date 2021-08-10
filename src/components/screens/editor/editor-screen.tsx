@@ -1,5 +1,4 @@
-import { Box, Drawer, Tab, Tabs, TextField, Button, MenuItem, InputLabel, Snackbar, Typography } from "@material-ui/core";
-import MuiAlert from '@material-ui/lab/Alert';
+import { Box, Drawer, Tab, Tabs, TextField, Button, MenuItem, InputLabel, Typography } from "@material-ui/core";
 import Divider from "@material-ui/core/Divider";
 import Toolbar from "@material-ui/core/Toolbar";
 import { KeycloakInstance } from "keycloak-js";
@@ -11,13 +10,13 @@ import Api from "../../../api/api";
 import { TokenizerType, KnotType, Knot, Intent, IntentType, TrainingMaterial, TrainingMaterialType, TrainingMaterialVisibility, KnotScope } from "../../../generated/client/models";
 import strings from "../../../localization/strings";
 import { ReduxActions, ReduxState } from "../../../store";
-import { AccessToken, RecentStory } from "../../../types";
+import { AccessToken, RecentStory, StoryData } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
 import IntentPanel from "../../intent-components/intent-list/intent-list";
 import KnotPanel from "../../knot-components/knot-list/knot-list";
 import StoryEditorView from "../../views/story-editor-view";
-import { CustomNodeModel } from "../../diagram-components/custom-node/custom-node-model";
-import { useEditorScreenStyles } from "./editor-screen.styles";
+import CustomNodeModel from "../../diagram-components/custom-node/custom-node-model";
+import useEditorScreenStyles from "./editor-screen.styles";
 import { useParams } from "react-router-dom";
 import CustomLinkModel from "../../diagram-components/custom-link/custom-link-model";
 import AccordionItem from "../../generic/accordion-item";
@@ -26,9 +25,8 @@ import QuickResponseButton from "../../intent-components/quick-response-button/q
 import EditorUtils from "../../../utils/editor";
 import { Cookies } from "react-cookie";
 import KnotLinking from "../../knot-components/knot-linking/knot-linking";
-import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import FullscreenIcon from "@material-ui/icons/Fullscreen";
 import GenericDialog from "../../generic/generic-dialog/generic-dialog";
-import { StoryData } from "../../../types";
 import { loadStory, setStoryData } from "../../../actions/story";
 import Loading from "../../generic/loading-item";
 import DiscussionComponent from "../../knot-components/discussion-component/discussion-component";
@@ -42,8 +40,8 @@ interface Props {
   accessToken?: AccessToken;
   storyData?: StoryData;
   storyLoading: boolean;
-  loadStory: () => void;
-  setStoryData: (storyData: StoryData) => void;
+  onLoadStory: typeof loadStory;
+  onSetStoryData: typeof setStoryData;
 }
 
 /**
@@ -56,13 +54,13 @@ const EditorScreen: React.FC<Props> = ({
   keycloak,
   storyData,
   storyLoading,
-  loadStory,
-  setStoryData,
+  onLoadStory,
+  onSetStoryData
 }) => {
   const { storyId } = useParams<{ storyId: string }>();
   const classes = useEditorScreenStyles();
-  const [ centeredKnot, setCenteredKnot ] = React.useState<Knot | undefined>(undefined);
-  const [ centeredIntent, setCenteredIntent ] = React.useState<Intent | undefined>(undefined);
+  const [ centeredKnot, setCenteredKnot ] = React.useState<Knot | undefined>(undefined);
+  const [ centeredIntent, setCenteredIntent ] = React.useState<Intent | undefined>(undefined);
   const [ leftToolBarIndex, setLeftToolBarIndex ] = React.useState(0);
   const [ rightToolBarIndex, setRightToolBarIndex ] = React.useState(0);
   const [ addingKnots, setAddingKnots ] = React.useState(false);
@@ -78,20 +76,13 @@ const EditorScreen: React.FC<Props> = ({
   const [ deleteConfirmDialogOpen, setDeleteConfirmDialogOpen ] = React.useState(false);
   const [ deletedKnotRef, setDeletedKnotRef ] = React.useState<Knot | undefined>(undefined);
   const [ deletedIntentRef, setDeletedIntentRef ] = React.useState<Intent | undefined>(undefined);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [ alertMessage, setAlertMessage ] = React.useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [ alertType, setAlertType ] = React.useState<"error" | "success">("success");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [ alertOpen, setAlertOpen ] = React.useState(false);
-  const [ selectedEntititiesLength, setSelectedEntitiesLength ] = React.useState(0);
-
-  React.useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line
-  }, []);
-
-  React.useEffect(() => {
-    setLastEdited();
-    // eslint-disable-next-line
-  }, [ storyData ]);
+  const [ selectedEntitiesLength, setSelectedEntitiesLength ] = React.useState(0);
 
   /**
    * Event handler for on knot click
@@ -103,8 +94,10 @@ const EditorScreen: React.FC<Props> = ({
       return;
     }
     setCenteredKnot(knot);
-    setStoryData({ ...storyData, selectedKnot: knot, selectedIntent: undefined });
-  }
+    onSetStoryData({
+      ...storyData, selectedKnot: knot, selectedIntent: undefined
+    });
+  };
 
   /**
    * Event handler for on intent click
@@ -116,21 +109,9 @@ const EditorScreen: React.FC<Props> = ({
       return;
     }
     setCenteredIntent(intent);
-    setStoryData({ ...storyData, selectedIntent: intent, selectedKnot: undefined });
-  }
-
-  /**
-   * Event handler for on intent click
-   * 
-   * @param event Synthetic event
-   * @param reason Reason of closing the alert
-   */
-  const handleAlertClose = (event?: React.SyntheticEvent, reason?: string) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setAlertOpen(false);
+    onSetStoryData({
+      ...storyData, selectedIntent: intent, selectedKnot: undefined
+    });
   };
 
   /**
@@ -139,6 +120,8 @@ const EditorScreen: React.FC<Props> = ({
    * @param node added node
    */
   const onAddNode = (node: CustomNodeModel) => {
+    const { knots } = storyData || {};
+
     if (!knots) {
       return;
     }
@@ -151,14 +134,14 @@ const EditorScreen: React.FC<Props> = ({
       tokenizer: TokenizerType.UNTOKENIZED,
       type: KnotType.TEXT,
       coordinates: node.getPosition()
-    }
+    };
 
-    setStoryData({
+    onSetStoryData({
       ...storyData,
       knots: [ ...knots, createdKnot ]
     });
     setDataChanged(true);
-  }
+  };
 
   /**
    * Event handler for node move
@@ -167,6 +150,8 @@ const EditorScreen: React.FC<Props> = ({
    * @param knot knot that needs update
    */
   const onMoveNode = (knotId: string, node: CustomNodeModel) => {
+    const { knots } = storyData || {};
+
     if (!knots) {
       return;
     }
@@ -174,17 +159,17 @@ const EditorScreen: React.FC<Props> = ({
     const updatedKnot: Knot = {
       ...knots.find(knot => knot.id === knotId)!,
       coordinates: node.getPosition()
-    }
+    };
 
-    setStoryData({
+    onSetStoryData({
       ...storyData,
       selectedKnot: updatedKnot,
       selectedIntent: undefined,
-      knots: knots.map(item => item.id === updatedKnot.id ? updatedKnot : item)
+      knots: knots.map(item => (item.id === updatedKnot.id ? updatedKnot : item))
     });
 
     setDataChanged(true);
-  }
+  };
 
   /**
    * Event handler for remove node
@@ -192,6 +177,8 @@ const EditorScreen: React.FC<Props> = ({
    * @param removedNodeId Removed node id (knot ID)
    */
   const onRemoveNode = (removedNodeId: string) => {
+    const { knots } = storyData || {};
+
     if (!knots) {
       return;
     }
@@ -203,12 +190,12 @@ const EditorScreen: React.FC<Props> = ({
     if (knot) {
       setRemovedKnots([ ...removedKnots, knot ]);
     }
-    setStoryData({
+    onSetStoryData({
       ...storyData,
       knots: knots.filter(item => item.id !== removedNodeId)
     });
     setDataChanged(true);
-  }
+  };
 
   /**
    * Event handler for add link
@@ -217,6 +204,12 @@ const EditorScreen: React.FC<Props> = ({
    * @param targetNodeId link (intent) target node (knot) id
    */
   const onAddLink = (sourceNodeId: string, targetNodeId: string) => {
+    const { intents } = storyData || {};
+
+    if (!intents) {
+      return null;
+    }
+
     if (!intents) {
       return;
     }
@@ -229,16 +222,16 @@ const EditorScreen: React.FC<Props> = ({
       quickResponseOrder: 0,
       trainingMaterials: {},
       type: IntentType.NORMAL
-    }
+    };
 
-    setStoryData({
+    onSetStoryData({
       ...storyData,
       intents: [ ...intents, createdIntent ],
       selectedIntent: createdIntent,
       selectedKnot: undefined
     });
     setDataChanged(true);
-  }
+  };
 
   /**
    * Event handler for remove link
@@ -246,21 +239,23 @@ const EditorScreen: React.FC<Props> = ({
    * @param linkId removed link (intent) id
    */
   const onRemoveLink = (linkId: string) => {
+    const { intents } = storyData || {};
+
     if (!intents) {
       return;
     }
 
     const intent = intents.find(item => item.id === linkId);
     if (intent) {
-      setRemovedIntents([ ...removedIntents, intent ])
+      setRemovedIntents([ ...removedIntents, intent ]);
     }
 
-    setStoryData({
+    onSetStoryData({
       ...storyData,
       intents: intents.filter(item => item.id !== linkId)
     });
     setDataChanged(true);
-  }
+  };
 
   /**
    * Event handler for node selection change
@@ -268,12 +263,14 @@ const EditorScreen: React.FC<Props> = ({
    * @param node node
    */
   const onNodeSelectionChange = (node: CustomNodeModel) => {
+    const { knots } = storyData || {};
+
     if (!knots) {
-      return;
+      return null;
     }
 
-    if (selectedEntititiesLength !== 0) {
-      setStoryData({
+    if (selectedEntitiesLength !== 0) {
+      onSetStoryData({
         ...storyData,
         selectedIntent: undefined,
         selectedKnot: undefined
@@ -283,7 +280,7 @@ const EditorScreen: React.FC<Props> = ({
 
     const knot = knots.find(item => item.id === node.getID());
 
-    setStoryData({
+    onSetStoryData({
       ...storyData,
       selectedIntent: undefined,
       selectedKnot: knot
@@ -293,7 +290,7 @@ const EditorScreen: React.FC<Props> = ({
     } else {
       setEditingEntityInfo(false);
     }
-  }
+  };
 
   /**
    * Event handler for link selection change
@@ -301,12 +298,14 @@ const EditorScreen: React.FC<Props> = ({
    * @param link link
    */
   const onLinkSelectionChange = (link: CustomLinkModel) => {
+    const { intents } = storyData || {};
+
     if (!intents) {
       return;
     }
 
-    if (selectedEntititiesLength !== 0) {
-      setStoryData({
+    if (selectedEntitiesLength !== 0) {
+      onSetStoryData({
         ...storyData,
         selectedIntent: undefined,
         selectedKnot: undefined
@@ -316,12 +315,12 @@ const EditorScreen: React.FC<Props> = ({
 
     const intent = intents.find(item => item.id === link.getID());
 
-    setStoryData({
+    onSetStoryData({
       ...storyData,
       selectedIntent: intent,
       selectedKnot: undefined
     });
-  }
+  };
 
   /**
    * Event handler for set active training material change 
@@ -329,6 +328,7 @@ const EditorScreen: React.FC<Props> = ({
    * @param event event from input change
    */
   const onSetActiveTrainingMaterialChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { intents, trainingMaterial, selectedIntent } = storyData || {};
     const { name, value } = event.target;
 
     if (!name || !value || !trainingMaterial || !selectedIntent || !intents) {
@@ -350,17 +350,17 @@ const EditorScreen: React.FC<Props> = ({
       Api.getIntentsApi(accessToken).updateIntent({
         intentId: updatedIntent.id,
         intent: updatedIntent,
-        storyId
+        storyId: storyId
       });
-    }    
+    }
     
-    setStoryData({
+    onSetStoryData({
       ...storyData,
       selectedIntent: updatedIntent,
-      intents: intents.map(intent => intent.id === updatedIntent.id ? updatedIntent : intent)
+      intents: intents.map(intent => (intent.id === updatedIntent.id ? updatedIntent : intent))
     });
     setDataChanged(true);
-  }
+  };
 
   /**
    * Event handler for add training material click
@@ -368,6 +368,8 @@ const EditorScreen: React.FC<Props> = ({
    * @param name name of the training material type
    */
   const onAddTrainingMaterialClick = (name: any) => {
+    const { selectedIntent } = storyData || {};
+
     if (!selectedIntent?.id) {
       return;
     }
@@ -376,12 +378,12 @@ const EditorScreen: React.FC<Props> = ({
     setSelectedTrainingMaterialType(name as keyof object);
     setEditedTrainingMaterial({
       type: name,
-      storyId,
+      storyId: storyId,
       name: "",
       text: "",
       visibility: TrainingMaterialVisibility.STORY
     });
-  }
+  };
 
   /**
    * Event handler for edit training material click
@@ -391,120 +393,63 @@ const EditorScreen: React.FC<Props> = ({
       setEditingTrainingMaterial(true);
       setSelectedTrainingMaterialType(editedTrainingMaterial.type);
     }
-  }
+  };
 
   /**
    * Event handler for delete training material click
    */
   const onDeleteTrainingMaterialClick = () => {
-    if (!editedTrainingMaterial?.type || !selectedIntent || !intents) {
+    const { intents, selectedIntent } = storyData || {};
+
+    if (!editedTrainingMaterial?.type || !selectedIntent || !intents) {
       return;
     }
 
     const key = EditorUtils.objectKeyConversion(editedTrainingMaterial.type);
 
-    setStoryData({
+    onSetStoryData({
       ...storyData,
       selectedIntent: { ...selectedIntent, trainingMaterials: { ...selectedIntent.trainingMaterials, [key]: undefined } },
-      intents: intents.map(item => item.id === selectedIntent.id ? selectedIntent : item)
+      intents: intents.map(item => (item.id === selectedIntent.id ? selectedIntent : item))
     });
     setEditingTrainingMaterial(false);
     setEditedTrainingMaterial(undefined);
     setDataChanged(true);
-  }
-
-  /**
-   * Event handler for save training material click
-   * 
-   * @param action action type: update / create
-   */
-  const onSaveTrainingMaterialClick = () => {
-    if(!editedTrainingMaterial) {
-      return;
-    }
-
-    editedTrainingMaterial.id ? updateTrainingMaterial() : createTrainingMaterial();
-    setEditingTrainingMaterial(false);
-    setSelectedTrainingMaterialType(null);
-  }
-
-  /**
-   * Event handler for delete from list click
-   * 
-   * @param entity entity to be deleted
-   */
-  const onDeleteFromListClick = (entity: Knot | Intent) => {
-    const intent = entity as Intent;
-    const sourceKnotId = intent.sourceKnotId;
-    if (!sourceKnotId) {
-      return;
-    }
-
-    setStoryData({
-      ...storyData,
-      selectedIntent: intent,
-      selectedKnot: undefined
-    });
-
-    setDeleteConfirmDialogOpen(true);
-  }
-
-  /**
-   * Event handler for delete confirm click
-   */
-  const onDeleteConfirmClick = () => {
-    if (selectedIntent && intents) {
-      setDeletedIntentRef(selectedIntent);
-      setRemovedIntents([ ...removedIntents, selectedIntent ]);
-      setStoryData({
-        ...storyData,
-        intents: intents.filter(intent => intent.id !== selectedIntent.id),
-        selectedIntent: undefined
-      });
-    }
-
-    if (selectedKnot && knots) {
-      setDeletedKnotRef(selectedKnot);
-      setRemovedKnots([ ...removedKnots, selectedKnot ]);
-      setStoryData({
-        ...storyData,
-        knots: knots.filter(knot => knot.id !== selectedKnot.id),
-        selectedKnot: undefined
-      });
-    }
-    
-    setDeleteConfirmDialogOpen(false);
-  }
+  };
 
   /**
    * Updates training material
    */
   const updateTrainingMaterial = () => {
-    if (!editedTrainingMaterial?.type || !trainingMaterial || !selectedIntent?.id || !intents) {
+    const { intents, trainingMaterial, selectedIntent } = storyData || {};
+
+    if (!editedTrainingMaterial?.type || !trainingMaterial || !selectedIntent?.id || !intents) {
       return;
     }
     const key = EditorUtils.objectKeyConversion(editedTrainingMaterial.type);
     const updatedIntent: Intent = {
-        ...selectedIntent,
-        trainingMaterials: { 
-          ...selectedIntent.trainingMaterials,
-          [key]: editedTrainingMaterial.id
-        }
-    }
-    setStoryData({
+      ...selectedIntent,
+      trainingMaterials: {
+        ...selectedIntent.trainingMaterials,
+        [key]: editedTrainingMaterial.id
+      }
+    };
+    onSetStoryData({
       ...storyData,
-      trainingMaterial: trainingMaterial.map(item => item.id === editedTrainingMaterial.id ? editedTrainingMaterial : item),
+      trainingMaterial: trainingMaterial.map(item => (item.id === editedTrainingMaterial.id ? editedTrainingMaterial : item)),
       selectedIntent: updatedIntent,
-      intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
+      intents: intents.map(item => (item.id === updatedIntent.id ? updatedIntent : item))
     });
     setDataChanged(true);
-  }
+  };
 
   /**
    * Creates training material
    */
   const createTrainingMaterial = () => {
-    if (!editedTrainingMaterial?.type || !trainingMaterial || !selectedIntent?.id || !intents) {
+    const { intents, trainingMaterial, selectedIntent } = storyData || {};
+
+    if (!editedTrainingMaterial?.type || !trainingMaterial || !selectedIntent?.id || !intents) {
       return;
     }
 
@@ -515,16 +460,82 @@ const EditorScreen: React.FC<Props> = ({
         ...selectedIntent.trainingMaterials,
         [key]: editedTrainingMaterial.id
       }
-    }
+    };
 
-    setStoryData({
+    onSetStoryData({
       ...storyData,
       trainingMaterial: [ ...trainingMaterial, editedTrainingMaterial ],
       selectedIntent: updatedIntent,
-      intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
+      intents: intents.map(item => (item.id === updatedIntent.id ? updatedIntent : item))
     });
     setDataChanged(true);
-  }
+  };
+
+  /**
+   * Event handler for save training material click
+   * 
+   * @param action action type: update / create
+   */
+  const onSaveTrainingMaterialClick = () => {
+    if (!editedTrainingMaterial) {
+      return;
+    }
+
+    editedTrainingMaterial.id ? updateTrainingMaterial() : createTrainingMaterial();
+    setEditingTrainingMaterial(false);
+    setSelectedTrainingMaterialType(null);
+  };
+
+  /**
+   * Event handler for delete from list click
+   * 
+   * @param entity entity to be deleted
+   */
+  const onDeleteFromListClick = (entity: Knot | Intent) => {
+    const intent = entity as Intent;
+    const { sourceKnotId } = intent;
+
+    if (!sourceKnotId) {
+      return;
+    }
+
+    onSetStoryData({
+      ...storyData,
+      selectedIntent: intent,
+      selectedKnot: undefined
+    });
+
+    setDeleteConfirmDialogOpen(true);
+  };
+
+  /**
+   * Event handler for delete confirm click
+   */
+  const onDeleteConfirmClick = () => {
+    const { intents, knots, selectedKnot, selectedIntent } = storyData || {};
+
+    if (selectedIntent && intents) {
+      setDeletedIntentRef(selectedIntent);
+      setRemovedIntents([ ...removedIntents, selectedIntent ]);
+      onSetStoryData({
+        ...storyData,
+        intents: intents.filter(intent => intent.id !== selectedIntent.id),
+        selectedIntent: undefined
+      });
+    }
+
+    if (selectedKnot && knots) {
+      setDeletedKnotRef(selectedKnot);
+      setRemovedKnots([ ...removedKnots, selectedKnot ]);
+      onSetStoryData({
+        ...storyData,
+        knots: knots.filter(knot => knot.id !== selectedKnot.id),
+        selectedKnot: undefined
+      });
+    }
+    
+    setDeleteConfirmDialogOpen(false);
+  };
 
   /**
    * Event handler for updating knot info
@@ -532,6 +543,8 @@ const EditorScreen: React.FC<Props> = ({
    * @param event event from input change
    */
   const onUpdateKnotInfo = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { knots, selectedKnot } = storyData || {};
+
     const { name, value } = event?.target;
     if (!knots || !selectedKnot?.id) {
       return;
@@ -540,15 +553,15 @@ const EditorScreen: React.FC<Props> = ({
     const updatedKnot: Knot = {
       ...selectedKnot,
       [name]: value
-    }
+    };
 
-    setStoryData({
+    onSetStoryData({
       ...storyData,
-      knots: knots.map(item => item.id === updatedKnot.id ? updatedKnot : item),
+      knots: knots.map(item => (item.id === updatedKnot.id ? updatedKnot : item)),
       selectedKnot: updatedKnot
     });
     setDataChanged(true);
-  }
+  };
 
   /**
    * Event handler for updating knot info
@@ -556,7 +569,9 @@ const EditorScreen: React.FC<Props> = ({
    * @param event event from input change
    */
   const onUpdateIntentInfo = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { intents, selectedIntent } = storyData || {};
     const { name, value } = event?.target;
+
     if (!intents || !selectedIntent?.id) {
       return;
     }
@@ -564,15 +579,15 @@ const EditorScreen: React.FC<Props> = ({
     const updatedIntent: Intent = {
       ...selectedIntent,
       [name]: value
-    }
+    };
 
-    setStoryData({
+    onSetStoryData({
       ...storyData,
       selectedIntent: updatedIntent,
-      intents: intents.map(item => item.id === updatedIntent.id ? updatedIntent : item)
+      intents: intents.map(item => (item.id === updatedIntent.id ? updatedIntent : item))
     });
     setDataChanged(true);
-  }
+  };
 
   /**
    * Event handler for updating story info
@@ -580,19 +595,21 @@ const EditorScreen: React.FC<Props> = ({
    * @param event event from input change
    */
   const onUpdateStoryInfo = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { story } = storyData || {};
     const { name, value } = event?.target;
-    if(!story) {
+
+    if (!story) {
       return;
     }
 
-    setStoryData({
+    onSetStoryData({
       ...storyData,
       story: {
         ...story,
         [name]: value
       }
-    })
-  }
+    });
+  };
 
   /**
    * Event handler for update edited training material
@@ -607,113 +624,7 @@ const EditorScreen: React.FC<Props> = ({
 
     setEditedTrainingMaterial({ ...editedTrainingMaterial, [name]: value });
     setDataChanged(true);
-  }
-
-  /**
-   * Event handler for save button click
-   */
-  const onSaveClick = async () => {
-    if (!accessToken || !storyData!.story) {
-      return;
-    }
-
-    try {
-      const knotsApi = Api.getKnotsApi(accessToken);
-      const intentsApi = Api.getIntentsApi(accessToken);
-      const trainingMaterialsApi = Api.getTrainingMaterialApi(accessToken);
-      const storyApi = Api.getStoriesApi(accessToken);
-
-      const storyPromise = story ? storyApi.updateStory({ storyId: storyId, story: story }) : undefined;
-      
-      const knotUpdatePromises = (knots || []).map(
-        knot => (
-          knot.id? knotsApi.updateKnot({
-            storyId: storyId,
-            knotId: knot.id,
-            knot: knot
-          }) : knotsApi.createKnot({
-            storyId: storyId,
-            knot: knot
-          })
-        )
-      );
-
-      const knotDeletePromises = removedKnots.map(
-        knot => (
-          knotsApi.deleteKnot({
-            storyId: storyId,
-            knotId: knot.id!!
-          })
-        )
-      );
-
-      const intentUpdatePromises = (intents || []).map(
-        intent => (
-          intent.id? intentsApi.updateIntent({
-            storyId: storyId,
-            intentId: intent.id,
-            intent: intent
-          }) : intentsApi.createIntent({
-            storyId: storyId,
-            intent: intent
-          })
-        )
-      );
-
-      const intentDeletePromises = removedIntents.map(
-        intent => (
-          intentsApi.deleteIntent({
-            storyId: storyId,
-            intentId: intent.id!!
-          })
-        )
-      );
-
-      const trainingMaterialUpdatePromises = (trainingMaterial || []).map(
-        material => (
-          material.id? trainingMaterialsApi.updateTrainingMaterial({
-            trainingMaterialId: material.id,
-            trainingMaterial: material
-          }) : trainingMaterialsApi.createTrainingMaterial({
-            trainingMaterial: material
-          })
-        )
-      )
-
-      await Promise.all([
-        Promise.all(knotDeletePromises),
-        Promise.all(intentDeletePromises)
-      ])
-
-      // TODO Loading, prevent user from interacting
-
-      const [ updatedStory, updatedKnots, updatedIntents, updatedMaterials ] = await Promise.all([ 
-        storyPromise, 
-        Promise.all(knotUpdatePromises),
-        Promise.all(intentUpdatePromises),
-        Promise.all(trainingMaterialUpdatePromises)
-      ]);
-      
-      setStoryData({
-        story: updatedStory!!,
-        knots: updatedKnots,
-        intents: updatedIntents,
-        trainingMaterial: updatedMaterials
-      });
-
-      setRemovedKnots([]);
-      setRemovedIntents([]);
-    } catch (error) {
-      setAlertOpen(true);
-      setAlertType("error");
-      setAlertMessage(strings.editorScreen.save.fail);
-      console.error(error);
-    }
-    setAlertOpen(true);
-    setAlertType("success");
-    setAlertMessage(strings.editorScreen.save.success);
-    setDataChanged(false);
-  }
+  };
 
   /**
    * Event handler for updating the content property of a knot
@@ -723,6 +634,8 @@ const EditorScreen: React.FC<Props> = ({
    * @param script script content
    */
   const onUpdateKnotContent = (text: string, imageUrl?: string, script?: string) => {
+    const { selectedKnot } = storyData || {};
+
     if (!selectedKnot) {
       return;
     }
@@ -735,14 +648,14 @@ const EditorScreen: React.FC<Props> = ({
       content += `\n<script>${script}</script>`;
     }
 
-    setStoryData({
+    onSetStoryData({
       ...storyData,
       selectedKnot: {
         ...selectedKnot,
         content: content
       }
-    })
-  }
+    });
+  };
 
   /**
    * Set the last edited story to cookie
@@ -758,7 +671,7 @@ const EditorScreen: React.FC<Props> = ({
       id: storyData.story?.id,
       name: storyData.story?.name,
       lastEditedTime: new Date().toLocaleString()
-    }
+    };
 
     if (!currentStory.id) {
       return;
@@ -768,54 +681,50 @@ const EditorScreen: React.FC<Props> = ({
       const idx = recentStories.findIndex(item => item.id === currentStory.id);
 
       // eslint-disable-next-line no-unused-expressions
-      idx !== -1 && recentStories.splice(idx, 1)
+      idx !== -1 && recentStories.splice(idx, 1);
       
       recentStories.unshift(currentStory);
       recentStories = recentStories.slice(0, 5);
-      cookies.set("recentStories", recentStories, { 
-        secure: true, 
+      cookies.set("recentStories", recentStories, {
+        secure: true,
         sameSite: true,
-        maxAge: 60*60*24*30 
+        maxAge: 60 * 60 * 24 * 30
       });
     } else {
-      cookies.set("recentStories", [currentStory], { 
-        secure: true, 
+      cookies.set("recentStories", [currentStory], {
+        secure: true,
         sameSite: true,
-        maxAge: 60*60*24*30 
+        maxAge: 60 * 60 * 24 * 30
       });
     }
-  }
+  };
 
   /**
    * Fetches knots list for the story
    */
   const fetchData = async () => {
-    if (!accessToken) {
+    if (!accessToken || (!storyLoading && storyData?.story?.id === storyId)) {
       return;
     }
 
-    if (!storyLoading && storyData?.story?.id === storyId) {
-      return;
-    }
+    onLoadStory();
 
-    loadStory();
-
-    const [ story, knotList, intentList, trainingMaterialList, scriptList ] = await Promise.all([
-      Api.getStoriesApi(accessToken).findStory({ storyId }),
-      Api.getKnotsApi(accessToken).listKnots({ storyId }),
-      Api.getIntentsApi(accessToken).listIntents({ storyId }),
-      Api.getTrainingMaterialApi(accessToken).listTrainingMaterials({ storyId }),
+    const [ foundStory, knotList, intentList, trainingMaterialList, scriptList ] = await Promise.all([
+      Api.getStoriesApi(accessToken).findStory({ storyId: storyId }),
+      Api.getKnotsApi(accessToken).listKnots({ storyId: storyId }),
+      Api.getIntentsApi(accessToken).listIntents({ storyId: storyId }),
+      Api.getTrainingMaterialApi(accessToken).listTrainingMaterials({ storyId: storyId }),
       Api.getScriptsApi(accessToken).listScripts()
     ]);
 
-    setStoryData({
-      story: story,
+    onSetStoryData({
+      story: foundStory,
       knots: knotList,
       intents: intentList,
       trainingMaterial: trainingMaterialList,
       scripts: scriptList
     });
-  }
+  };
 
   /**
    * Renders loading
@@ -826,34 +735,36 @@ const EditorScreen: React.FC<Props> = ({
         <Loading text={ strings.loading.loadingStory }/>
       </Box>
     );
-  }
+  };
 
   /**
-   * Render alert message
+   * Renders story tab of right toolbar
    */
-  const renderAlert = () => {
+  const renderStoryTab = () => {
+    const { story } = storyData || {};
+
     return (
-      <Snackbar 
-        open={ alertOpen } 
-        autoHideDuration={ 6000 } 
-        onClose={ handleAlertClose }
-      >
-        <MuiAlert 
-          onClose={ handleAlertClose } 
-          severity={ alertType }
-          elevation={ 6 } 
-          variant="filled"
-        >
-        { alertMessage }
-        </MuiAlert>
-      </Snackbar>
+      <TextField
+        label={ strings.editorScreen.rightBar.storyNameHelper }
+        name="name"
+        value={ story?.name }
+        onChange={ onUpdateStoryInfo }
+        onFocus={ () => setEditingEntityInfo(true) }
+        onBlur={ () => setEditingEntityInfo(false) }
+      />
     );
-  }
+  };
 
   /**
    * Renders left toolbar
    */
   const renderLeftToolbar = () => {
+    const { knots, intents } = storyData || {};
+
+    if (!knots || !intents) {
+      return null;
+    }
+
     return (
       <Drawer
         variant="permanent"
@@ -901,20 +812,63 @@ const EditorScreen: React.FC<Props> = ({
         </Box>
       </Drawer>
     );
-  }
+  };
+
+  /**
+   * Renders toolbar action buttons
+   */
+  const renderActionButtons = () => {
+    return (
+      <>
+        <div className={ classes.headerButtonsContainer }>
+          <Button
+            className={ classes.knotButton }
+            variant="contained"
+            onClick={ () => setAddingKnots(!addingKnots) }
+          >
+            <div className={ addingKnots ? classes.activeKnotButtonContainer : classes.inactiveKnotButtonContainer }>
+              <Box width="100%" color="inherit">
+                <KnotIcon htmlColor="inherit"/>
+              </Box>
+              <Box width="100%">
+                { strings.editorScreen.add.knot }
+              </Box>
+            </div>
+          </Button>
+          <Button
+            className={ classes.zoomButton }
+            variant="contained"
+            onClick={ () => setZoom100(true) }
+          >
+            <div className={ classes.zoomButtonContainer }>
+              <Box width="100%" color="inherit">
+                <FullscreenIcon htmlColor="inherit"/>
+              </Box>
+              <Box width="100%">
+                100%
+              </Box>
+            </div>
+          </Button>
+        </div>
+
+      </>
+    );
+  };
 
   /**
    * Renders main editor area
    */
   const renderEditorContent = () => {
+    const { knots, intents } = storyData || {};
+
     if (!knots || !intents) {
-      return;
+      return null;
     }
 
     return (
       <Box
         marginLeft="320px"
-        marginRight={ selectedEntititiesLength !== 0 ? "320px" : "0px" }
+        marginRight={ selectedEntitiesLength !== 0 ? "320px" : "0px" }
         height="100%"
       >
         <Toolbar/>
@@ -941,143 +895,19 @@ const EditorScreen: React.FC<Props> = ({
             editingEntityInfo={ editingEntityInfo }
             onNodeSelectionChange={ onNodeSelectionChange }
             onLinkSelectionChange={ onLinkSelectionChange }
-            onSelectedEntitiesAmountChange = { setSelectedEntitiesLength }
+            onSelectedEntitiesAmountChange={ setSelectedEntitiesLength }
           />
         </Box>
       </Box>
     );
-  }
-
-  /**
-   * Renders toolbar action buttons
-   */
-  const renderActionButtons = () => {
-    return (
-      <>
-        <div className={ classes.headerButtonsContainer }>
-          <Button
-            className= { classes.knotButton }
-            variant="contained"
-            onClick={ () => setAddingKnots(!addingKnots) }
-          > 
-            <div className={ addingKnots ? classes.activeKnotButtonContainer : classes.inactiveKnotButtonContainer }>
-              <Box width="100%" color="inherit">
-                <KnotIcon htmlColor={ "inherit" }/>
-              </Box>
-              <Box width="100%">
-                { strings.editorScreen.add.knot }
-              </Box>
-            </div>
-          </Button>
-          <Button
-            className={ classes.zoomButton }
-            variant="contained"
-            onClick={ () => setZoom100(true) }
-          >
-            <div className={ classes.zoomButtonContainer }>
-              <Box width="100%" color="inherit">
-                <FullscreenIcon htmlColor={ "inherit" }/>
-              </Box>
-              <Box width="100%">
-              { "100%" }
-              </Box>
-            </div>
-          </Button>
-        </div>
-
-      </>
-    );
-  }
-
-  /**
-   * Renders right toolbar
-   */
-  const renderRightToolbar = () => {
-    return (
-      <Drawer
-        variant="permanent"
-        anchor="right"
-      >
-        <Toolbar/>
-        <Tabs
-          onChange={ (event, value: number) => setRightToolBarIndex(value) }
-          value={ rightToolBarIndex } 
-        >
-          <Tab
-            value={ 0 }
-            label={ strings.editorScreen.rightBar.detailsRightTab }
-          />
-          <Tab
-            value={ 1 }
-            label={ strings.editorScreen.rightBar.linkingRightTab }
-          />
-        </Tabs>
-        <Box p={ 2 }>
-          { rightToolBarIndex === 0 && renderDetailsTab() }
-          { rightToolBarIndex === 1 && renderLinkingTab() }
-        </Box>
-      </Drawer>
-    );
-  }
-
-  /**
-   * Renders story tab of right toolbar
-   */
-  const renderStoryTab = () => {
-    return (
-      <TextField
-        label={ strings.editorScreen.rightBar.storyNameHelper }
-        name="name"
-        value={ story?.name }
-        onChange={ onUpdateStoryInfo }
-        onFocus={ () => setEditingEntityInfo(true) }
-        onBlur={ () => setEditingEntityInfo(false) }
-      />
-    );
-  }
-
-  /**
-   * Renders details tab if an entity is selected  
-   */
-  const renderDetailsTab = () => {
-    return (
-      <Box>
-        { selectedKnot &&
-          <TextField
-            label={ strings.editorScreen.rightBar.knotNameHelper }
-            name="name"
-            value={ selectedKnot.name ?? "" }
-            onFocus={ () => setEditingEntityInfo(true) }
-            onBlur={ () => setEditingEntityInfo(false) }
-            onChange={ onUpdateKnotInfo }
-          />
-        }
-        { selectedIntent &&
-          <TextField
-            label={ strings.editorScreen.rightBar.intentNameHelper }
-            name="name"
-            defaultValue={ selectedIntent.name ?? "" }
-            onChange={ (e: any) => onUpdateIntentInfo(e) }
-            onFocus={ () => setEditingEntityInfo(true) }
-            onBlur={ () => setEditingEntityInfo(false) }
-          />
-        }
-        <Divider className={ classes.divider }/>
-        { 
-          selectedKnot ?
-            renderKnotDetails() :
-            selectedIntent ?
-              renderIntentDetails() :
-              null
-        }
-      </Box>
-    )
-  }
+  };
 
   /**
    * Renders detailed tab of knot details
    */
   const renderKnotDetails = () => {
+    const { selectedKnot, scripts, intents } = storyData || {};
+
     if (!selectedKnot) {
       return null;
     }
@@ -1102,15 +932,14 @@ const EditorScreen: React.FC<Props> = ({
               onUpdateFieldInfo={ onUpdateIntentInfo }
               onFocus={ () => setEditingEntityInfo(true) }
               onBlur={ () => setEditingEntityInfo(false) }
-            />
-          )}
+            />)}
         </AccordionItem>
         <AccordionItem title={ strings.editorScreen.knots.advancedSettings }>
           <div className={ classes.accordionContent }>
             <TextField
               className={ classes.textField }
               label={ strings.editorScreen.knots.hintHelper }
-              name={ "hint" }
+              name="hint"
               placeholder={ strings.editorScreen.knots.hint }
               value={ selectedKnot.hint ?? "" }
               onChange={ onUpdateKnotInfo }
@@ -1118,7 +947,7 @@ const EditorScreen: React.FC<Props> = ({
             <TextField
               className={ classes.textField }
               label={ strings.editorScreen.rightBar.tokenizerHeader }
-              name={ "tokenizer" }
+              name="tokenizer"
               select
               value={ selectedKnot.tokenizer ?? TokenizerType.WHITESPACE }
               onChange={ onUpdateKnotInfo }
@@ -1126,64 +955,20 @@ const EditorScreen: React.FC<Props> = ({
               { Object.values(TokenizerType).map(name =>
                 <MenuItem key={ name } value={ name }>
                   { strings.editorScreen.rightBar.tokenizerType[name] }
-                </MenuItem>
-              )}
+                </MenuItem>)}
             </TextField>
           </div>
         </AccordionItem>
       </>
     );
-  }
-
-  /**
-   * Renders detailed tab of intent details
-   * 
-   * @param currentKnot current intent
-   */
-  const renderIntentDetails = () => {
-    if (!selectedIntent) {
-      return null;
-    }
-
-    const intentTypes: string[] = Object.values(IntentType);
-
-    return (
-      <>
-        <TextField
-          label={ strings.editorScreen.rightBar.intentTypeHelper }
-          name="type"
-          select
-          defaultValue={ selectedIntent.type }
-          onChange={ onUpdateIntentInfo }
-          onFocus={ () => setEditingEntityInfo(true) }
-          onBlur={ () => setEditingEntityInfo(false) }
-        >
-          { intentTypes.map(name => 
-            <MenuItem key={ name } value={ name }>
-              { strings.editorScreen.rightBar.intentType[name as keyof object] }
-            </MenuItem>
-          )}
-        </TextField>
-        <Divider className={ classes.divider }/>
-          <InputLabel className={ classes.buttonLabel }>
-            { strings.editorScreen.rightBar.quickResponsesHelper }
-          </InputLabel>
-          { renderSpecialButton() }
-        <Divider className={ classes.divider }/>
-        <Box>
-          <AccordionItem title={ strings.editorScreen.rightBar.trainingMaterialsHeader }>
-            { renderTrainingSelectionOptions() }
-          </AccordionItem>
-        </Box>
-        <Divider className={ classes.divider }/>
-      </>
-    );
-  }
+  };
 
   /**
    * Renders special button
    */
   const renderSpecialButton = () => {
+    const { selectedIntent } = storyData || {};
+
     return (
       <QuickResponseButton
         editing={ editingQuickResponse }
@@ -1194,12 +979,14 @@ const EditorScreen: React.FC<Props> = ({
         onBlur={ () => setEditingEntityInfo(false) }
       />
     );
-  }
+  };
 
   /**
    * Renders training selection options content cards
    */
   const renderTrainingSelectionOptions = () => {
+    const { trainingMaterial, selectedIntent } = storyData || {};
+
     return (
       <TrainingSelectionOptions
         selectedIntent={ selectedIntent }
@@ -1217,12 +1004,160 @@ const EditorScreen: React.FC<Props> = ({
         onBlur={ () => setEditingEntityInfo(false) }
       />
     );
-  }
+  };
+
+  /**
+   * Renders detailed tab of intent details
+   * 
+   * @param currentKnot current intent
+   */
+  const renderIntentDetails = () => {
+    const { selectedIntent } = storyData || {};
+
+    if (!selectedIntent) {
+      return null;
+    }
+
+    const intentTypes: string[] = Object.values(IntentType);
+
+    return (
+      <>
+        <TextField
+          label={ strings.editorScreen.rightBar.intentTypeHelper }
+          name="type"
+          select
+          defaultValue={ selectedIntent.type }
+          onChange={ onUpdateIntentInfo }
+          onFocus={ () => setEditingEntityInfo(true) }
+          onBlur={ () => setEditingEntityInfo(false) }
+        >
+          { intentTypes.map(name =>
+            <MenuItem key={ name } value={ name }>
+              { strings.editorScreen.rightBar.intentType[name as keyof object] }
+            </MenuItem>)}
+        </TextField>
+        <Divider className={ classes.divider }/>
+        <InputLabel className={ classes.buttonLabel }>
+          { strings.editorScreen.rightBar.quickResponsesHelper }
+        </InputLabel>
+        { renderSpecialButton() }
+        <Divider className={ classes.divider }/>
+        <Box>
+          <AccordionItem title={ strings.editorScreen.rightBar.trainingMaterialsHeader }>
+            { renderTrainingSelectionOptions() }
+          </AccordionItem>
+        </Box>
+        <Divider className={ classes.divider }/>
+      </>
+    );
+  };
+
+  /**
+   * Renders knot or intent
+   */
+  const renderKnotOrIntent = () => {
+    const { selectedKnot, selectedIntent } = storyData || {};
+
+    if (selectedKnot) {
+      return renderKnotDetails();
+    } if (selectedIntent) {
+      renderIntentDetails();
+    }
+
+    return null;
+  };
+
+  /**
+   * Renders details tab if an entity is selected  
+   */
+  const renderDetailsTab = () => {
+    const { selectedKnot, selectedIntent } = storyData || {};
+
+    return (
+      <Box>
+        { selectedKnot &&
+          <TextField
+            label={ strings.editorScreen.rightBar.knotNameHelper }
+            name="name"
+            value={ selectedKnot.name ?? "" }
+            onFocus={ () => setEditingEntityInfo(true) }
+            onBlur={ () => setEditingEntityInfo(false) }
+            onChange={ onUpdateKnotInfo }
+          />
+        }
+        { selectedIntent &&
+          <TextField
+            label={ strings.editorScreen.rightBar.intentNameHelper }
+            name="name"
+            defaultValue={ selectedIntent.name ?? "" }
+            onChange={ (e: any) => onUpdateIntentInfo(e) }
+            onFocus={ () => setEditingEntityInfo(true) }
+            onBlur={ () => setEditingEntityInfo(false) }
+          />
+        }
+        <Divider className={ classes.divider }/>
+        { renderKnotOrIntent() }
+      </Box>
+    );
+  };
+
+  /**
+   * Renders right toolbar linking tab
+   */
+  const renderLinkingTab = () => {
+    const { intents, knots, selectedKnot } = storyData || {};
+
+    if (!selectedKnot || !knots || !intents) {
+      return null;
+    }
+
+    return (
+      <KnotLinking
+        selectedKnot={ selectedKnot }
+        knots={ knots }
+        intents={ intents }
+        onAddLink={ onAddLink }
+      />
+    );
+  };
+
+  /**
+   * Renders right toolbar
+   */
+  const renderRightToolbar = () => {
+    return (
+      <Drawer
+        variant="permanent"
+        anchor="right"
+      >
+        <Toolbar/>
+        <Tabs
+          onChange={ (event, value: number) => setRightToolBarIndex(value) }
+          value={ rightToolBarIndex }
+        >
+          <Tab
+            value={ 0 }
+            label={ strings.editorScreen.rightBar.detailsRightTab }
+          />
+          <Tab
+            value={ 1 }
+            label={ strings.editorScreen.rightBar.linkingRightTab }
+          />
+        </Tabs>
+        <Box p={ 2 }>
+          { rightToolBarIndex === 0 && renderDetailsTab() }
+          { rightToolBarIndex === 1 && renderLinkingTab() }
+        </Box>
+      </Drawer>
+    );
+  };
 
   /**
    * Renders delete confirm dialog
    */
   const renderDeleteConfirmDialog = () => {
+    const { selectedKnot, selectedIntent } = storyData || {};
+
     return (
       <GenericDialog
         title={ strings.editorScreen.confirm.title }
@@ -1241,25 +1176,17 @@ const EditorScreen: React.FC<Props> = ({
         }
       </GenericDialog>
     );
-  }
+  };
 
-  /**
-   * Renders right toolbar linking tab
-   */
-  const renderLinkingTab = () => {
-    if (!selectedKnot || !knots || !intents) {
-      return null;
-    }
+  React.useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line
+  }, []);
 
-    return (
-      <KnotLinking
-        selectedKnot={ selectedKnot }
-        knots={ knots }
-        intents={ intents }
-        onAddLink={ onAddLink }
-      />
-    );
-  }
+  React.useEffect(() => {
+    setLastEdited();
+    // eslint-disable-next-line
+  }, [ storyData ]);
 
   if (!keycloak) {
     return null;
@@ -1277,16 +1204,6 @@ const EditorScreen: React.FC<Props> = ({
     );
   }
 
-  const {
-    story,
-    knots,
-    selectedKnot,
-    selectedIntent,
-    intents,
-    trainingMaterial,
-    scripts
-  } = storyData;
-
   return (
     <AppLayout
       keycloak={ keycloak }
@@ -1300,7 +1217,7 @@ const EditorScreen: React.FC<Props> = ({
       { renderDeleteConfirmDialog() }
     </AppLayout>
   );
-}
+};
 
 /**
  * Redux mapper for mapping store state to component props
@@ -1321,8 +1238,8 @@ const mapStateToProps = (state: ReduxState) => ({
  * @param dispatch dispatch method
  */
 const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({
-  loadStory: () => dispatch(loadStory()),
-  setStoryData: (storyData: StoryData) => dispatch(setStoryData(storyData)),
+  onLoadStory: () => dispatch(loadStory()),
+  onSetStoryData: (storyData: StoryData) => dispatch(setStoryData(storyData))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditorScreen);

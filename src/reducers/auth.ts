@@ -17,7 +17,7 @@ export interface AuthState {
 const initialState: AuthState = {
   accessToken: undefined,
   keycloak: undefined
-}
+};
 
 /**
  * Redux reducer for authorization
@@ -28,17 +28,24 @@ const initialState: AuthState = {
  */
 export function authReducer(state: AuthState = initialState, action: AuthAction): AuthState {
   switch (action.type) {
-    case LOGIN:
-      const keycloak = action.keycloak;
+    case LOGIN: {
+      const { keycloak } = action;
       const { token, tokenParsed } = keycloak;
       const userId = tokenParsed?.sub;
+
       const accessToken = userId && token ?
-        { token, userId } :
+        { token: token, userId: userId } :
         undefined;
 
-      return { ...state, keycloak: keycloak, accessToken: accessToken };
+      return {
+        ...state, keycloak: keycloak, accessToken: accessToken
+      };
+    }
+
     case LOGOUT:
-      return { ...state, keycloak: undefined, accessToken: undefined };
+      return {
+        ...state, keycloak: undefined, accessToken: undefined
+      };
     default:
       return state;
   }

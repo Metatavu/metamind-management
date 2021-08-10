@@ -1,12 +1,12 @@
 import * as React from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton, WithStyles, withStyles } from "@material-ui/core";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
-import { styles } from "./generic-dialog.styles";
+import genericDialogStyles from "./generic-dialog.styles";
 
 /**
  * Interface representing component properties
  */
-interface Props extends WithStyles<typeof styles> {
+interface Props extends WithStyles<typeof genericDialogStyles> {
   title: string;
   positiveButtonText: string;
   cancelButtonText?: string;
@@ -42,7 +42,6 @@ const GenericDialog: React.FC<Props> = ({
   classes,
   children
 }) => {
-
   return (
     <Dialog
       disableEnforceFocus={ disableEnforceFocus }
@@ -86,6 +85,6 @@ const GenericDialog: React.FC<Props> = ({
       </DialogActions>
     </Dialog>
   );
-}
+};
 
-export default withStyles(styles)(GenericDialog);
+export default withStyles(genericDialogStyles)(GenericDialog);

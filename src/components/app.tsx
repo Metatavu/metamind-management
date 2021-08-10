@@ -37,14 +37,14 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider theme={ theme }>
-      <CssBaseline />
+      <CssBaseline/>
       <Provider store={ store }>
         <AccessTokenRefresh>
           <BrowserRouter>
             <Switch>
               <Route
                 path="/"
-                exact={ true }
+                exact
                 render={({ history }) => (
                   <HomeScreen
                     history={ history }
@@ -63,6 +63,6 @@ const App: React.FC = () => {
       </Provider>
     </ThemeProvider>
   );
-}
+};
 
 export default App;

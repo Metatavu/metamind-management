@@ -15,7 +15,7 @@ export interface StoryState {
 const initialState: StoryState = {
   storyLoading: false,
   storyData: undefined
-}
+};
 
 /**
  * Redux reducer for story
@@ -27,16 +27,16 @@ const initialState: StoryState = {
 export function storyReducer(state: StoryState = initialState, action: StoryAction): StoryState {
   switch (action.type) {
     case LOAD_STORY:
-      return { 
-        ...state, 
-        storyLoading: true, 
-        storyData: undefined 
+      return {
+        ...state,
+        storyLoading: true,
+        storyData: undefined
       };
     case SET_STORY:
-      return { 
+      return {
         ...state,
         storyData: action.storyData,
-        storyLoading: false 
+        storyLoading: false
       };
     default:
       return state;

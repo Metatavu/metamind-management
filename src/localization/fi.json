@@ -137,5 +137,8 @@
     "loading": "Ladataan",
     "loadingStory": "Lataa tarinaa...",
     "savingStory": "Tallennetaan tarinaa..."
-  }
+  },
+
+  "storyView": {},
+  "globalView": {}
 }

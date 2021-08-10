@@ -7,12 +7,12 @@ import IntentIcon from "@material-ui/icons/DoubleArrow";
 import AccordionItem from "../../generic/accordion-item/accordion-item";
 import InteractiveListItem from "../../generic/list-items/interactive-list-item";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import { styles } from "./intent-list.styles";
+import intentListStyles from "./intent-list.styles";
 
 /**
  * Interface describing component props
  */
-interface Props extends WithStyles<typeof styles> {
+interface Props extends WithStyles<typeof intentListStyles> {
   intents: Intent[];
   onIntentClick: (intent: Intent) => void;
   onIntentSecondaryClick: (intent: Intent) => void;
@@ -24,7 +24,6 @@ interface Props extends WithStyles<typeof styles> {
  * @param props component properties
  */
 const IntentPanel: React.FC<Props> = ({ intents, onIntentClick, classes, onIntentSecondaryClick }) => {
-
   const [ searchValue, setSearchValue ] = React.useState("");
 
   /**
@@ -35,7 +34,7 @@ const IntentPanel: React.FC<Props> = ({ intents, onIntentClick, classes, onInten
   const onSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setSearchValue(value);
-  }
+  };
 
   /**
    * Renders a list of intents that match the search
@@ -54,20 +53,18 @@ const IntentPanel: React.FC<Props> = ({ intents, onIntentClick, classes, onInten
               icon={ <IntentIcon/> }
               title={ intent.name ?? "" }
               onClick={ () => onIntentClick(intent) }
-            />
-          )
+            />)
         }
       </List>
     );
-  }
+  };
 
   /**
    * Renders list of intents based on type for left toolbar second tab
    *
    * @param type intent type
    */
-    const renderIntentGroups = (type: IntentType) => {
-
+  const renderIntentGroups = (type: IntentType) => {
     return (
       <List className={ classes.list }>
         {
@@ -84,8 +81,8 @@ const IntentPanel: React.FC<Props> = ({ intents, onIntentClick, classes, onInten
             ))
         }
       </List>
-    )
-  }
+    );
+  };
 
   return (
     <Box>
@@ -112,11 +109,11 @@ const IntentPanel: React.FC<Props> = ({ intents, onIntentClick, classes, onInten
           </AccordionItem>
         </>
       }
-      { searchValue.length > 0 && 
+      { searchValue.length > 0 &&
         renderSearchedIntents()
       }
     </Box>
   );
-}
+};
 
-export default withStyles(styles)(IntentPanel);
+export default withStyles(intentListStyles)(IntentPanel);

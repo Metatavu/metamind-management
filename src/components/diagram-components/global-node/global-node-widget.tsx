@@ -1,12 +1,12 @@
-import * as React from 'react';
+import * as React from "react";
 import styles from "../styles/global-node";
-import { GlobalNodeModel } from './global-node-model';
-import AttachmentIcon from '@material-ui/icons/Attachment';
-import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
-import { DiagramEngine } from '@projectstorm/react-diagrams-core';
-import { CustomPortWidget } from '../custom-port/custom-port-widget';
-import { withStyles, WithStyles } from '@material-ui/core';
-import { DefaultNodeModelOptions } from '@projectstorm/react-diagrams';
+import GlobalNodeModel from "./global-node-model";
+import AttachmentIcon from "@material-ui/icons/Attachment";
+import DoubleArrowIcon from "@material-ui/icons/DoubleArrow";
+import { DiagramEngine } from "@projectstorm/react-diagrams-core";
+import { CustomPortWidget } from "../custom-port/custom-port-widget";
+import { withStyles, WithStyles } from "@material-ui/core";
+import { DefaultNodeModelOptions, DefaultPortModel } from "@projectstorm/react-diagrams";
 import GlobalKnot from "../../../resources/svg/global-knot-icon";
 
 /**
@@ -28,68 +28,79 @@ interface State {
  * Class for custom node widget
  */
 class GlobalNodeWidget extends React.Component<Props, State> {
-  private inPort = this.props.node.getInPorts()[0];
-  private outPort = this.props.node.getOutPorts()[0];
 
-	constructor(props: Props) {
-		super(props);
-		this.state = {
+  private inPort: DefaultPortModel;
+  private outPort: DefaultPortModel;
+
+  /**
+   * Constructor
+   */
+  constructor(props: Props) {
+    super(props);
+
+    const { node } = props;
+    const [ inPort ] = node.getInPorts();
+    const [ outPort ] = node.getOutPorts();
+    this.inPort = inPort;
+    this.outPort = outPort;
+    
+    this.state = {
       showInPort: false
     };
-	}
+  }
 
   /**
    * Component did mount life cycle handler
    */
   public componentDidMount = () => {
     this.registerEventListeners();
-  }
+  };
 
   /**
    * Component render
    */
-	public render = () => {
+  public render = () => {
     const { node, engine, classes } = this.props;
     const { showInPort } = this.state;
     const options = node.getOptions();
 
-		return (
+    return (
       <div
         className={ classes.globalNode }
         style={ this.getDynamicStyles(options) }
       >
-        <GlobalKnot className={ classes.globalIcon } htmlColor="#000" />
+        <GlobalKnot className={ classes.globalIcon } htmlColor="#000"/>
         { this.outPort &&
-          <CustomPortWidget
-            engine={ engine }
-            port={ this.outPort }
-            className={ classes.port }
+        <CustomPortWidget
+          engine={ engine }
+          port={ this.outPort }
+          className={ classes.port }
+        >
+          <div
+            className={ classes.globalLinkAction }
+            style={{ display: showInPort ? "none" : "block" }}
           >
-            <div
-              className={ classes.globalLinkAction }
-              style={{ display: showInPort ? "none" : "block" }}
-            >
-              <DoubleArrowIcon />
-            </div>
-          </CustomPortWidget>
+            <DoubleArrowIcon/>
+          </div>
+        </CustomPortWidget>
         }
         { this.inPort &&
-          <CustomPortWidget
-            engine={ engine }
-            port={ this.inPort }
-            className={ classes.port }
+        <CustomPortWidget
+          engine={ engine }
+          port={ this.inPort }
+          className={ classes.port }
+        >
+          <div
+            className={ classes.globalLinkAction }
+            style={{ display: showInPort ? "block" : "none" }}
           >
-            <div
-              className={ classes.globalLinkAction }
-              style={{ display: showInPort ? "block" : "none" }}
-            >
-              <AttachmentIcon />
-            </div>
-          </CustomPortWidget>
+            <AttachmentIcon/>
+          </div>
+        </CustomPortWidget>
         }
       </div>
     );
-	}
+  };
 
   /**
    * Register event listeners
@@ -101,7 +112,7 @@ class GlobalNodeWidget extends React.Component<Props, State> {
     model.registerListener({
       linksUpdated: this.onUpdateLinks
     });
-  }
+  };
 
   /**
    * Event handler for update link
@@ -115,7 +126,7 @@ class GlobalNodeWidget extends React.Component<Props, State> {
       link.registerListener({
         targetPortChanged: this.onUpdateLinks,
         entityRemoved: this.cancelLink
-      })
+      });
 
       this.setState({
         showInPort: true
@@ -125,7 +136,7 @@ class GlobalNodeWidget extends React.Component<Props, State> {
         showInPort: false
       });
     }
-  }
+  };
 
   /**
    * Event handler for cancel click
@@ -134,7 +145,7 @@ class GlobalNodeWidget extends React.Component<Props, State> {
     this.setState({
       showInPort: false
     });
-  }
+  };
 
   /**
    * Gets dynamic styles for component
@@ -145,7 +156,7 @@ class GlobalNodeWidget extends React.Component<Props, State> {
   private getDynamicStyles = (options: DefaultNodeModelOptions): React.CSSProperties => ({
     color: options.selected ? "#ffffff" : "#000000",
     backgroundColor: options.selected ? "#36b0f4" : "#ffffff"
-  })
+  });
 
 }
 

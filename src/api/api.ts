@@ -1,8 +1,8 @@
 import { Configuration, ScriptsApi, TrainingMaterialsApi } from "../generated/client";
 import { AccessToken } from "../types";
-import { KnotsApi } from '../generated/client/apis/KnotsApi';
-import { StoriesApi } from '../generated/client/apis/StoriesApi';
-import { IntentsApi } from '../generated/client/apis/IntentsApi';
+import { KnotsApi } from "../generated/client/apis/KnotsApi";
+import { StoriesApi } from "../generated/client/apis/StoriesApi";
+import { IntentsApi } from "../generated/client/apis/IntentsApi";
 
 /**
  * Utility class for loading api with predefined configuration
@@ -71,4 +71,5 @@ export default class Api {
   public static getScriptsApi(accessToken: AccessToken) {
     return new ScriptsApi(Api.getConfiguration(accessToken));
   }
+
 }

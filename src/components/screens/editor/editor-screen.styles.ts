@@ -3,7 +3,7 @@ import theme from "../../../theme/theme";
 
 const toolbarHeight = theme.mixins.toolbar.minHeight;
 
-export const useEditorScreenStyles = makeStyles({
+const useEditorScreenStyles = makeStyles({
 
   tabs: {
     borderBottom: 0
@@ -25,7 +25,7 @@ export const useEditorScreenStyles = makeStyles({
 
   editorContainer: {
     // 100% height substracted with two toolbars and extra spacing for tight fit
-    height: `calc(100% - ${toolbarHeight}px - ${toolbarHeight}px - ${theme.spacing(2)}px)`,
+    height: `calc(100% - ${toolbarHeight}px - ${toolbarHeight}px - ${theme.spacing(2)}px)`
   },
 
   divider: {
@@ -55,7 +55,7 @@ export const useEditorScreenStyles = makeStyles({
     color: "inherit"
   },
 
-    accordionContent: {
+  accordionContent: {
     display: "flex",
     flexDirection: "column",
     width: "100%"
@@ -65,7 +65,7 @@ export const useEditorScreenStyles = makeStyles({
     marginBottom: theme.spacing(2)
   },
 
-  knotButton : {
+  knotButton: {
     backgroundColor: "#121212",
     border: "1px solid #121212",
     marginTop: theme.spacing(1),
@@ -76,26 +76,28 @@ export const useEditorScreenStyles = makeStyles({
     }
   },
 
-  activeKnotButtonContainer : {
+  activeKnotButtonContainer: {
     display: "flex",
     flexDirection: "column",
     color: theme.palette.primary.main
   },
 
-  inactiveKnotButtonContainer : {
+  inactiveKnotButtonContainer: {
     display: "flex",
     flexDirection: "column",
     color: "#fff"
   },
 
   loadingContainer: {
-    height: "100%", 
-    width: "100%", 
-    alignItems: "center", 
-    justifyContent: "center", 
+    height: "100%",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
     display: "flex"
   }
 
 }, {
   name: "editor-screen"
 });
+
+export default useEditorScreenStyles;

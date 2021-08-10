@@ -1,7 +1,7 @@
 import { createStyles } from "@material-ui/core";
 import theme from "../../../theme/theme";
 
-export const styles = createStyles({
+const trainingSelectionOptionsStyles = createStyles({
 
   actionButtons: {
     display: "flex",
@@ -30,7 +30,7 @@ export const styles = createStyles({
 
   trainingSelectionOption: {
     padding: "10px 0px 10px 0px",
-    width: "100%",
+    width: "100%"
   },
 
   trainingSelectionOptionContent: {
@@ -54,3 +54,5 @@ export const styles = createStyles({
   }
 
 });
+
+export default trainingSelectionOptionsStyles;

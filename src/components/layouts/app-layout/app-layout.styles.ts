@@ -1,7 +1,7 @@
 import { createStyles } from "@material-ui/core";
 import theme from "../../../theme/theme";
 
-export const styles = createStyles({
+const appLayoutStyles = createStyles({
 
   root: {
     overflow: "hidden",
@@ -27,3 +27,5 @@ export const styles = createStyles({
   }
 
 });
+
+export default appLayoutStyles;

@@ -1,26 +1,25 @@
-import { Box, Button, IconButton, List, ListItem, ListItemText, Typography, WithStyles, withStyles, TextField, Divider, MenuItem } from "@material-ui/core";
+import { Box, Button, IconButton, ListItem, ListItemText, Typography, WithStyles, withStyles, TextField, Divider, MenuItem } from "@material-ui/core";
 import { History } from "history";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
 import { Cookies } from "react-cookie";
 import Carousel from "react-material-ui-carousel";
 import { connect } from "react-redux";
-import { Dispatch } from "redux";
 import Api from "../../../api/api";
 import { KnotScope, KnotType, Story, TokenizerType } from "../../../generated/client";
 import strings from "../../../localization/strings";
-import { ReduxActions, ReduxState } from "../../../store";
+import { ReduxState } from "../../../store";
 import { AccessToken, RecentStory } from "../../../types";
 import AppLayout from "../../layouts/app-layout/app-layout";
-import { styles } from "./home-screen.styles";
 import NavigateBeforeIcon from "@material-ui/icons/NavigateBefore";
 import { DropzoneArea } from "material-ui-dropzone";
-import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import homeScreenStyles from "./home-screen.styles";
 
 /**
  * Interface describing component props
  */
-interface Props extends WithStyles<typeof styles> {
+interface Props extends WithStyles<typeof homeScreenStyles> {
   history: History;
   accessToken?: AccessToken;
   keycloak?: KeycloakInstance;
@@ -55,7 +54,7 @@ class HomeScreen extends React.Component<Props, State> {
       stories: [],
       cardShown: "SELECT",
       newStoryName: ""
-    }
+    };
   }
 
   /**
@@ -63,7 +62,7 @@ class HomeScreen extends React.Component<Props, State> {
    */
   public componentDidMount = async () => {
     await this.fetchData();
-  }
+  };
 
   /**
    * Component render
@@ -76,7 +75,7 @@ class HomeScreen extends React.Component<Props, State> {
     }
 
     return (
-      <AppLayout 
+      <AppLayout
         pageTitle={ strings.homeScreen.title }
         keycloak={ keycloak }
         dataChanged={ true }
@@ -87,7 +86,7 @@ class HomeScreen extends React.Component<Props, State> {
         </Box>
       </AppLayout>
     );
-  }
+  };
 
   /**
    * Renders card shown
@@ -99,13 +98,13 @@ class HomeScreen extends React.Component<Props, State> {
       case "SELECT":
         return this.renderSelectStoryCard();
       case "CREATE":
-        return this.renderCreateStory()
+        return this.renderCreateStory();
       case "IMPORT":
-        return this.renderImportStory()
-      default: 
+        return this.renderImportStory();
+      default:
         return this.renderSelectStoryCard();
     }
-  }
+  };
 
   /**
    * Renders import story card
@@ -158,7 +157,7 @@ class HomeScreen extends React.Component<Props, State> {
         }
       </Box>
     );
-  }
+  };
 
   /**
    * Renders create story card
@@ -203,7 +202,7 @@ class HomeScreen extends React.Component<Props, State> {
         </Button>
       </Box>
     );
-  }
+  };
 
   /**
    * Renders select story card
@@ -240,13 +239,13 @@ class HomeScreen extends React.Component<Props, State> {
         >
           { strings.homeScreen.open }
         </Button>
-        <Box 
+        <Box
           mb={ 4 }
           mt={ 4 }
           ml={ 2 }
           mr={ 2 }
         >
-          <Divider light />
+          <Divider light/>
         </Box>
         <Button
           variant="outlined"
@@ -255,10 +254,10 @@ class HomeScreen extends React.Component<Props, State> {
         >
           { strings.homeScreen.createNewStory }
         </Button>
-        <Box 
+        <Box
           mb={ 1 }
           mt={ 1 }
-        ></Box>
+        />
         <Button
           variant="outlined"
           color="secondary"
@@ -269,18 +268,19 @@ class HomeScreen extends React.Component<Props, State> {
         { this.renderRecentStories() }
       </Box>
     );
-  }
+  };
 
   /**
    * Renders story options
    */
   private renderStoryOptions = () => {
-    return this.state.stories.map(story =>
+    const { stories } = this.state;
+
+    return stories.map(story =>
       <MenuItem value={ story.id } key={ story.id }>
         { story.name }
-      </MenuItem>
-    );
-  }
+      </MenuItem>);
+  };
 
   /**
    * Renders recent edited stories
@@ -296,28 +296,28 @@ class HomeScreen extends React.Component<Props, State> {
             { strings.homeScreen.lastEditedStories }
           </Typography>
         </Box>
-          <Carousel
-            autoPlay = { false }
-            className={ classes.carousel }
-            navButtonsProps={{ style: { margin: 0 } }}
-            indicatorContainerProps={{ style: { marginTop: 0 } }}
-          >
-            { recentStories && recentStories?.map(recentStory => (
-              <ListItem 
-                button
-                onClick={ () => history.push(`/editor/${recentStory.id}`) }
-              >
-                <ListItemText
-                  className={ classes.listItemText }
-                  primary={ recentStory.name }
-                  secondary={`${strings.generic.edited}: ${recentStory.lastEditedTime}`}
-                />
-              </ListItem>
-            )) }
-          </Carousel>
+        <Carousel
+          autoPlay={ false }
+          className={ classes.carousel }
+          navButtonsProps={{ style: { margin: 0 } }}
+          indicatorContainerProps={{ style: { marginTop: 0 } }}
+        >
+          { recentStories && recentStories?.map(recentStory => (
+            <ListItem
+              button
+              onClick={ () => history.push(`/editor/${recentStory.id}`) }
+            >
+              <ListItemText
+                className={ classes.listItemText }
+                primary={ recentStory.name }
+                secondary={`${strings.generic.edited}: ${recentStory.lastEditedTime}`}
+              />
+            </ListItem>
+          )) }
+        </Carousel>
       </Box>
     );
-  }
+  };
 
   /**
    * Renders selected file  preview
@@ -345,7 +345,7 @@ class HomeScreen extends React.Component<Props, State> {
         </Box>
       </Box>
     );
-  }
+  };
 
   /**
    * Event handler for import story click
@@ -356,22 +356,20 @@ class HomeScreen extends React.Component<Props, State> {
     const { accessToken } = this.props;
     const { cardShown } = this.state;
 
-    if (cardShown === "SELECT" || !accessToken) {
+    if (cardShown === "SELECT" || !accessToken) {
       this.setState({ cardShown: "IMPORT" });
-      return;
     }
     // TODO: implement importing of story from the .xml file
-    return;
-  }
+  };
   
   /**
    * Event handler for create new story click
    */
   private onCreateNewStoryClick = async () => {
-    const { accessToken } = this.props;
-    const { cardShown, newStoryName } = this.state;
+    const { accessToken, history } = this.props;
+    const { cardShown, newStoryName, stories, selectedStoryId } = this.state;
 
-    if (cardShown === "SELECT" || !accessToken) {
+    if (cardShown === "SELECT" || !accessToken) {
       this.setState({ cardShown: "CREATE" });
       return;
     }
@@ -410,14 +408,13 @@ class HomeScreen extends React.Component<Props, State> {
       });
 
       this.setState({
-        stories: [ ...this.state.stories, createdStory ],
-        selectedStoryId: createdStory.id ?? this.state.selectedStoryId
+        stories: [ ...stories, createdStory ],
+        selectedStoryId: createdStory.id ?? selectedStoryId
       });
       
-      this.props.history.push(`editor/${createdStory.id}`);
+      history.push(`editor/${createdStory.id}`);
     }
-    
-  }
+  };
 
   /**
    * Event handler for return button click
@@ -428,7 +425,7 @@ class HomeScreen extends React.Component<Props, State> {
       newStoryName: "",
       storyFile: undefined
     });
-  }
+  };
 
   /**
    * Event handler for story name change
@@ -442,10 +439,10 @@ class HomeScreen extends React.Component<Props, State> {
       return;
     }
 
-    this.setState({ 
-      newStoryName: value 
+    this.setState({
+      newStoryName: value
     });
-  }
+  };
 
   /**
    * Event handler for files drop
@@ -457,10 +454,10 @@ class HomeScreen extends React.Component<Props, State> {
       return;
     }
 
-    this.setState({ 
-      storyFile: files[0] 
+    this.setState({
+      storyFile: files[0]
     });
-  }
+  };
 
   /**
    * Event handler for selected story change
@@ -469,20 +466,21 @@ class HomeScreen extends React.Component<Props, State> {
    */
   private onSelectedStoryChange: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement> = event => {
     this.setState({ selectedStoryId: event.target.value });
-  }
+  };
 
   /**
    * Event handler for selected story open click
    */
   private onOpenSelectedStoryClick = () => {
+    const { history } = this.props;
     const { selectedStoryId } = this.state;
 
     if (!selectedStoryId) {
       return;
     }
 
-    this.props.history.push(`editor/${selectedStoryId}`);
-  }
+    history.push(`editor/${selectedStoryId}`);
+  };
 
   /**
    * Fetches data from API
@@ -496,18 +494,19 @@ class HomeScreen extends React.Component<Props, State> {
 
     try {
       const stories = await Api.getStoriesApi(accessToken).listStories();
-      this.setState({ stories });
+      this.setState({ stories: stories });
 
       const cookies = new Cookies();
       const recentStories = cookies.get("recentStories");
 
       this.setState({
-        recentStories: recentStories 
+        recentStories: recentStories
       });
     } catch (error) {
       console.error(error);
     }
-  }
+  };
+
 }
 
 /**
@@ -521,11 +520,4 @@ const mapStateToProps = (state: ReduxState) => ({
   keycloak: state.auth.keycloak
 });
 
-/**
- * Redux mapper for mapping component dispatches
- *
- * @param dispatch dispatch method
- */
-const mapDispatchToProps = (dispatch: Dispatch<ReduxActions>) => ({});
-
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(HomeScreen));
+export default connect(mapStateToProps)(withStyles(homeScreenStyles)(HomeScreen));

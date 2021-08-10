@@ -1,7 +1,7 @@
 import { createStyles } from "@material-ui/core";
 import theme from "../../../theme/theme";
 
-export const styles = createStyles({
+const discussionComponentStyles = createStyles({
 
   list: {
     padding: 0,
@@ -43,7 +43,7 @@ export const styles = createStyles({
   headerButtonIcon: {
     color: "#999999",
     "&:hover": {
-      color:theme.palette.primary.main
+      color: theme.palette.primary.main
     }
   },
 
@@ -136,3 +136,5 @@ export const styles = createStyles({
   }
 
 });
+
+export default discussionComponentStyles;

@@ -137,5 +137,8 @@
     "loading": "Loading",
     "loadingStory": "Loading story...",
     "savingStory": "Saving story..."
-  }
+  },
+
+  "storyView": {},
+  "globalView": {}
 }

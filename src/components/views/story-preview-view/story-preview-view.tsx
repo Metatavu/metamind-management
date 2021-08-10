@@ -1,10 +1,10 @@
 import * as React from "react";
-import { useStoryPreviewViewStyles } from "./story-preview-view";
+import useStoryPreviewViewStyles from "./story-preview-view";
 import { MessageData } from "metamind-metatavu-bot/dist/types";
 import MessageList from "metamind-metatavu-bot/dist/components/message-list/message-list";
 import MessageInput from "metamind-metatavu-bot/dist/components/message-input/message-input";
 import { StoryData } from "../../../types/index";
-import { Box } from "@material-ui/core";  
+import { Box } from "@material-ui/core";
 
 /**
  * Interface describing component props
@@ -37,29 +37,17 @@ const StoryPreviewView: React.FC<Props> = ({
 }) => {
   const classes = useStoryPreviewViewStyles();
   const [ waitingForBot, setWaitingForBot ] = React.useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [ hint, setHint ] = React.useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [ quickResponses, setQuickResponses ] = React.useState<string[]>([]);
-
-  React.useEffect(() => {
-    loadData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  /**
-   * Sending new messages
-   * 
-   * @param message message content
-   */
-  const sendMessage = (message: string) => {
-    // TODO
-  }
 
   /**
    * Restart the converstation
    */
   const restartConversation = () => {
     // TODO 
-  }
+  };
 
   /**
    * Load the story
@@ -87,7 +75,11 @@ const StoryPreviewView: React.FC<Props> = ({
       id: "2968ce0c-8d5e-4dec-9458-9a6ad2202c34-message",
       isBot: false
     });
-  }
+  };
+
+  React.useEffect(() => {
+    loadData();
+  }, []);
 
   const globalQuickResponses: string[] = [];
   /**
@@ -100,10 +92,10 @@ const StoryPreviewView: React.FC<Props> = ({
           messageDatas={ messageData }
           messagesEnd={ messagesEnd }
           waitingForBot={ waitingForBot }
-          conversationStarted={ conversationStarted } 
+          conversationStarted={ conversationStarted }
           quickResponses={ quickResponses }
           startConversation={ conversationStart }
-          onSendMessage={ sendMessage }
+          onSendMessage={ () => console.log("TODO") }
           onReset={ botReset }
           onWaitingForBotChange={ setWaitingForBot }
           userResponse={ botOrUserResponse }
@@ -117,14 +109,14 @@ const StoryPreviewView: React.FC<Props> = ({
           waitingForBot={ waitingForBot }
           globalQuickResponses={ globalQuickResponses }
           hint={ hint || "Sano jotain..." }
-          onSendMessage={ sendMessage }
-          conversationStarted={ conversationStarted } 
+          onSendMessage={ () => console.log("TODO") }
+          conversationStarted={ conversationStarted }
           onReset={ botReset }
           onRestartConversation={ restartConversation }
         />
       </Box>
     </div>
   );
-}
+};
 
 export default StoryPreviewView;

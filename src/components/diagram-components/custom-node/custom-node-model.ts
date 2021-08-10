@@ -1,18 +1,24 @@
-import { CustomPortModel } from '../custom-port/custom-port-model';
-import { DefaultNodeModel, DefaultNodeModelOptions } from '@projectstorm/react-diagrams';
+import CustomPortModel from "../custom-port/custom-port-model";
+import { DefaultNodeModel, DefaultNodeModelOptions } from "@projectstorm/react-diagrams";
 
 /**
  * Class for custom node model
  */
-export class CustomNodeModel extends DefaultNodeModel {
+export default class CustomNodeModel extends DefaultNodeModel {
 
-	constructor(options?: DefaultNodeModelOptions) {
-		super({
-			id: options?.id,
-			type: 'custom-node',
+  /**
+   * Constructor
+   */
+  constructor(options?: DefaultNodeModelOptions) {
+    super({
+      id: options?.id,
+      type: "custom-node",
       name: options?.name
-		});
-    this.addPort(new CustomPortModel({ name: "out" }));
+    });
+    this.addPort(new CustomPortModel({
+      name: "out"
+    }));
     this.addPort(new CustomPortModel({ name: "in", in: true }));
-	}
+  }
+
 }

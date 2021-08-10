@@ -1,14 +1,14 @@
 import { Button, IconButton, List, ListItem, ListItemSecondaryAction, TextField, withStyles, WithStyles } from "@material-ui/core";
 import * as React from "react";
-import { styles } from "./quick-response-button.styles";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import { Intent } from "../../../generated/client/models";
 import strings from "../../../localization/strings";
+import quickResponseButtonStyles from "./quick-response-button.styles";
 
 /**
  * Interface describing component properties
  */
-interface Props extends WithStyles<typeof styles> {
+interface Props extends WithStyles<typeof quickResponseButtonStyles> {
   editing: boolean;
   selectedIntent?: Intent;
   setEditingButtonFieldValue: React.Dispatch<React.SetStateAction<boolean>>;
@@ -33,7 +33,7 @@ const QuickResponseButton: React.FC<Props> = ({
 }) => {
   return (
     <>
-      { !editing && 
+      { !editing &&
         <Button
           className={ classes.button }
           onClick={ () => setEditingButtonFieldValue(true) }
@@ -71,6 +71,6 @@ const QuickResponseButton: React.FC<Props> = ({
       }
     </>
   );
-}
+};
 
-export default withStyles(styles)(QuickResponseButton);
+export default withStyles(quickResponseButtonStyles)(QuickResponseButton);

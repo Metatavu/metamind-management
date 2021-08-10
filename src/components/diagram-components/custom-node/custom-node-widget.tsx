@@ -1,15 +1,15 @@
-import * as React from 'react';
+import * as React from "react";
 
-import styles from "../styles/custom-node/";
-import { CustomNodeModel } from './custom-node-model';
-import AttachmentIcon from '@material-ui/icons/Attachment';
-import TextFieldsIcon from '@material-ui/icons/TextFields';
-import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
-import { DiagramEngine } from '@projectstorm/react-diagrams-core';
-import { CustomPortWidget } from '../custom-port/custom-port-widget';
-import SportsVolleyballIcon from '@material-ui/icons/SportsVolleyball';
-import { Typography, withStyles, WithStyles } from '@material-ui/core';
-import { DefaultNodeModelOptions } from '@projectstorm/react-diagrams';
+import styles from "../styles/custom-node";
+import CustomNodeModel from "./custom-node-model";
+import AttachmentIcon from "@material-ui/icons/Attachment";
+import TextFieldsIcon from "@material-ui/icons/TextFields";
+import DoubleArrowIcon from "@material-ui/icons/DoubleArrow";
+import { DiagramEngine } from "@projectstorm/react-diagrams-core";
+import { CustomPortWidget } from "../custom-port/custom-port-widget";
+import SportsVolleyballIcon from "@material-ui/icons/SportsVolleyball";
+import { Typography, withStyles, WithStyles } from "@material-ui/core";
+import { DefaultNodeModelOptions, DefaultPortModel } from "@projectstorm/react-diagrams";
 
 /**
  * Interface describing component properties
@@ -30,37 +30,48 @@ interface State {
  * Class for custom node widget
  */
 class CustomNodeWidget extends React.Component<Props, State> {
-  private inPort = this.props.node.getInPorts()[0];
-  private outPort = this.props.node.getOutPorts()[0];
 
-	constructor(props: Props) {
-		super(props);
-		this.state = {
+  private inPort: DefaultPortModel;
+  private outPort: DefaultPortModel;
+
+  /**
+   * Constructor
+   */
+  constructor(props: Props) {
+    super(props);
+
+    const { node } = props;
+    const [ inPort ] = node.getInPorts();
+    const [ outPort ] = node.getOutPorts();
+    this.inPort = inPort;
+    this.outPort = outPort;
+
+    this.state = {
       showInPort: false
     };
-	}
+  }
 
   /**
    * Component did mount life cycle handler
    */
   public componentDidMount = () => {
     this.registerEventListeners();
-  }
+  };
 
   /**
    * Component render
    */
-	public render = () => {
+  public render = () => {
     const { node, engine, classes } = this.props;
     const { showInPort } = this.state;
     const options = node.getOptions();
 
-		return (
+    return (
       <div
         className={ classes.node }
         style={ this.getDynamicStyles(options) }
       >
-        <SportsVolleyballIcon className={ classes.icon } />
+        <SportsVolleyballIcon className={ classes.icon }/>
         <Typography className={ classes.name }>
           { options.name }
         </Typography>
@@ -68,7 +79,7 @@ class CustomNodeWidget extends React.Component<Props, State> {
           className={ classes.contentTypes }
           style={{ display: showInPort ? "none" : "block" }}
         >
-          <TextFieldsIcon />
+          <TextFieldsIcon/>
         </div>
         { this.outPort &&
           <CustomPortWidget
@@ -80,7 +91,7 @@ class CustomNodeWidget extends React.Component<Props, State> {
               className={ classes.linkAction }
               style={{ display: showInPort ? "none" : "block" }}
             >
-              <DoubleArrowIcon />
+              <DoubleArrowIcon/>
             </div>
           </CustomPortWidget>
         }
@@ -94,13 +105,13 @@ class CustomNodeWidget extends React.Component<Props, State> {
               className={ classes.linkAction }
               style={{ display: showInPort ? "block" : "none" }}
             >
-              <AttachmentIcon />
+              <AttachmentIcon/>
             </div>
           </CustomPortWidget>
         }
       </div>
     );
-	}
+  };
 
   /**
    * Register event listeners
@@ -112,7 +123,7 @@ class CustomNodeWidget extends React.Component<Props, State> {
     model.registerListener({
       linksUpdated: this.onUpdateLinks
     });
-  }
+  };
 
   /**
    * Event handler for update link
@@ -126,7 +137,7 @@ class CustomNodeWidget extends React.Component<Props, State> {
       link.registerListener({
         targetPortChanged: this.onUpdateLinks,
         entityRemoved: this.cancelLink
-      })
+      });
 
       this.setState({
         showInPort: true
@@ -136,7 +147,7 @@ class CustomNodeWidget extends React.Component<Props, State> {
         showInPort: false
       });
     }
-  }
+  };
 
   /**
    * Event handler for cancel click
@@ -145,7 +156,7 @@ class CustomNodeWidget extends React.Component<Props, State> {
     this.setState({
       showInPort: false
     });
-  }
+  };
 
   /**
    * Gets dynamic styles for component
@@ -156,7 +167,7 @@ class CustomNodeWidget extends React.Component<Props, State> {
   private getDynamicStyles = (options: DefaultNodeModelOptions): React.CSSProperties => ({
     color: options.selected ? "#ffffff" : "#000000",
     backgroundColor: options.selected ? "#36b0f4" : "#ffffff"
-  })
+  });
 
 }
 

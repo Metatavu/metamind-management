@@ -1,21 +1,23 @@
 import { makeStyles } from "@material-ui/core";
 
-export const useLoadingStyles = makeStyles({
+const useLoadingStyles = makeStyles({
 
   root: {
-    display: "grid", 
+    display: "grid",
     justifyItems: "center",
     "& .MuiCircularProgress-root": {
-      height: 40, 
+      height: 40,
       width: 40
     },
     "& .MuiTypography-root": {
-      fontSize: 18, 
-      marginTop: 15, 
+      fontSize: 18,
+      marginTop: 15,
       color: "#fff"
     }
   }
 
 }, {
-  "name": "loading-item"
+  name: "loading-item"
 });
+
+export { useLoadingStyles as default };
