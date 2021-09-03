@@ -20,7 +20,7 @@
     "@types/react-dom": "^16.9.8",
     "closest": "0.0.1",
     "dagre": "^0.8.5",
-    "immer": "^8.0.1",
+    "immer": "^9.0.6",
     "keycloak-js": "^11.0.2",
     "localized-strings": "^0.2.4",
     "lodash": "^4.17.21",
