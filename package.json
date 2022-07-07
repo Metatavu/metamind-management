@@ -26,7 +26,7 @@
     "lodash": "^4.17.21",
     "material-ui-dropzone": "^3.5.0",
     "metamind-metatavu-bot": "file:metamind-metatavu-bot",
-    "moment": "^2.27.0",
+    "moment": "^2.29.4",
     "pathfinding": "^0.4.18",
     "paths-js": "^0.4.11",
     "react": "^17.0.2",
